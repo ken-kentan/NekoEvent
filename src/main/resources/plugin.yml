@@ -1,0 +1,12 @@
+name: NekoCore
+main: jp.kentan.minecraft.event.NekoEvent
+version: 0.0.1-SNAPSHOT
+author: ken_kentan
+website: http://ken.kentan.jp
+
+commands:
+    event:
+        description: NekoCoreのヘルプを表示します。
+        usage: /<command>
+        permission: jp.kentan.minecraft.event
+        permission-message: You don't have <permission>
