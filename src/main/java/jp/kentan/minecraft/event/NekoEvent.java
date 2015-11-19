@@ -1,34 +1,32 @@
 package jp.kentan.minecraft.event;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 
 public class NekoEvent extends JavaPlugin {
 	private String ticket_str;
+	private Location location;
+	private int sec_tp = 0;
 	
 	@Override
 	public void onEnable() {
-//		new BukkitRunnable()
-//		{
-//		    @Override
-//		    public void run()
-//		    {
-//		    	//run
-//		    }
-//		}.runTaskTimer(this, 20, 20);//20 1s
+		new BukkitRunnable()
+		{
+		    @Override
+		    public void run()
+		    {
+		    	if(sec_tp > 660) sec_tp = 0; //reset over 10m
+		    	if(sec_tp > 0) sec_tp++;     //count 0-1m
+		    }
+		}.runTaskTimer(this, 20, 20);//20 1s　1200 1m
 		
-		try{
-			reloadConfig();
-			ticket_str = getConfig().getString("ticket.ID");
-		}catch(Exception e){
-			showException(e);
-			getLogger().info("TicketIDを正常に読み込めませんでした。");
-			onDisable();
-		}
+		getBaseConfig();
 		
 		getLogger().info("NekoEventを有効にしました");
 	}
@@ -46,20 +44,19 @@ public class NekoEvent extends JavaPlugin {
 			switch (args[0]){
 			case "reload":
 				
-				try{
-					reloadConfig();
-					ticket_str = getConfig().getString("ticket.ID");
-				}catch(Exception e){
-					showException(e);
-					getLogger().info("TicketIDを正常に読み込めませんでした。");
-					onDisable();
-				}
+				getBaseConfig();
 				
 				sender.sendMessage(ChatColor.GREEN + "NekoEventの設定を再読み込みしました。");
 				
 				break;
-			case "test":
-				test(args[1]);
+			case "create":
+				if(args.length < 1){
+					getLogger().info("対象プレイヤーを入力してください。");
+					return true;
+				}
+				
+				createPlayer(args[1]);
+				
 				break;
 			case "ticket":
 				if(args.length < 3){
@@ -69,7 +66,46 @@ public class NekoEvent extends JavaPlugin {
 				giveTicket(args[1],args[2]);
 				break;
 			case "athletic":
-				clearAthletics(args[1],args[2]);
+				if(args.length < 3){
+					getLogger().info("ステージまたは対象プレイヤーが指定されていません。");
+					return true;
+				}
+				
+				clearAthletics(args[1],args[2]);//stage, name
+				break;
+			case "dungeon":
+				if(args.length < 3){
+					getLogger().info("ステージまたは対象プレイヤーが指定されていません。");
+					return true;
+				}
+				
+				clearDungeon(args[1],args[2]);//stage, name
+				break;
+			case "tp":
+				if(args.length < 3){
+					getLogger().info("パラメータが不足しています。");
+					return true;
+				}
+				
+				if(args[1].equals("set")){ //event tp set test
+					if(checkInGame(sender) == false){
+						sender.sendMessage(ChatColor.RED + "このコマンドはゲーム内から実行してください。");
+						return false;
+					}
+					setTP((Player)sender, args[2]);
+					
+					return true;
+				}
+				
+				//singleTP
+				if(sec_tp > 60){
+					sender.sendMessage(ChatColor.RED + "初回のプレイヤー参加から１分が経過しました。");
+					sender.sendMessage(ChatColor.YELLOW + "プレイヤーがダンジョンをクリアするか、" + (600 - (sec_tp - 60)) + "秒経過するまで参加できません。");
+					
+					getLogger().info(sender.getName() + "がダンジョンへの参加をリジェクトされました。(over 1m)");
+					return true;
+				}
+				singleTP(args[2], (Player)sender);
 				break;
 			}
 			
@@ -80,6 +116,11 @@ public class NekoEvent extends JavaPlugin {
 	
 	public void showException(Exception _e) {
 		getLogger().info(_e.toString());
+	}
+	
+	private boolean checkInGame(CommandSender _sender){
+		if (!(_sender instanceof Player)) return false;
+		else                              return true;
 	}
 	
 	private void giveTicket(String player,String number){
@@ -94,7 +135,7 @@ public class NekoEvent extends JavaPlugin {
 		if(ticket_number > 0){
 			getServer().dispatchCommand(getServer().getConsoleSender(), "give " + player + ticket_str + ticket_number);
 			
-			getServer().dispatchCommand(getServer().getConsoleSender(), "tell " + player + " &bイベントチケット&fを&a" + ticket_number + "枚&6ゲット&fしました！");
+			getServer().dispatchCommand(getServer().getConsoleSender(), "tell " + player + " &bイベントチケット&fを&a" + ticket_number + "&f枚&6ゲット&fしました！");
 			getLogger().info(player + "に、イベントチケットを" + ticket_number + "枚追加しました。");
 		}
 		
@@ -109,6 +150,13 @@ public class NekoEvent extends JavaPlugin {
 		}
 	}
 	
+	private void getBaseConfig(){
+		reloadConfig();
+		ticket_str = getConfig().getString("ticket.ID");
+		
+		getLogger().info("Done. getBaseConfig from config.yml");
+	}
+	
 	private boolean checkString(String str) {
 
 		if (str.length() < 1)
@@ -117,7 +165,7 @@ public class NekoEvent extends JavaPlugin {
 		return true;
 	}
 
-	public void createPlayer(String name) {
+	private void createPlayer(String name) {
 
 		if (checkString(name) == false) return;
 
@@ -126,12 +174,64 @@ public class NekoEvent extends JavaPlugin {
 		saveConfig();
 	}
 	
-	public void clearAthletics(String stage, String name) {
+	private void setTP(Player player, String tp) {
+		String path = "TP." + tp;
+
+		if (checkString(path) == false) return;
+		
+		location = player.getLocation();
+		getConfig().set(path + ".X", location.getX());
+		getConfig().set(path + ".Y", location.getY());
+		getConfig().set(path + ".Z", location.getZ());
+		saveConfig();
+	}
+	
+	private void clearDungeon(String stage, String name) {
+		String path = name + ".dungeon." + stage;
 
 		if (checkString(name) == false || checkString(stage) == false) return;
 
-		getConfig().set(name + "." + "Athletic." + stage, true);
+		//give EventTicket when first clear
+		if(getConfig().getBoolean(path) == false){
+			giveTicket(name, "5");
+		}
+		
+		getConfig().set(path, true);
 		saveConfig();
+		
+		sec_tp = 0;//reset
+	}
+	
+	private void clearAthletics(String stage, String name) {
+		String path = name + ".athletic." + stage;
+
+		if (checkString(name) == false || checkString(stage) == false) return;
+
+		//give EventTicket when first clear
+		if(getConfig().getBoolean(path) == false){
+			giveTicket(name, "1");
+		}
+		
+		getConfig().set(path, true);
+		saveConfig();
+	}
+	
+	private void singleTP(String tp, Player player) {
+		String path = "TP." + tp;
+
+		if (checkString(path) == false) return;
+		
+		location = player.getLocation();
+		location.setX(getConfig().getDouble(path + ".X"));
+		location.setY(getConfig().getDouble(path + ".Y"));
+		location.setZ(getConfig().getDouble(path + ".Z"));
+		
+		player.teleport(location);
+		
+		//count start
+		if(sec_tp == 0) sec_tp = 1;
+		
+		getLogger().info(player.getName() + "を" + tp + "にsingleTPしました。");
 	}
 
 }
