@@ -1,5 +1,6 @@
 package jp.kentan.minecraft.event;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -105,7 +106,7 @@ public class NekoEvent extends JavaPlugin {
 					getLogger().info(sender.getName() + "がダンジョンへの参加をリジェクトされました。(over 1m)");
 					return true;
 				}
-				singleTP(args[2], (Player)sender);
+				singleTP(args[1], Bukkit.getServer().getPlayer(args[2]));//tp player
 				break;
 			}
 			
@@ -133,7 +134,7 @@ public class NekoEvent extends JavaPlugin {
 		}
 		
 		if(ticket_number > 0){
-			getServer().dispatchCommand(getServer().getConsoleSender(), "give " + player + ticket_str + ticket_number);
+			getServer().dispatchCommand(getServer().getConsoleSender(), "give " + player + ticket_str.replace("{number}", Integer.toString(ticket_number)));
 			
 			getServer().dispatchCommand(getServer().getConsoleSender(), "tell " + player + " &bイベントチケット&fを&a" + ticket_number + "&f枚&6ゲット&fしました！");
 			getLogger().info(player + "に、イベントチケットを" + ticket_number + "枚追加しました。");
