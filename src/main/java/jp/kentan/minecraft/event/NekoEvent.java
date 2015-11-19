@@ -6,12 +6,13 @@ import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 
 public class NekoEvent extends JavaPlugin {
-	private String ticket_str;
+	private String ticket_str, ticket_itemstack;
 	private Location location;
 	private int sec_tp = 0;
 	
@@ -108,6 +109,9 @@ public class NekoEvent extends JavaPlugin {
 				}
 				singleTP(args[1], Bukkit.getServer().getPlayer(args[2]));//tp player
 				break;
+			case "test":
+				checkTicket((Player)sender,1);
+				break;
 			}
 			
 		}
@@ -122,6 +126,19 @@ public class NekoEvent extends JavaPlugin {
 	private boolean checkInGame(CommandSender _sender){
 		if (!(_sender instanceof Player)) return false;
 		else                              return true;
+	}
+	
+	private boolean checkTicket(Player player, int ticket_number) {
+		String itemS_str = ticket_itemstack.replace("{number}", Integer.toString(ticket_number));;
+
+		for(ItemStack itemS : player.getInventory().getContents()) {
+			  // isにはインベントリのアイテムが順々に入ります。
+			if(itemS != null || itemS_str.equals(itemS.toString())){
+				return true;
+			}
+		}
+
+		return false;
 	}
 	
 	private void giveTicket(String player,String number){
@@ -142,18 +159,10 @@ public class NekoEvent extends JavaPlugin {
 		
 	}
 	
-	public void test(String name){
-		
-		try{
-			createPlayer(name);
-		}catch(Exception e){
-			showException(e);
-		}
-	}
-	
 	private void getBaseConfig(){
 		reloadConfig();
 		ticket_str = getConfig().getString("ticket.ID");
+		ticket_itemstack = getConfig().getString("ticket.ItemStack");
 		
 		getLogger().info("Done. getBaseConfig from config.yml");
 	}
@@ -205,8 +214,14 @@ public class NekoEvent extends JavaPlugin {
 	
 	private void clearAthletics(String stage, String name) {
 		String path = name + ".athletic." + stage;
+		Player player = Bukkit.getServer().getPlayer(name);
+		
+		player.sendMessage(ChatColor.RED + stage +"クリア！");
 
-		if (checkString(name) == false || checkString(stage) == false) return;
+		if (checkString(name) == false || checkString(stage) == false){
+			player.sendMessage(ChatColor.YELLOW +"イベチケは各アスレにつき1つまで入手できます。");
+			return;
+		}
 
 		//give EventTicket when first clear
 		if(getConfig().getBoolean(path) == false){
