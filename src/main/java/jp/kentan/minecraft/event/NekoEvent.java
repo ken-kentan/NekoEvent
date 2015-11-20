@@ -110,7 +110,7 @@ public class NekoEvent extends JavaPlugin {
 				singleTP(args[1], Bukkit.getServer().getPlayer(args[2]));//tp player
 				break;
 			case "test":
-				checkTicket((Player)sender,1);
+				removeTicket((Player)sender,2);
 				break;
 			}
 			
@@ -128,12 +128,22 @@ public class NekoEvent extends JavaPlugin {
 		else                              return true;
 	}
 	
-	private boolean checkTicket(Player player, int ticket_number) {
+	private boolean removeTicket(Player player, int ticket_number) {
 		String itemS_str = ticket_itemstack.replace("{number}", Integer.toString(ticket_number));;
 
-		for(ItemStack itemS : player.getInventory().getContents()) {
-			  // isにはインベントリのアイテムが順々に入ります。
-			if(itemS != null || itemS_str.equals(itemS.toString())){
+		for(int i = 0; i < player.getInventory().getSize(); i++) {
+			ItemStack itemS = player.getInventory().getItem(i);
+			if(itemS != null && itemS.toString().indexOf(itemS_str) != -1){
+				int amt = itemS.getAmount() - ticket_number;
+				
+				if(amt < 0){
+					player.sendMessage(ChatColor.YELLOW +"イベントチケットが" + Math.abs(amt) + "枚不足しています。");	
+					return false;
+				}
+				
+				itemS.setAmount(amt);
+				player.getInventory().setItem(i, amt > 0 ? itemS : null);
+				player.updateInventory();
 				return true;
 			}
 		}
@@ -150,10 +160,10 @@ public class NekoEvent extends JavaPlugin {
 			showException(nfex);
 		}
 		
-		if(ticket_number > 0){
+		if(ticket_number > 0){			
 			getServer().dispatchCommand(getServer().getConsoleSender(), "give " + player + ticket_str.replace("{number}", Integer.toString(ticket_number)));
 			
-			getServer().dispatchCommand(getServer().getConsoleSender(), "tell " + player + " &bイベントチケット&fを&a" + ticket_number + "&f枚&6ゲット&fしました！");
+			Bukkit.getServer().getPlayer(player).sendMessage(ChatColor.AQUA +" イベントチケット" + ChatColor.WHITE + "を" + ticket_number + "枚" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "しました！");
 			getLogger().info(player + "に、イベントチケットを" + ticket_number + "枚追加しました。");
 		}
 		
@@ -216,16 +226,13 @@ public class NekoEvent extends JavaPlugin {
 		String path = name + ".athletic." + stage;
 		Player player = Bukkit.getServer().getPlayer(name);
 		
-		player.sendMessage(ChatColor.RED + stage +"クリア！");
-
-		if (checkString(name) == false || checkString(stage) == false){
-			player.sendMessage(ChatColor.YELLOW +"イベチケは各アスレにつき1つまで入手できます。");
-			return;
-		}
+		player.sendMessage(stage + ChatColor.AQUA + "をクリア！");
 
 		//give EventTicket when first clear
 		if(getConfig().getBoolean(path) == false){
 			giveTicket(name, "1");
+		}else{
+			player.sendMessage(ChatColor.YELLOW +"イベチケは各アスレにつき1つまで入手できます。");
 		}
 		
 		getConfig().set(path, true);
