@@ -13,8 +13,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class NekoEvent extends JavaPlugin {
 	private String ticket_str, ticket_itemstack;
+	private String gacha_list[] = new String[10], gacha_itemname[] = new String[10];
 	private Location location;
-	private int sec_tp = 0;
+	private int sec_tp = 0, gacha_numbers = 0;
 	
 	@Override
 	public void onEnable() {
@@ -73,7 +74,7 @@ public class NekoEvent extends JavaPlugin {
 					return true;
 				}
 				
-				clearAthletics(args[1],args[2]);//stage, name
+				clearAthletics(args[1],args[2]);//event athletic <stage> <player>
 				break;
 			case "dungeon":
 				if(args.length < 3){
@@ -81,7 +82,7 @@ public class NekoEvent extends JavaPlugin {
 					return true;
 				}
 				
-				clearDungeon(args[1],args[2]);//stage, name
+				clearDungeon(args[1],args[2]);//event dungeon <stage> <player>
 				break;
 			case "tp":
 				if(args.length < 3){
@@ -109,8 +110,16 @@ public class NekoEvent extends JavaPlugin {
 				}
 				singleTP(args[1], Bukkit.getServer().getPlayer(args[2]));//tp player
 				break;
-			case "test":
-				removeTicket((Player)sender,2);
+			case "gacha":
+				if(args.length < 2){
+					getLogger().info("パラメータが不足しています。");
+					return true;
+				}
+				
+				if(removeTicket(Bukkit.getServer().getPlayer(args[1]),Integer.parseInt(args[2])) == true){
+					//ガチャ
+					processGacha(Bukkit.getServer().getPlayer(args[1]));
+				}
 				break;
 			}
 			
@@ -137,7 +146,7 @@ public class NekoEvent extends JavaPlugin {
 				int amt = itemS.getAmount() - ticket_number;
 				
 				if(amt < 0){
-					player.sendMessage(ChatColor.YELLOW +"イベントチケットが" + Math.abs(amt) + "枚不足しています。");	
+					player.sendMessage(ChatColor.YELLOW +"イベントチケットが" + Math.abs(amt) + "枚不足しています。");
 					return false;
 				}
 				
@@ -147,6 +156,8 @@ public class NekoEvent extends JavaPlugin {
 				return true;
 			}
 		}
+		
+		player.sendMessage(ChatColor.YELLOW +"イベントチケットが" + ticket_number + "枚不足しています。");
 
 		return false;
 	}
@@ -174,7 +185,16 @@ public class NekoEvent extends JavaPlugin {
 		ticket_str = getConfig().getString("ticket.ID");
 		ticket_itemstack = getConfig().getString("ticket.ItemStack");
 		
+		for(int i = 0; i < 10; i++){
+			if(getConfig().getString("gacha.ID." + i) != null){
+				gacha_list[i] = getConfig().getString("gacha.ID." + i);
+				gacha_itemname[i] = getConfig().getString("gacha.name." + i);
+				gacha_numbers = i;
+			}
+		}
+		
 		getLogger().info("Done. getBaseConfig from config.yml");
+		getLogger().info("Result. gacha_numbers=" + (gacha_numbers + 1));
 	}
 	
 	private boolean checkString(String str) {
@@ -208,12 +228,17 @@ public class NekoEvent extends JavaPlugin {
 	
 	private void clearDungeon(String stage, String name) {
 		String path = name + ".dungeon." + stage;
+		Player player = Bukkit.getServer().getPlayer(name);
+		
+		player.sendMessage(ChatColor.BLUE + stage + ChatColor.AQUA + "ダンジョンをクリア！");
 
 		if (checkString(name) == false || checkString(stage) == false) return;
 
 		//give EventTicket when first clear
 		if(getConfig().getBoolean(path) == false){
 			giveTicket(name, "5");
+		}else{
+			player.sendMessage(ChatColor.YELLOW +"イベントチケットは各ダンジョンにつき5つまで入手できます。");
 		}
 		
 		getConfig().set(path, true);
@@ -226,13 +251,13 @@ public class NekoEvent extends JavaPlugin {
 		String path = name + ".athletic." + stage;
 		Player player = Bukkit.getServer().getPlayer(name);
 		
-		player.sendMessage(stage + ChatColor.AQUA + "をクリア！");
+		player.sendMessage(ChatColor.GREEN + stage + ChatColor.AQUA + "アスレをクリア！");
 
 		//give EventTicket when first clear
 		if(getConfig().getBoolean(path) == false){
 			giveTicket(name, "1");
 		}else{
-			player.sendMessage(ChatColor.YELLOW +"イベチケは各アスレにつき1つまで入手できます。");
+			player.sendMessage(ChatColor.YELLOW +"イベントチケットは各アスレにつき1つまで入手できます。");
 		}
 		
 		getConfig().set(path, true);
@@ -255,6 +280,15 @@ public class NekoEvent extends JavaPlugin {
 		if(sec_tp == 0) sec_tp = 1;
 		
 		getLogger().info(player.getName() + "を" + tp + "にsingleTPしました。");
+	}
+	
+	private void processGacha(Player player){
+		int rand = (int) (Math.random()*(gacha_numbers + 1));//0-gacha_numbers
+		
+		getServer().dispatchCommand(getServer().getConsoleSender(), "give " + player.getName() + gacha_list[rand]);
+		
+		player.sendMessage(ChatColor.AQUA + gacha_itemname[rand] + ChatColor.WHITE + "を" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "しました！");
+		getLogger().info(player.getName() + "にガチャ景品：" + gacha_list[rand] + "を追加しました。");
 	}
 
 }
