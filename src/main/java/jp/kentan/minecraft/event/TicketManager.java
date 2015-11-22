@@ -14,6 +14,7 @@ public class TicketManager extends NekoEvent{
 			ticket_number = Integer.parseInt(number);
 		} catch (NumberFormatException nfex) {
 			showException(nfex);
+			return;
 		}
 		
 		if(ticket_number > 0){			
@@ -21,6 +22,7 @@ public class TicketManager extends NekoEvent{
 			
 			Bukkit.getServer().getPlayer(player).sendMessage(ChatColor.AQUA +" イベントチケット" + ChatColor.WHITE + "を" + ticket_number + "枚" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "しました！");
 			getLogger().info(player + "に、イベントチケットを" + ticket_number + "枚追加しました。");
+			writeLog("Ticket:" + player + " +" + ticket_number );
 		}
 		
 	}
@@ -41,6 +43,8 @@ public class TicketManager extends NekoEvent{
 				itemS.setAmount(amt);
 				player.getInventory().setItem(i, amt > 0 ? itemS : null);
 				player.updateInventory();
+				
+				writeLog("Ticket:" + player + " -" + ticket_number );
 				return true;
 			}
 		}

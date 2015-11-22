@@ -1,5 +1,10 @@
 package jp.kentan.minecraft.event;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Calendar;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -164,6 +169,34 @@ public class NekoEvent extends JavaPlugin {
 		getLogger().info("Result. gacha_numbers:" + gacha_numbers[0] + "," + gacha_numbers[1] + "," + gacha_numbers[2] + "," + gacha_numbers[3] + "," + gacha_numbers[4]);
 	}
 	
+	private static boolean checkBeforeWritefile(File file) {
+		if (file.exists()) {
+			if (file.isFile() && file.canWrite()) return true;
+		}
+		return false;
+	}
+	
+	public void writeLog(String _str){
+		try {
+			File file = new File("plugins/NekoEvent/log.txt");
+
+			if (checkBeforeWritefile(file)) {
+				FileWriter filewriter = new FileWriter(file, true);
+
+				Calendar calendar = Calendar.getInstance();
+
+				filewriter.write("[" + calendar.getTime().toString() + "]" + _str + "\r\n");
+
+				filewriter.close();
+			} else {
+				getLogger().info("ログをファイルに書き込めませんでした");
+			}
+		} catch (IOException e) {
+			showException(e);
+			getLogger().info("ログをファイルに書き込めませんでした");
+		}
+	}
+	
 	private void setTP(Player player, String tp) {
 		String path = "TP." + tp;
 		
@@ -184,6 +217,7 @@ public class NekoEvent extends JavaPlugin {
 		Player player = Bukkit.getServer().getPlayer(s_player);
 		
 		player.sendMessage(ChatColor.BLUE + stage + ChatColor.AQUA + "ダンジョンをクリア！");
+		writeLog("Dungeon:" + player + " !Clear" );
 		
 		if(checkOverDiffMinute(path, 1440)){ //if over 24h,reset
 			getConfig().set(path + "clear", false);
@@ -208,6 +242,7 @@ public class NekoEvent extends JavaPlugin {
 		Player player = Bukkit.getServer().getPlayer(s_player);
 		
 		player.sendMessage(ChatColor.GREEN + stage + ChatColor.AQUA + "アスレをクリア！");
+		writeLog("Parkour:" + player + " !Clear" );
 		
 		if(checkOverDiffMinute(path, 1440)){ //if over 24h,reset
 			getConfig().set(path + "clear", false);
@@ -239,6 +274,7 @@ public class NekoEvent extends JavaPlugin {
 		if(sec_tp == 0) sec_tp = 1;
 		
 		getLogger().info(player.getName() + "を" + tp + "にsingleTPしました。");
+		writeLog("TP:" + player + " tp:" + tp );
 	}
 	
 	private void processGacha(Player player,int type){
@@ -248,6 +284,7 @@ public class NekoEvent extends JavaPlugin {
 		
 		player.sendMessage(ChatColor.AQUA + gacha_itemname[type][rand] + ChatColor.WHITE + "を" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "しました！");
 		getLogger().info(player.getName() + "にガチャ景品 " + gacha_list[type][rand] + " を追加しました。");
+		writeLog("Gacha:" + player + " get:" + gacha_itemname[type][rand] );
 	}
 	
 	private boolean checkOverDiffMinute(String _path, int baseDiff){
