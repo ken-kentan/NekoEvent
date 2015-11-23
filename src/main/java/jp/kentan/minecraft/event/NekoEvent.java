@@ -11,23 +11,20 @@ import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 
 public class NekoEvent extends JavaPlugin {
-	protected String ticket_str;
-	protected String ticket_itemstack;
+	private String ticket_str;
+	private String ticket_itemstack;
 	private String gacha_list[][] = new String[5][10], gacha_itemname[][] = new String[5][10];
 	private Location location;
 	private int sec_tp = 0, sec = 0, sec_m = 0, gacha_numbers[] = new int[5];
 	
-	TicketManager ticket;
-	
 	@Override
 	public void onEnable() {
-		
-		ticket = new TicketManager();
 		
 		new BukkitRunnable()
 		{
@@ -56,6 +53,8 @@ public class NekoEvent extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
+		getConfig().set("sec_m", sec_m);
+		saveConfig();
 		getLogger().info("NekoEventを無効にしました");
 	}
 	
@@ -77,8 +76,15 @@ public class NekoEvent extends JavaPlugin {
 					getLogger().info("対象プレイヤーまたはチケット数が指定されていません。");
 					return true;
 				}
-				ticket.give(args[1],args[2]);
+				giveTicket(args[1],args[2]);
 				
+				break;
+			case "minigame":
+				int rand = (int) (Math.random()*5);//0-5
+				
+				if(rand == 5){
+					giveTicket(args[1],"1");
+				}
 				break;
 			case "parkour":
 				if(args.length < 3){
@@ -130,7 +136,7 @@ public class NekoEvent extends JavaPlugin {
 				int type         = Integer.parseInt(args[2]),
 					need_tickers = Integer.parseInt(args[3]);
 				
-				if(ticket.remove(Bukkit.getServer().getPlayer(args[1]),need_tickers) == true){
+				if(removeTicket(Bukkit.getServer().getPlayer(args[1]),need_tickers) == true){
 					processGacha(Bukkit.getServer().getPlayer(args[1]),type);
 				}
 				break;
@@ -155,6 +161,8 @@ public class NekoEvent extends JavaPlugin {
 		ticket_str = getConfig().getString("ticket.ID");
 		ticket_itemstack = getConfig().getString("ticket.ItemStack");
 		
+		sec_m = getConfig().getInt("sec_m");
+		
 		for(int j = 0; j < 5; j++){
 			for(int i = 0; i < 10; i++){
 				if(getConfig().getString("gacha.ID." + j + "_" + i) != null){
@@ -173,6 +181,53 @@ public class NekoEvent extends JavaPlugin {
 		if (file.exists()) {
 			if (file.isFile() && file.canWrite()) return true;
 		}
+		return false;
+	}
+	
+	private void giveTicket(String player, String number){
+		int ticket_number = 0;
+		
+		try {
+			ticket_number = Integer.parseInt(number);
+		} catch (NumberFormatException nfex) {
+			showException(nfex);
+			return;
+		}
+		
+		if(ticket_number > 0){			
+			getServer().dispatchCommand(getServer().getConsoleSender(), "give " + player + ticket_str.replace("{number}", Integer.toString(ticket_number)));
+			
+			Bukkit.getServer().getPlayer(player).sendMessage(ChatColor.AQUA +" イベントチケット" + ChatColor.WHITE + "を" + ticket_number + "枚" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "しました！");
+			getLogger().info(player + "に、イベントチケットを" + ticket_number + "枚追加しました。");
+			writeLog("Ticket:" + player + " +" + ticket_number );
+		}
+		
+	}
+	
+	private boolean removeTicket(Player player, int ticket_number) {
+		String itemS_str = ticket_itemstack.replace("{number}", Integer.toString(ticket_number));;
+
+		for(int i = 0; i < player.getInventory().getSize(); i++) {
+			ItemStack itemS = player.getInventory().getItem(i);
+			if(itemS != null && itemS.toString().indexOf(itemS_str) != -1){
+				int amt = itemS.getAmount() - ticket_number;
+				
+				if(amt < 0){
+					player.sendMessage(ChatColor.YELLOW +"イベントチケットが" + Math.abs(amt) + "枚不足しています。");
+					return false;
+				}
+				
+				itemS.setAmount(amt);
+				player.getInventory().setItem(i, amt > 0 ? itemS : null);
+				player.updateInventory();
+				
+				writeLog("Ticket:" + player + " -" + ticket_number );
+				return true;
+			}
+		}
+		
+		player.sendMessage(ChatColor.YELLOW +"イベントチケットが" + ticket_number + "枚不足しています。");
+
 		return false;
 	}
 	
@@ -217,7 +272,7 @@ public class NekoEvent extends JavaPlugin {
 		Player player = Bukkit.getServer().getPlayer(s_player);
 		
 		player.sendMessage(ChatColor.BLUE + stage + ChatColor.AQUA + "ダンジョンをクリア！");
-		writeLog("Dungeon:" + player + " !Clear" );
+		writeLog("Dungeon:" + player + " clear:" + stage);
 		
 		if(checkOverDiffMinute(path, 1440)){ //if over 24h,reset
 			getConfig().set(path + "clear", false);
@@ -225,7 +280,7 @@ public class NekoEvent extends JavaPlugin {
 		}
 
 		if(getConfig().getBoolean(path + "clear") == false){
-			ticket.give(s_player, "5");
+			giveTicket(s_player, "5");
 			getConfig().set(path + "sec_m", sec_m);
 		}else{
 			player.sendMessage(ChatColor.YELLOW +"イベントチケットは各ダンジョンで24時間おきに入手できます。");
@@ -242,7 +297,7 @@ public class NekoEvent extends JavaPlugin {
 		Player player = Bukkit.getServer().getPlayer(s_player);
 		
 		player.sendMessage(ChatColor.GREEN + stage + ChatColor.AQUA + "アスレをクリア！");
-		writeLog("Parkour:" + player + " !Clear" );
+		writeLog("Parkour:" + player + " clear" + stage);
 		
 		if(checkOverDiffMinute(path, 1440)){ //if over 24h,reset
 			getConfig().set(path + "clear", false);
@@ -250,7 +305,7 @@ public class NekoEvent extends JavaPlugin {
 		}
 
 		if(getConfig().getBoolean(path + "clear") == false){
-			ticket.give(s_player, "1");
+			giveTicket(s_player, "1");
 			getConfig().set(path + "sec_m", sec_m);
 		}else{
 			player.sendMessage(ChatColor.YELLOW +"イベントチケットは各アスレで24時間おきに入手できます。");
