@@ -21,7 +21,7 @@ public class NekoEvent extends JavaPlugin {
 	private String ticket_itemstack;
 	private String gacha_list[][] = new String[5][10], gacha_itemname[][] = new String[5][10];
 	private Location location;
-	private int sec_tp = 0, sec = 0, sec_m = 0, gacha_numbers[] = new int[5];
+	private int sec_tp = 0, sec = 0, sec_m = 0, gacha_numbers[] = new int[5], minigame_rate = 0;
 	
 	@Override
 	public void onEnable() {
@@ -76,15 +76,15 @@ public class NekoEvent extends JavaPlugin {
 					getLogger().info("対象プレイヤーまたはチケット数が指定されていません。");
 					return true;
 				}
+				
 				giveTicket(args[1],args[2]);
 				
 				break;
 			case "minigame":
-				int rand = (int) (Math.random()*5);//0-5
+				int rand = (int) (Math.random()*minigame_rate);//0-5
 				
-				if(rand == 5){
-					giveTicket(args[1],"1");
-				}
+				if(rand == minigame_rate - 1) giveTicket(args[1],"1");
+				
 				break;
 			case "parkour":
 				if(args.length < 3){
@@ -139,9 +139,10 @@ public class NekoEvent extends JavaPlugin {
 				if(removeTicket(Bukkit.getServer().getPlayer(args[1]),need_tickers) == true){
 					processGacha(Bukkit.getServer().getPlayer(args[1]),type);
 				}
+			case "test":
+				getLogger().info(Integer.toString(sec_m));
 				break;
 			}
-			
 		}
 		
 		return true;
@@ -158,10 +159,12 @@ public class NekoEvent extends JavaPlugin {
 	
 	private void getBaseConfig(){
 		reloadConfig();
+		
 		ticket_str = getConfig().getString("ticket.ID");
 		ticket_itemstack = getConfig().getString("ticket.ItemStack");
 		
 		sec_m = getConfig().getInt("sec_m");
+		minigame_rate = getConfig().getInt("minigame_rate");
 		
 		for(int j = 0; j < 5; j++){
 			for(int i = 0; i < 10; i++){
@@ -174,7 +177,7 @@ public class NekoEvent extends JavaPlugin {
 		}
 		
 		getLogger().info("Done. getBaseConfig from config.yml");
-		getLogger().info("Result. gacha_numbers:" + gacha_numbers[0] + "," + gacha_numbers[1] + "," + gacha_numbers[2] + "," + gacha_numbers[3] + "," + gacha_numbers[4]);
+		getLogger().info("Result. sec_m:" + sec_m + " minigame_rate" + minigame_rate + " acha_numbers:" + gacha_numbers[0] + "," + gacha_numbers[1] + "," + gacha_numbers[2] + "," + gacha_numbers[3] + "," + gacha_numbers[4]);
 	}
 	
 	private static boolean checkBeforeWritefile(File file) {
@@ -205,7 +208,12 @@ public class NekoEvent extends JavaPlugin {
 	}
 	
 	private boolean removeTicket(Player player, int ticket_number) {
-		String itemS_str = ticket_itemstack.replace("{number}", Integer.toString(ticket_number));;
+		String itemS_str = ticket_itemstack.replace("{number}", Integer.toString(ticket_number));
+		
+		if(checkInGame(player) == false){
+			player.sendMessage(ChatColor.RED + "このコマンドはゲーム内から実行してください。");
+			return false;
+		}
 
 		for(int i = 0; i < player.getInventory().getSize(); i++) {
 			ItemStack itemS = player.getInventory().getItem(i);
@@ -244,7 +252,7 @@ public class NekoEvent extends JavaPlugin {
 
 				filewriter.close();
 			} else {
-				getLogger().info("ログをファイルに書き込めませんでした");
+				getLogger().info("ログファイルが見つかりません");
 			}
 		} catch (IOException e) {
 			showException(e);
@@ -272,7 +280,7 @@ public class NekoEvent extends JavaPlugin {
 		Player player = Bukkit.getServer().getPlayer(s_player);
 		
 		player.sendMessage(ChatColor.BLUE + stage + ChatColor.AQUA + "ダンジョンをクリア！");
-		writeLog("Dungeon:" + player + " clear:" + stage);
+		writeLog("Dungeon:" + s_player + " clear:" + stage);
 		
 		if(checkOverDiffMinute(path, 1440)){ //if over 24h,reset
 			getConfig().set(path + "clear", false);
@@ -297,7 +305,7 @@ public class NekoEvent extends JavaPlugin {
 		Player player = Bukkit.getServer().getPlayer(s_player);
 		
 		player.sendMessage(ChatColor.GREEN + stage + ChatColor.AQUA + "アスレをクリア！");
-		writeLog("Parkour:" + player + " clear" + stage);
+		writeLog("Parkour:" + s_player + " clear:" + stage);
 		
 		if(checkOverDiffMinute(path, 1440)){ //if over 24h,reset
 			getConfig().set(path + "clear", false);
@@ -329,7 +337,7 @@ public class NekoEvent extends JavaPlugin {
 		if(sec_tp == 0) sec_tp = 1;
 		
 		getLogger().info(player.getName() + "を" + tp + "にsingleTPしました。");
-		writeLog("TP:" + player + " tp:" + tp );
+		writeLog("TP:" + player.getName() + " tp:" + tp );
 	}
 	
 	private void processGacha(Player player,int type){
