@@ -35,7 +35,7 @@ public class NekoEvent extends JavaPlugin {
 		    	if(sec_tp > 0) sec_tp++;     //count 0-1m
 		    	
 		    	if(sec >= 59){
-		    		sec = 0;
+		    		sec = -1;
 		    		sec_m++;
 		    	}
 		    	sec++;
@@ -80,10 +80,12 @@ public class NekoEvent extends JavaPlugin {
 				giveTicket(args[1],args[2]);
 				
 				break;
-			case "minigame":
+			case "minigame"://event minigame <player> <ticket>
 				int rand = (int) (Math.random()*minigame_rate);//0-5
 				
-				if(rand == minigame_rate - 1) giveTicket(args[1],"1");
+				writeLog("Minigame:" + args[1] + " rand:" + rand + " rate:" + minigame_rate);
+				
+				if(rand == minigame_rate - 1) giveTicket(args[1],args[2]);
 				
 				break;
 			case "parkour":
@@ -139,8 +141,10 @@ public class NekoEvent extends JavaPlugin {
 				if(removeTicket(Bukkit.getServer().getPlayer(args[1]),need_tickers) == true){
 					processGacha(Bukkit.getServer().getPlayer(args[1]),type);
 				}
-			case "test":
-				getLogger().info(Integer.toString(sec_m));
+			case "save":
+				getLogger().info("Now sec_m:" + Integer.toString(sec_m));
+				getConfig().set("sec_m", sec_m);
+				saveConfig();
 				break;
 			}
 		}
@@ -177,7 +181,7 @@ public class NekoEvent extends JavaPlugin {
 		}
 		
 		getLogger().info("Done. getBaseConfig from config.yml");
-		getLogger().info("Result. sec_m:" + sec_m + " minigame_rate" + minigame_rate + " acha_numbers:" + gacha_numbers[0] + "," + gacha_numbers[1] + "," + gacha_numbers[2] + "," + gacha_numbers[3] + "," + gacha_numbers[4]);
+		getLogger().info("Result. sec_m:" + sec_m + " minigame_rate:" + minigame_rate + " acha_numbers:" + gacha_numbers[0] + "," + gacha_numbers[1] + "," + gacha_numbers[2] + "," + gacha_numbers[3] + "," + gacha_numbers[4]);
 	}
 	
 	private static boolean checkBeforeWritefile(File file) {
@@ -229,7 +233,7 @@ public class NekoEvent extends JavaPlugin {
 				player.getInventory().setItem(i, amt > 0 ? itemS : null);
 				player.updateInventory();
 				
-				writeLog("Ticket:" + player + " -" + ticket_number );
+				writeLog("Ticket:" + player.getName() + " -" + ticket_number );
 				return true;
 			}
 		}
@@ -287,9 +291,9 @@ public class NekoEvent extends JavaPlugin {
 			saveConfig();
 		}
 
-		if(getConfig().getBoolean(path + "clear") == false){
+		if(getConfig().getBoolean(path + ".clear") == false){
 			giveTicket(s_player, "5");
-			getConfig().set(path + "sec_m", sec_m);
+			getConfig().set(path + ".sec_m", sec_m);
 		}else{
 			player.sendMessage(ChatColor.YELLOW +"イベントチケットは各ダンジョンで24時間おきに入手できます。");
 		}
@@ -312,9 +316,9 @@ public class NekoEvent extends JavaPlugin {
 			saveConfig();
 		}
 
-		if(getConfig().getBoolean(path + "clear") == false){
+		if(getConfig().getBoolean(path + ".clear") == false){
 			giveTicket(s_player, "1");
-			getConfig().set(path + "sec_m", sec_m);
+			getConfig().set(path + ".sec_m", sec_m);
 		}else{
 			player.sendMessage(ChatColor.YELLOW +"イベントチケットは各アスレで24時間おきに入手できます。");
 		}
@@ -347,7 +351,7 @@ public class NekoEvent extends JavaPlugin {
 		
 		player.sendMessage(ChatColor.AQUA + gacha_itemname[type][rand] + ChatColor.WHITE + "を" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "しました！");
 		getLogger().info(player.getName() + "にガチャ景品 " + gacha_list[type][rand] + " を追加しました。");
-		writeLog("Gacha:" + player + " get:" + gacha_itemname[type][rand] );
+		writeLog("Gacha:" + player.getName() + " get:" + gacha_itemname[type][rand] +"(" + gacha_list[type][rand] + ")");
 	}
 	
 	private boolean checkOverDiffMinute(String _path, int baseDiff){
