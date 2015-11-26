@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemStack;
 public class TicketManager {
 	public static String name, itemstack;
 	
-	NekoEvent ne;
+	static NekoEvent ne;
 
 	public void setInstance(NekoEvent _ne) {
 		ne = _ne;

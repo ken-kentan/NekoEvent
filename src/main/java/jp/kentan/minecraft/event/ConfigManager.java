@@ -1,10 +1,10 @@
 package jp.kentan.minecraft.event;
 
 public class ConfigManager {
-	NekoEvent ne;
-	TicketManager ticket = new TicketManager();
-	TimeManager time = new TimeManager();
-	GameManager game = new GameManager();
+	static NekoEvent ne;
+	static TicketManager ticket = new TicketManager();
+	static TimeManager time = new TimeManager();
+	static GameManager game = new GameManager();
 	
 	public void setInstance(NekoEvent _ne){
 		ne = _ne;

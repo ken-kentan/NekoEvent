@@ -7,9 +7,9 @@ import org.bukkit.entity.Player;
 public class GameManager {
 	public static int reward_rate = 0;
 	
-	NekoEvent ne;
-	TicketManager ticket = new TicketManager();
-	TimeManager time = new TimeManager();
+	static NekoEvent ne;
+	static TicketManager ticket = new TicketManager();
+	static TimeManager time = new TimeManager();
 	
 	public void setInstance(NekoEvent _ne){
 		ne = _ne;
@@ -72,7 +72,7 @@ public class GameManager {
 			player.sendMessage(ChatColor.YELLOW +"イベントチケットは各アスレで24時間おきに入手できます。");
 		}
 		
-		ne.getConfig().set(path + "clear", true);
+		ne.getConfig().set(path + ".clear", true);
 		ne.saveConfig();
 	}
 	

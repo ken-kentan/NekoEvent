@@ -8,7 +8,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class TimeManager extends BukkitRunnable{
 	public static int tp = 0, sec = 0, minute = 0;
 	
-	NekoEvent ne;
+	static NekoEvent ne;
 	
 	public void setInstance(NekoEvent _ne){
 		ne = _ne;
@@ -29,8 +29,8 @@ public class TimeManager extends BukkitRunnable{
 	public boolean checkOverDiffMinute(String _path, int baseDiff){
 		int last_minute = 0;
 		
-		if(ne.getConfig().getString(_path + "last_minute") != null){
-			last_minute = ne.getConfig().getInt(_path + "last_minute");
+		if(ne.getConfig().getString(_path + ".clear") != null){
+			last_minute = ne.getConfig().getInt(_path + ".last_minute");
 			if(Math.abs(minute - last_minute) > baseDiff) return true;
 		}
 		return false;

@@ -5,8 +5,8 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 public class TPManager {
-	NekoEvent ne;
-	TimeManager time = new TimeManager();
+	static NekoEvent ne;
+	static TimeManager time = new TimeManager();
 
 	Location location;
 
