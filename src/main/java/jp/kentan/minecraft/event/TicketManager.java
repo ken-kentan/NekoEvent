@@ -6,8 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public class TicketManager {
-	public String name;
-	public String itemstack;
+	public static String name, itemstack;
 	
 	NekoEvent ne;
 

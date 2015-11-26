@@ -13,8 +13,8 @@ public class ConfigManager {
 	public void setBase(){
 		ne.reloadConfig();
 		
-		ticket.name       = ne.getConfig().getString("ticket.ID");
-		ticket.itemstack  = ne.getConfig().getString("ticket.ItemStack");
+		TicketManager.name       = ne.getConfig().getString("ticket.ID");
+		TicketManager.itemstack  = ne.getConfig().getString("ticket.ItemStack");
 		
 		TimeManager.minute = ne.getConfig().getInt("minute");
 		GameManager.reward_rate = ne.getConfig().getInt("reward_rate");
@@ -30,7 +30,7 @@ public class ConfigManager {
 		}
 		
 		ne.getLogger().info("Done. getBaseConfig from config.yml");
-		ne.getLogger().info("Result. minute:" + TimeManager.minute + " reward_rate:" + GameManager.reward_rate + " acha_numbers:" + NekoEvent.gacha_numbers[0] + "," + NekoEvent.gacha_numbers[1] + "," + NekoEvent.gacha_numbers[2] + "," + NekoEvent.gacha_numbers[3] + "," + NekoEvent.gacha_numbers[4]);
+		ne.getLogger().info("Result. minute:" + TimeManager.minute + " reward_rate:" + GameManager.reward_rate + " gacha_numbers:" + NekoEvent.gacha_numbers[0] + "," + NekoEvent.gacha_numbers[1] + "," + NekoEvent.gacha_numbers[2] + "," + NekoEvent.gacha_numbers[3] + "," + NekoEvent.gacha_numbers[4]);
 	}
 	
 	public void save(){

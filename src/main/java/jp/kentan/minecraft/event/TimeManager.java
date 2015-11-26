@@ -48,8 +48,4 @@ public class TimeManager extends BukkitRunnable{
 		}
 		return true;
 	}
-	
-	public void test(){
-		ne.getLogger().info("Hi! " + sec +" "+ minute);
-	}
 }

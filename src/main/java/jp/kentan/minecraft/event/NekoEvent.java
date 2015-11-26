@@ -39,14 +39,14 @@ public class NekoEvent extends JavaPlugin {
 		
 		config.setBase();
 		
-		getLogger().info("NekoEventを有効にしました");
+		getLogger().info("NekoEventを有効化しました。");
 	}
 
 	@Override
 	public void onDisable() {
 		config.save();
 		
-		getLogger().info("NekoEventを無効にしました");
+		getLogger().info("NekoEventを無効化しました。");
 	}
 	
 	@Override
