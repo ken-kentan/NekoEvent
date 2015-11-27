@@ -12,121 +12,130 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-
 public class NekoEvent extends JavaPlugin {
 	public static String gacha_list[][] = new String[5][10], gacha_itemname[][] = new String[5][10];
 	public static int gacha_numbers[] = new int[5];
-	
-	ConfigManager config = new ConfigManager();
-	TicketManager ticket = new TicketManager();
-	GameManager game = new GameManager();
-	TimeManager time = new TimeManager();
-	TPManager tp = new TPManager();
-	
+
 	@Override
 	public void onEnable() {
-		config.setInstance(this);
-		ticket.setInstance(this);
-		game.setInstance(this);
-		time.setInstance(this);
-		tp.setInstance(this);
-		
-		time.runTaskTimer(this, 20, 20);//20 1s　1200 1m
-		
-		for(int i = 0;i < 5;i++){
+		ConfigManager.setInstance(this);
+		TicketManager.setInstance(this);
+		GameManager.setInstance(this);
+		TimeManager.setInstance(this);
+		TPManager.setInstance(this);
+
+		new TimeManager().runTaskTimer(this, 20, 20);// 20 1s 1200 1m
+
+		for (int i = 0; i < 5; i++) {
 			gacha_numbers[i] = -1;
 		}
-		
-		config.setBase();
-		
-		getLogger().info("NekoEventを有効化しました。");
+
+		ConfigManager.setBase();
+
+		getLogger().info("NekoEventを有効にしました。");
 	}
 
 	@Override
 	public void onDisable() {
-		config.save();
+		ConfigManager.save();
 		
-		getLogger().info("NekoEventを無効化しました。");
+		Bukkit.getScheduler().cancelTasks(this);
+
+		getLogger().info("NekoEventを無効にしました。");
 	}
-	
+
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
-		
-		if(cmd.getName().equals("event") && args.length > 0){
-			
-			switch (args[0]){
+
+		if (cmd.getName().equals("event") && args.length > 0) {
+
+			switch (args[0]) {
 			case "reload":
-				
-				config.setBase();
-				
+
+				ConfigManager.setBase();
+
 				sender.sendMessage(ChatColor.GREEN + "NekoEventの設定を再読み込みしました。");
-				
+
 				break;
-			case "ticket"://event ticket <player> <number>
-				
-				ticket.give(args[1],args[2]);
-				
+			case "ticket":// event ticket <player> <number>
+
+				TicketManager.give(args[1], args[2]);
+
 				break;
-			case "minigame"://event minigame <player> <ticket>
-				
-				game.reward(args[1],args[2]);
-				
+			case "minigame":// event minigame <player> <ticket>
+
+				GameManager.reward(args[1], args[2]);
+
 				break;
-			case "parkour"://event parkour <stage> <player>
-				
-				game.clearParkour(args[1],args[2]);
-				
+			case "parkour":// event parkour <stage> <player>
+
+				GameManager.clearParkour(args[1], args[2]);
+
 				break;
-			case "dungeon"://event dungeon <stage> <player>
-				
-				game.clearDungeon(args[1],args[2]);
-				
+			case "dungeon":// event dungeon <stage> <player>
+
+				GameManager.clearDungeon(args[1], args[2]);
+
 				break;
-			case "tp"://event tp <player> <tp>
-				
-				if(args[1].equals("set")){ //event tp set <name>
-					if(checkInGame(sender) == true)tp.set((Player)sender, args[2]);
+			case "tp":// event tp <player> <tp>
+
+				if (args[1].equals("set")) { // event tp set <name>
+					if (checkInGame(sender) == true)
+						TPManager.set((Player) sender, args[2]);
 					return true;
 				}
-				
-				if(time.checkOverTPTime(args[1]) == true) tp.singleTP(args[1], args[2]);
-				
+
+				if (TimeManager.checkOverTPTime(args[1]) == true)
+					TPManager.singleTP(args[1], args[2]);
+
 				break;
-			case "gacha"://event gacha <player> <type> <ticket>
-				
-				if(ticket.remove(args[1],args[3]) == true){
-					processGacha(Bukkit.getServer().getPlayer(args[1]),Integer.parseInt(args[2]));
+			case "gacha":// event gacha <player> <type> <ticket>
+
+				if (TicketManager.remove(args[1], args[3]) == true) {
+					processGacha(Bukkit.getServer().getPlayer(args[1]), Integer.parseInt(args[2]));
 				}
-				
+
 				break;
 			case "save":
-				
-				config.save();
-				
+
+				ConfigManager.save();
+
 				break;
 			}
 		}
-		
+
 		return true;
 	}
-	
+
 	public void showException(Exception _e) {
 		getLogger().info(_e.toString());
 	}
-	
-	public boolean checkInGame(CommandSender _sender){
-		if (!(_sender instanceof Player)) return false;
-		else                              return true;
+
+	public boolean checkInGame(CommandSender _sender) {
+		if (!(_sender instanceof Player))
+			return false;
+		else
+			return true;
 	}
-	
+
+	public boolean checkPlayer(Player player) {
+
+		if (checkInGame(player) == false) {
+			getLogger().info("プレイヤーが見つかりません。");
+			return false;
+		}
+		return true;
+	}
+
 	private static boolean checkBeforeWritefile(File file) {
 		if (file.exists()) {
-			if (file.isFile() && file.canWrite()) return true;
+			if (file.isFile() && file.canWrite())
+				return true;
 		}
 		return false;
 	}
-	
-	public void writeLog(String _str){
+
+	public void writeLog(String _str) {
 		try {
 			File file = new File("plugins/NekoEvent/log.txt");
 
@@ -146,14 +155,17 @@ public class NekoEvent extends JavaPlugin {
 			getLogger().info("ログをファイルに書き込めませんでした");
 		}
 	}
-	
-	private void processGacha(Player player,int type){
-		int rand = (int) (Math.random()*(gacha_numbers[type] + 1));//0-gacha_numbers
-		
-		getServer().dispatchCommand(getServer().getConsoleSender(), "give " + player.getName() + gacha_list[type][rand]);
-		
-		player.sendMessage(ChatColor.AQUA + gacha_itemname[type][rand] + ChatColor.WHITE + "を" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "しました！");
+
+	private void processGacha(Player player, int type) {
+		int rand = (int) (Math.random() * (gacha_numbers[type] + 1));// 0-gacha_numbers
+
+		getServer().dispatchCommand(getServer().getConsoleSender(),
+				"give " + player.getName() + gacha_list[type][rand]);
+
+		player.sendMessage(ChatColor.AQUA + gacha_itemname[type][rand] + ChatColor.WHITE + "を" + ChatColor.GOLD + "ゲット"
+				+ ChatColor.WHITE + "しました！");
 		getLogger().info(player.getName() + "にガチャ景品 " + gacha_list[type][rand] + " を追加しました。");
-		writeLog("Gacha:" + player.getName() + " get:" + gacha_itemname[type][rand] +"(" + gacha_list[type][rand] + ")");
+		writeLog("Gacha:" + player.getName() + " get:" + gacha_itemname[type][rand] + "(" + gacha_list[type][rand]
+				+ ")");
 	}
 }

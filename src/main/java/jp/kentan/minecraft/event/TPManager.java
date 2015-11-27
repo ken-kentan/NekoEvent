@@ -6,27 +6,17 @@ import org.bukkit.entity.Player;
 
 public class TPManager {
 	static NekoEvent ne;
-	static TimeManager time = new TimeManager();
 
-	Location location;
+	private static Location location;
 
-	public void setInstance(NekoEvent _ne) {
+	public static void setInstance(NekoEvent _ne) {
 		ne = _ne;
 	}
 
-	private boolean checkPlayer(Player player) {
-
-		if (ne.checkInGame(player) == false) {
-			ne.getLogger().info("プレイヤーが見つかりません。");
-			return false;
-		}
-		return true;
-	}
-
-	public void set(Player player, String tp) {
+	public static void set(Player player, String tp) {
 		String path = "TP." + tp;
 
-		if (checkPlayer(player) == false) return;
+		if (ne.checkPlayer(player) == false) return;
 
 		location = player.getLocation();
 		ne.getConfig().set(path + ".X", location.getX());
@@ -35,11 +25,11 @@ public class TPManager {
 		ne.saveConfig();
 	}
 
-	public void singleTP(String tp, String s_player) {
+	public static void singleTP(String tp, String s_player) {
 		Player player = Bukkit.getServer().getPlayer(s_player);
 		String path = "TP." + tp;
 		
-		if (checkPlayer(player) == false) return;
+		if (ne.checkPlayer(player) == false) return;
 
 		location = player.getLocation();
 		location.setX(ne.getConfig().getDouble(path + ".X"));

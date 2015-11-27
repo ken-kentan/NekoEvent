@@ -10,25 +10,16 @@ public class TicketManager {
 	
 	static NekoEvent ne;
 
-	public void setInstance(NekoEvent _ne) {
+	public static void setInstance(NekoEvent _ne) {
 		ne = _ne;
 	}
 	
-	private boolean checkPlayer(Player player){
-		
-		if(ne.checkInGame(player) == false){
-			ne.getLogger().info("プレイヤーが見つかりません。");
-			return false;
-		}
-		return true;
-	}
-	
-	public void give(String s_player, String number){
+	public static void give(String s_player, String number){
 		int ticket_number = 0;
 		
 		Player player = Bukkit.getServer().getPlayer(s_player);
 		
-		if(checkPlayer(player) == false) return;
+		if(ne.checkPlayer(player) == false) return;
 		
 		try {
 			ticket_number = Integer.parseInt(number);
@@ -47,7 +38,7 @@ public class TicketManager {
 		
 	}
 	
-	public boolean remove(String s_player, String number) {
+	public static boolean remove(String s_player, String number) {
 		int ticket_number = 0;
 		
 		Player player = Bukkit.getServer().getPlayer(s_player);

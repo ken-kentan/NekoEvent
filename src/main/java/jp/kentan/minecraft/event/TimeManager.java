@@ -10,7 +10,7 @@ public class TimeManager extends BukkitRunnable{
 	
 	static NekoEvent ne;
 	
-	public void setInstance(NekoEvent _ne){
+	public static void setInstance(NekoEvent _ne){
 		ne = _ne;
 	}
 	
@@ -26,7 +26,7 @@ public class TimeManager extends BukkitRunnable{
     	sec++;
     }
 	
-	public boolean checkOverDiffMinute(String _path, int baseDiff){
+	public static boolean checkOverDiffMinute(String _path, int baseDiff){
 		int last_minute = 0;
 		
 		if(ne.getConfig().getString(_path + ".clear") != null){
@@ -36,7 +36,7 @@ public class TimeManager extends BukkitRunnable{
 		return false;
 	}
 
-	public boolean checkOverTPTime(String s_player){
+	public static boolean checkOverTPTime(String s_player){
 		Player player = Bukkit.getServer().getPlayer(s_player);
 		
 		if(tp > 60){

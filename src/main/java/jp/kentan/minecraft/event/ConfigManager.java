@@ -2,15 +2,12 @@ package jp.kentan.minecraft.event;
 
 public class ConfigManager {
 	static NekoEvent ne;
-	static TicketManager ticket = new TicketManager();
-	static TimeManager time = new TimeManager();
-	static GameManager game = new GameManager();
 	
-	public void setInstance(NekoEvent _ne){
+	public static void setInstance(NekoEvent _ne){
 		ne = _ne;
 	}
 	
-	public void setBase(){
+	public static void setBase(){
 		ne.reloadConfig();
 		
 		TicketManager.name       = ne.getConfig().getString("ticket.ID");
@@ -33,8 +30,8 @@ public class ConfigManager {
 		ne.getLogger().info("Result. minute:" + TimeManager.minute + " reward_rate:" + GameManager.reward_rate + " gacha_numbers:" + NekoEvent.gacha_numbers[0] + "," + NekoEvent.gacha_numbers[1] + "," + NekoEvent.gacha_numbers[2] + "," + NekoEvent.gacha_numbers[3] + "," + NekoEvent.gacha_numbers[4]);
 	}
 	
-	public void save(){
-		ne.getLogger().info("Saved. minute:" + TimeManager.minute);
+	public static void save(){
+		ne.getLogger().info("Saving. minute:" + TimeManager.minute);
 		ne.getConfig().set("minute", TimeManager.minute);
 		ne.saveConfig();
 	}

@@ -1,0 +1,12 @@
+name: NekoEvent
+main: jp.kentan.minecraft.event.NekoEvent
+version: 1.0.0
+author: ken_kentan
+website: http://ken.kentan.jp
+
+commands:
+    event:
+        description: NekoEvent
+        usage: /<command>
+        permission: jp.kentan.minecraft.event
+        permission-message: You don't have <permission>
