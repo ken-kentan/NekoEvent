@@ -23,7 +23,7 @@ public class GameManager {
 		ne.writeLog("Dungeon:" + s_player + " clear:" + stage);
 		
 		if(TimeManager.checkOverDiffMinute(path, 1440)){ //if over 24h,reset
-			ne.getConfig().set(path + "clear", false);
+			ne.getConfig().set(path + ".clear", false);
 			ne.saveConfig();
 		}
 
@@ -34,7 +34,7 @@ public class GameManager {
 			player.sendMessage(ChatColor.YELLOW +"イベントチケットは各ダンジョンで24時間おきに入手できます。");
 		}
 		
-		ne.getConfig().set(path + "clear", true);
+		ne.getConfig().set(path + ".clear", true);
 		ne.saveConfig();
 		
 		TimeManager.tp = 0;//reset
@@ -50,7 +50,7 @@ public class GameManager {
 		ne.writeLog("Parkour:" + s_player + " clear:" + stage);
 		
 		if(TimeManager.checkOverDiffMinute(path, 1440)){ //if over 24h,reset
-			ne.getConfig().set(path + "clear", false);
+			ne.getConfig().set(path + ".clear", false);
 			ne.saveConfig();
 		}
 

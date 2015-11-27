@@ -1,6 +1,6 @@
 name: NekoEvent
 main: jp.kentan.minecraft.event.NekoEvent
-version: 1.0.0-SNAPSHOT
+version: 1.0.0
 author: ken_kentan
 website: http://ken.kentan.jp
 

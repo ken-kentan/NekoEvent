@@ -43,7 +43,7 @@ public class TicketManager {
 		
 		Player player = Bukkit.getServer().getPlayer(s_player);
 		
-		if(checkPlayer(player) == false) return true;
+		if(ne.checkPlayer(player) == false) return true;
 		
 		try {
 			ticket_number = Integer.parseInt(number);
