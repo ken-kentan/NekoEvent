@@ -1,11 +1,7 @@
 package jp.kentan.minecraft.event;
 
 public class ConfigManager {
-	static NekoEvent ne;
-	
-	public static void setInstance(NekoEvent _ne){
-		ne = _ne;
-	}
+	static NekoEvent ne = NekoEvent.getInstance();
 	
 	public static void setBase(){
 		ne.reloadConfig();

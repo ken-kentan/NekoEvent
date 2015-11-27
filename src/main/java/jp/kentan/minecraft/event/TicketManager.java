@@ -8,11 +8,7 @@ import org.bukkit.inventory.ItemStack;
 public class TicketManager {
 	public static String name, itemstack;
 	
-	static NekoEvent ne;
-
-	public static void setInstance(NekoEvent _ne) {
-		ne = _ne;
-	}
+	static NekoEvent ne = NekoEvent.getInstance();
 	
 	public static void give(String s_player, String number){
 		int ticket_number = 0;
@@ -43,7 +39,7 @@ public class TicketManager {
 		
 		Player player = Bukkit.getServer().getPlayer(s_player);
 		
-		if(ne.checkPlayer(player) == false) return true;
+		if(ne.checkPlayer(player) == false) return false;
 		
 		try {
 			ticket_number = Integer.parseInt(number);

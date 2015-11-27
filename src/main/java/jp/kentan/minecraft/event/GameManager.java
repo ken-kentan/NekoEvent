@@ -7,11 +7,7 @@ import org.bukkit.entity.Player;
 public class GameManager {
 	public static int reward_rate = 0;
 	
-	static NekoEvent ne;
-	
-	public static void setInstance(NekoEvent _ne){
-		ne = _ne;
-	}
+	static NekoEvent ne = NekoEvent.getInstance();
 	
 	public static void clearDungeon(String stage, String s_player) {
 		String path = s_player + ".dungeon." + stage;

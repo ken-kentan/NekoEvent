@@ -5,20 +5,15 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 public class TPManager {
-	static NekoEvent ne;
 
-	private static Location location;
-
-	public static void setInstance(NekoEvent _ne) {
-		ne = _ne;
-	}
+	static NekoEvent ne = NekoEvent.getInstance();
 
 	public static void set(Player player, String tp) {
 		String path = "TP." + tp;
 
 		if (ne.checkPlayer(player) == false) return;
 
-		location = player.getLocation();
+		Location location = player.getLocation();
 		ne.getConfig().set(path + ".X", location.getX());
 		ne.getConfig().set(path + ".Y", location.getY());
 		ne.getConfig().set(path + ".Z", location.getZ());
@@ -31,7 +26,7 @@ public class TPManager {
 		
 		if (ne.checkPlayer(player) == false) return;
 
-		location = player.getLocation();
+		Location location = player.getLocation();
 		location.setX(ne.getConfig().getDouble(path + ".X"));
 		location.setY(ne.getConfig().getDouble(path + ".Y"));
 		location.setZ(ne.getConfig().getDouble(path + ".Z"));

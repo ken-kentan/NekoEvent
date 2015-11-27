@@ -8,11 +8,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class TimeManager extends BukkitRunnable{
 	public static int tp = 0, sec = 0, minute = 0;
 	
-	static NekoEvent ne;
-	
-	public static void setInstance(NekoEvent _ne){
-		ne = _ne;
-	}
+	static NekoEvent ne = NekoEvent.getInstance();
 	
 	@Override
     public void run() {

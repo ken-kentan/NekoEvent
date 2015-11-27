@@ -15,14 +15,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class NekoEvent extends JavaPlugin {
 	public static String gacha_list[][] = new String[5][10], gacha_itemname[][] = new String[5][10];
 	public static int gacha_numbers[] = new int[5];
+	
+	private static NekoEvent instance;
 
 	@Override
 	public void onEnable() {
-		ConfigManager.setInstance(this);
-		TicketManager.setInstance(this);
-		GameManager.setInstance(this);
-		TimeManager.setInstance(this);
-		TPManager.setInstance(this);
+		
+		instance = this;
 
 		new TimeManager().runTaskTimer(this, 20, 20);// 20 1s 1200 1m
 
@@ -109,6 +108,10 @@ public class NekoEvent extends JavaPlugin {
 
 	public void showException(Exception _e) {
 		getLogger().info(_e.toString());
+	}
+	
+	public static NekoEvent getInstance(){
+		return instance;
 	}
 
 	public boolean checkInGame(CommandSender _sender) {
