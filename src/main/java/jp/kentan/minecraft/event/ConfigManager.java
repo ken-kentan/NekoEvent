@@ -29,6 +29,7 @@ public class ConfigManager {
 	public static void save(){
 		ne.getLogger().info("Saving. minute:" + TimeManager.minute);
 		ne.getConfig().set("minute", TimeManager.minute);
+		ne.getLogger().info("Save success!");
 		ne.saveConfig();
 	}
 }

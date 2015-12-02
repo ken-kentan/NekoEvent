@@ -15,7 +15,7 @@ public class GameManager {
 		
 		if(ne.checkPlayer(player) == false) return;
 		
-		player.sendMessage(ChatColor.BLUE + stage + ChatColor.AQUA + "ダンジョンをクリア！");
+		player.sendMessage(ChatColor.RED+ stage + "ダンジョン" + ChatColor.WHITE + "を" + ChatColor.AQUA + "クリア！");
 		ne.writeLog("Dungeon:" + s_player + " clear:" + stage);
 		
 		if(TimeManager.checkOverDiffMinute(path, 1440)){ //if over 24h,reset
@@ -26,6 +26,7 @@ public class GameManager {
 		if(ne.getConfig().getBoolean(path + ".clear") == false){
 			TicketManager.give(s_player, "5");
 			ne.getConfig().set(path + ".last_minute", TimeManager.minute);
+			ne.broadcastAll(player, NekoEvent.ne_tag + ChatColor.BLUE + s_player + ChatColor.WHITE + "が、" + ChatColor.RED + stage + "ダンジョン" + ChatColor.WHITE +"をクリアしました！");//
 		}else{
 			player.sendMessage(ChatColor.YELLOW +"イベントチケットは各ダンジョンで24時間おきに入手できます。");
 		}
@@ -42,7 +43,7 @@ public class GameManager {
 		
 		if(ne.checkPlayer(player) == false) return;
 		
-		player.sendMessage(ChatColor.GREEN + stage + ChatColor.AQUA + "アスレをクリア！");
+		player.sendMessage(ChatColor.GREEN + stage + "アスレ" + ChatColor.WHITE + "を" + ChatColor.AQUA + "クリア！");
 		ne.writeLog("Parkour:" + s_player + " clear:" + stage);
 		
 		if(TimeManager.checkOverDiffMinute(path, 1440)){ //if over 24h,reset
@@ -53,6 +54,7 @@ public class GameManager {
 		if(ne.getConfig().getBoolean(path + ".clear") == false){
 			TicketManager.give(s_player, "1");
 			ne.getConfig().set(path + ".last_minute", TimeManager.minute);
+			ne.broadcastAll(player, NekoEvent.ne_tag + ChatColor.BLUE + s_player + ChatColor.WHITE + "が、" + ChatColor.GREEN + stage + "アスレ" + ChatColor.WHITE +"をクリアしました！");
 		}else{
 			player.sendMessage(ChatColor.YELLOW +"イベントチケットは各アスレで24時間おきに入手できます。");
 		}
