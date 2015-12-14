@@ -36,7 +36,7 @@ public class TPManager {
 		// count startne
 		if (TimeManager.tp == 0)
 			TimeManager.tp = 1;
-
+		
 		ne.getLogger().info(player.getName() + "を" + tp + "にsingleTPしました。");
 		ne.writeLog("TP:" + player.getName() + " tp:" + tp);
 	}

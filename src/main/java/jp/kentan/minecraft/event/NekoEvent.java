@@ -14,6 +14,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class NekoEvent extends JavaPlugin {
 	public static String ne_tag = ChatColor.GRAY + "[" + ChatColor.GOLD  + "Neko" + ChatColor.YELLOW + "Event" + ChatColor.GRAY + "] " + ChatColor.WHITE;
+	public static String sp_itemid, sp_name;
 	public static String gacha_list[][] = new String[5][10], gacha_itemname[][] = new String[5][10];
 	public static int gacha_numbers[] = new int[5];
 	
@@ -57,6 +58,11 @@ public class NekoEvent extends JavaPlugin {
 				sender.sendMessage(ChatColor.GREEN + "NekoEventの設定を再読み込みしました。");
 
 				break;
+			case "save":
+
+				ConfigManager.save();
+
+				break;
 			case "ticket":// event ticket <player> <number>
 
 				TicketManager.give(args[1], args[2]);
@@ -85,7 +91,7 @@ public class NekoEvent extends JavaPlugin {
 					return true;
 				}
 
-				if (TimeManager.checkOverTPTime(args[1]) == true)
+				if (TimeManager.checkOverTPTime(args[2]) == true)
 					TPManager.singleTP(args[1], args[2]);
 
 				break;
@@ -96,9 +102,10 @@ public class NekoEvent extends JavaPlugin {
 				}
 
 				break;
-			case "save":
+			case "special":
 
-				ConfigManager.save();
+				if(TimeManager.checkSpecialDay() == true) processSpecial(args[1], args[2]);
+				else sender.sendMessage(ChatColor.YELLOW + "今日はスペシャル対象の日ではありません。");
 
 				break;
 			}
@@ -163,13 +170,34 @@ public class NekoEvent extends JavaPlugin {
 	private void processGacha(Player player, int type) {
 		int rand = (int) (Math.random() * (gacha_numbers[type] + 1));// 0-gacha_numbers
 
-		getServer().dispatchCommand(getServer().getConsoleSender(),
-				"give " + player.getName() + gacha_list[type][rand]);
+		getServer().dispatchCommand(getServer().getConsoleSender(), "give " + player.getName() + gacha_list[type][rand]);
 
 		player.sendMessage(ChatColor.AQUA + gacha_itemname[type][rand] + ChatColor.WHITE + "を" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "しました！");
 		broadcastAll(player,ne_tag + ChatColor.BLUE + player.getName() + ChatColor.WHITE + "が,ガチャで" + ChatColor.AQUA + gacha_itemname[type][rand] + ChatColor.WHITE + "を" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "しました！");
 		getLogger().info(player.getName() + "にガチャ景品 " + gacha_list[type][rand] + " を追加しました。");
 		writeLog("Gacha:" + player.getName() + " get:" + gacha_itemname[type][rand] + "(" + gacha_list[type][rand] + ")");
+	}
+	
+	private void processSpecial(String s_player, String name) {
+		Player player = Bukkit.getServer().getPlayer(s_player);
+		if(checkPlayer(player) == false) return;
+		
+		String path = s_player + ".special." + name;
+		
+		if(getConfig().getBoolean(path) == false){
+			getConfig().set(path, true);
+		}
+		else {
+			player.sendMessage(ChatColor.YELLOW + "あなたはすでに" + name + "景品を入手しています。");
+			return;
+		}
+
+		getServer().dispatchCommand(getServer().getConsoleSender(), "give " + player.getName() + sp_itemid);
+
+		player.sendMessage(ChatColor.AQUA + sp_name + ChatColor.WHITE + "を" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "しました！");
+		broadcastAll(player,ne_tag + ChatColor.BLUE + player.getName() + ChatColor.WHITE + "が," + ChatColor.AQUA + sp_name + ChatColor.WHITE + "を" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "しました！");
+		getLogger().info(player.getName() + "にスペシャル景品 " + sp_itemid + " を追加しました。");
+		writeLog("Special:" + player.getName() + " get:" + sp_name + "(" + sp_itemid + ")");
 	}
 	
 	public void broadcastAll(Player me, String str){
