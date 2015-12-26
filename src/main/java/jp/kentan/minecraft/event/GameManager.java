@@ -9,7 +9,7 @@ public class GameManager {
 	
 	static NekoEvent ne = NekoEvent.getInstance();
 	
-	public static void clearDungeon(String stage, String s_player) {
+	public static void clearDungeon(String stage,String et_number, String s_player) {
 		String path = s_player + ".dungeon." + stage;
 		Player player = Bukkit.getServer().getPlayer(s_player);
 		
@@ -18,17 +18,17 @@ public class GameManager {
 		player.sendMessage(ChatColor.RED+ stage + "ダンジョン" + ChatColor.WHITE + "を" + ChatColor.AQUA + "クリア！");
 		ne.writeLog("Dungeon:" + s_player + " clear:" + stage);
 		
-		if(TimeManager.checkOverDiffMinute(path, 1440)){ //if over 24h,reset
+		if(TimeManager.checkOverDiffMinute(path, 30)){ //if over 30m,reset
 			ne.getConfig().set(path + ".clear", false);
 			ne.saveConfig();
 		}
 
 		if(ne.getConfig().getBoolean(path + ".clear") == false){
-			TicketManager.give(s_player, "5");
+			TicketManager.give(s_player, et_number);
 			ne.getConfig().set(path + ".last_minute", TimeManager.minute);
 			ne.broadcastAll(player, NekoEvent.ne_tag + ChatColor.BLUE + s_player + ChatColor.WHITE + "が、" + ChatColor.RED + stage + "ダンジョン" + ChatColor.WHITE +"をクリアしました！");//
 		}else{
-			player.sendMessage(ChatColor.YELLOW +"イベントチケットは各ダンジョンで24時間おきに入手できます。");
+			player.sendMessage(ChatColor.YELLOW +"イベントチケットは各ダンジョンで30分おきに入手できます。");
 		}
 		
 		ne.getConfig().set(path + ".clear", true);

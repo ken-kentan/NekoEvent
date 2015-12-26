@@ -16,6 +16,7 @@ public class NekoEvent extends JavaPlugin {
 	public static String ne_tag = ChatColor.GRAY + "[" + ChatColor.GOLD  + "Neko" + ChatColor.YELLOW + "Event" + ChatColor.GRAY + "] " + ChatColor.WHITE;
 	public static String sp_itemid, sp_name;
 	public static String gacha_list[][] = new String[5][10], gacha_itemname[][] = new String[5][10];
+	public static String buy_list[] = new String[20], buy_name[] = new String[20];
 	public static int gacha_numbers[] = new int[5];
 	
 	private static NekoEvent instance;
@@ -78,9 +79,9 @@ public class NekoEvent extends JavaPlugin {
 				GameManager.clearParkour(args[1], args[2]);
 
 				break;
-			case "dungeon":// event dungeon <stage> <player>
+			case "dungeon":// event dungeon <stage> <number> <player>
 
-				GameManager.clearDungeon(args[1], args[2]);
+				GameManager.clearDungeon(args[1], args[2], args[3]);
 
 				break;
 			case "tp":// event tp <player> <tp>
@@ -102,10 +103,17 @@ public class NekoEvent extends JavaPlugin {
 				}
 
 				break;
-			case "special":
+			case "special":// event special <player> <name>
 
 				if(TimeManager.checkSpecialDay() == true) processSpecial(args[1], args[2]);
-				else sender.sendMessage(ChatColor.YELLOW + "今日はスペシャル対象の日ではありません。");
+				else Bukkit.getServer().getPlayer(args[1]).sendMessage(ChatColor.YELLOW + "今日はスペシャル対象の日ではありません。");
+
+				break;
+			case "buy":// event buy <player> <type> <ticket>
+
+				if (TicketManager.remove(args[1], args[3]) == true) {
+					processBuy(Bukkit.getServer().getPlayer(args[1]), Integer.parseInt(args[2]));
+				}
 
 				break;
 			}
@@ -186,6 +194,7 @@ public class NekoEvent extends JavaPlugin {
 		
 		if(getConfig().getBoolean(path) == false){
 			getConfig().set(path, true);
+			saveConfig();
 		}
 		else {
 			player.sendMessage(ChatColor.YELLOW + "あなたはすでに" + name + "景品を入手しています。");
@@ -198,6 +207,16 @@ public class NekoEvent extends JavaPlugin {
 		broadcastAll(player,ne_tag + ChatColor.BLUE + player.getName() + ChatColor.WHITE + "が," + ChatColor.AQUA + sp_name + ChatColor.WHITE + "を" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "しました！");
 		getLogger().info(player.getName() + "にスペシャル景品 " + sp_itemid + " を追加しました。");
 		writeLog("Special:" + player.getName() + " get:" + sp_name + "(" + sp_itemid + ")");
+	}
+	
+	private void processBuy(Player player, int type) {
+
+		getServer().dispatchCommand(getServer().getConsoleSender(), "give " + player.getName() + buy_list[type]);
+
+		player.sendMessage(ChatColor.AQUA + buy_name[type] + ChatColor.WHITE + "を" + ChatColor.GOLD + "購入" + ChatColor.WHITE + "しました！");
+		broadcastAll(player,ne_tag + ChatColor.BLUE + player.getName() + ChatColor.WHITE + "が," + ChatColor.AQUA + buy_name[type] + ChatColor.WHITE + "を" + ChatColor.GOLD + "購入" + ChatColor.WHITE + "しました！");
+		getLogger().info(player.getName() + "にコマンド " + buy_list[type] + " を実行しました。");
+		writeLog("Buy:" + player.getName() + " detail:" + buy_name[type] + "(" + buy_list[type] + ")");
 	}
 	
 	public void broadcastAll(Player me, String str){

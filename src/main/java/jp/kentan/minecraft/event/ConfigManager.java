@@ -28,6 +28,13 @@ public class ConfigManager {
 				}
 			}
 		}
+		
+		for (int i = 0; i < 20; i++) {
+			if (ne.getConfig().getString("buy.command." + i) != null) {
+				NekoEvent.buy_list[i] = ne.getConfig().getString("buy.command."+ i);
+				NekoEvent.buy_name[i] = ne.getConfig().getString("buy.name." + i);
+			}
+		}
 
 		ne.getLogger().info("Done. getBaseConfig from config.yml");
 		ne.getLogger().info("Result. minute:" + TimeManager.minute + " reward_rate:" + GameManager.reward_rate
