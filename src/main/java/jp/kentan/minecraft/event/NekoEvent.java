@@ -140,7 +140,7 @@ public class NekoEvent extends JavaPlugin {
 	public boolean checkPlayer(Player player) {
 
 		if (checkInGame(player) == false) {
-			getLogger().info("プレイヤーが見つかりません。");
+			getLogger().info("プレイヤー(" + player.getName() + ")が見つかりません。");
 			return false;
 		}
 		return true;
@@ -210,12 +210,13 @@ public class NekoEvent extends JavaPlugin {
 	}
 	
 	private void processBuy(Player player, int type) {
+		String _command = buy_list[type].replace("{player}", player.getName());
 
-		getServer().dispatchCommand(getServer().getConsoleSender(), "give " + player.getName() + buy_list[type]);
+		getServer().dispatchCommand(getServer().getConsoleSender(), _command);
 
 		player.sendMessage(ChatColor.AQUA + buy_name[type] + ChatColor.WHITE + "を" + ChatColor.GOLD + "購入" + ChatColor.WHITE + "しました！");
 		broadcastAll(player,ne_tag + ChatColor.BLUE + player.getName() + ChatColor.WHITE + "が," + ChatColor.AQUA + buy_name[type] + ChatColor.WHITE + "を" + ChatColor.GOLD + "購入" + ChatColor.WHITE + "しました！");
-		getLogger().info(player.getName() + "にコマンド " + buy_list[type] + " を実行しました。");
+		getLogger().info(player.getName() + "にコマンド [" + buy_list[type] + "]を実行しました。");
 		writeLog("Buy:" + player.getName() + " detail:" + buy_name[type] + "(" + buy_list[type] + ")");
 	}
 	
