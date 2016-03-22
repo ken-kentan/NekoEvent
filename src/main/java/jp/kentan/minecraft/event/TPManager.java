@@ -8,11 +8,35 @@ public class TPManager {
 
 	static NekoEvent ne = NekoEvent.getInstance();
 	
-	public static void TP(Player player, Location thisLoc ,double x, double y, double z){
-		Location location = new Location(thisLoc.getWorld(), x, y, z);
+	public static void TP(Player player, Location thisLoc ,String[] strLoc){
+		boolean[] isRelative = {false,false,false};
+		double[] loc = new double[3];
+		
+		loc[0] = thisLoc.getX();
+		loc[1] = thisLoc.getY();
+		loc[2] = thisLoc.getZ();
+		
+		for(int i=0; i<3; i++){
+			if(strLoc[i].indexOf("~") != -1){
+				isRelative[i] = true;
+				loc[i] = Double.parseDouble(strLoc[i].replace("~", ""));
+			}
+			else {
+				loc[i] = Double.parseDouble(strLoc[i]);
+			}
+		}
+
+		Location playerLoc = player.getLocation();
+		
+		if(isRelative[0]) loc[0] += playerLoc.getX();
+		if(isRelative[1]) loc[1] += playerLoc.getY();
+		if(isRelative[2]) loc[2] += playerLoc.getZ();
+		
+		Location location = new Location(thisLoc.getWorld(), loc[0], loc[1], loc[2]);
 		
 		player.teleport(location);
-		ne.getLogger().info(player.getName() + "を(" + location.getWorld().getName() + "," + x + "," + y + "," + z+ ")にTPしました。");
+	
+		ne.getLogger().info(player.getName() + "を(" + location.getWorld().getName() + "," + loc[0] + "," + loc[1] + "," + loc[2]+ ")にTPしました。");
 	}
 
 	public static void set(Player player, String tp) {
@@ -48,15 +72,41 @@ public class TPManager {
 		ne.writeLog("TP:" + player.getName() + " tp:" + tp);
 	}
 	
-	public static void areaTP(float range, Location thisLoc ,double x, double y, double z){
+	public static void areaTP(float range, Location thisLoc , String[] strLoc){
+		boolean[] isRelative = {false,false,false};
+		double[] loc = new double[3];
 		
-		//TP location
-		Location location = new Location(thisLoc.getWorld(), x, y, z);
+		loc[0] = thisLoc.getX();
+		loc[1] = thisLoc.getY();
+		loc[2] = thisLoc.getZ();
+		
+		for(int i=0; i<3; i++){
+			if(strLoc[i].indexOf("~") != -1){
+				isRelative[i] = true;
+				loc[i] = Double.parseDouble(strLoc[i].replace("~", ""));
+			}
+			else {
+				loc[i] = Double.parseDouble(strLoc[i]);
+			}
+		}
+		
 		
 		for(Player player : Bukkit.getServer().getOnlinePlayers()){
-			if(player.getWorld() == location.getWorld() && thisLoc.distance(player.getLocation()) <= (double)range){//thisLoc.distance(location) <= (double)range
+			if(player.getWorld() == thisLoc.getWorld() && thisLoc.distance(player.getLocation()) <= (double)range){
+				Location playerLoc = player.getLocation();
+				
+				if(isRelative[0]) loc[0] += playerLoc.getX();
+				if(isRelative[1]) loc[1] += playerLoc.getY();
+				if(isRelative[2]) loc[2] += playerLoc.getZ();
+				
+				Location location = new Location(thisLoc.getWorld(), loc[0], loc[1], loc[2]);
+				
+				if(isRelative[0]) loc[0] -= playerLoc.getX();
+				if(isRelative[1]) loc[1] -= playerLoc.getY();
+				if(isRelative[2]) loc[2] -= playerLoc.getZ();
+				
 				player.teleport(location);
-				ne.getLogger().info(player.getName() + "を(" + location.getWorld().getName() + "," + x + "," + y + "," + z+ ")にareaTPしました。");
+				ne.getLogger().info(player.getName() + "を(" + location.getWorld().getName() + "," + loc[0] + "," + loc[1] + "," + loc[2] + ")にareaTPしました。");
 			}
 		}
 	}

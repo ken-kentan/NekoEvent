@@ -102,12 +102,11 @@ public class NekoEvent extends JavaPlugin {
 			case "tp"://event tp <range> <x ,y, z> or /event tp 0 <x ,y, z> <player>
 				float range = Float.parseFloat(args[1]);
 				
-				double x = Double.parseDouble(args[2]),
-					   y = Double.parseDouble(args[3]),
-					   z = Double.parseDouble(args[4]);
+				String[] strLoc = new String[3];
+				
+				for(int i=0; i<3; i++) strLoc[i] = args[i+2];
 				
 				Block thisCommandBlock;
-				
 				
 				try{
 					thisCommandBlock = ((BlockCommandSender)sender).getBlock();
@@ -116,8 +115,8 @@ public class NekoEvent extends JavaPlugin {
 					break;
 				}
 				
-				if(range > 0) TPManager.areaTP(range, thisCommandBlock.getLocation(), x, y, z);
-				else TPManager.TP(Bukkit.getServer().getPlayer(args[5]), thisCommandBlock.getLocation(), x, y, z);
+				if(range > 0) TPManager.areaTP(range, thisCommandBlock.getLocation(), strLoc);
+				else TPManager.TP(Bukkit.getServer().getPlayer(args[5]), thisCommandBlock.getLocation(), strLoc);
 
 				break;
 			case "gacha":// event gacha <player> <type> <ticket>
@@ -143,7 +142,7 @@ public class NekoEvent extends JavaPlugin {
 			case "msg"://event msg <player> <name color> <name> <message>
 				Player player = (Player)Bukkit.getServer().getPlayer(args[1]);
 				
-				player.sendMessage(" " + getChatColor(args[2]) + args[3] + " " + ChatColor.GREEN + ":" + ChatColor.WHITE + args[4]);
+				player.sendMessage(" " + getChatColor(args[2]) + args[3] + ChatColor.GREEN + ": " +ChatColor.WHITE + args[4]);
 				break;
 			}
 		}
