@@ -7,6 +7,13 @@ import org.bukkit.entity.Player;
 public class TPManager {
 
 	static NekoEvent ne = NekoEvent.getInstance();
+	
+	public static void TP(Player player, Location thisLoc ,double x, double y, double z){
+		Location location = new Location(thisLoc.getWorld(), x, y, z);
+		
+		player.teleport(location);
+		ne.getLogger().info(player.getName() + "を(" + location.getWorld().getName() + "," + x + "," + y + "," + z+ ")にTPしました。");
+	}
 
 	public static void set(Player player, String tp) {
 		String path = "TP." + tp;
@@ -39,5 +46,18 @@ public class TPManager {
 		
 		ne.getLogger().info(player.getName() + "を" + tp + "にsingleTPしました。");
 		ne.writeLog("TP:" + player.getName() + " tp:" + tp);
+	}
+	
+	public static void areaTP(float range, Location thisLoc ,double x, double y, double z){
+		
+		//TP location
+		Location location = new Location(thisLoc.getWorld(), x, y, z);
+		
+		for(Player player : Bukkit.getServer().getOnlinePlayers()){
+			if(player.getWorld() == location.getWorld() && thisLoc.distance(player.getLocation()) <= (double)range){//thisLoc.distance(location) <= (double)range
+				player.teleport(location);
+				ne.getLogger().info(player.getName() + "を(" + location.getWorld().getName() + "," + x + "," + y + "," + z+ ")にareaTPしました。");
+			}
+		}
 	}
 }

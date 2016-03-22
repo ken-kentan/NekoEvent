@@ -7,6 +7,9 @@ import java.util.Calendar;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.block.Block;
+import org.bukkit.block.CommandBlock;
+import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -84,7 +87,7 @@ public class NekoEvent extends JavaPlugin {
 				GameManager.clearDungeon(args[1], args[2], args[3]);
 
 				break;
-			case "tp":// event tp <player> <tp>
+			case "join":// event join <player> <stage> , event join set <stage>
 
 				if (args[1].equals("set")) { // event tp set <name>
 					if (checkInGame(sender) == true)
@@ -94,6 +97,27 @@ public class NekoEvent extends JavaPlugin {
 
 				if (TimeManager.checkOverTPTime(args[2]) == true)
 					TPManager.singleTP(args[1], args[2]);
+
+				break;
+			case "tp"://event tp <range> <x ,y, z> or /event tp 0 <x ,y, z> <player>
+				float range = Float.parseFloat(args[1]);
+				
+				double x = Double.parseDouble(args[2]),
+					   y = Double.parseDouble(args[3]),
+					   z = Double.parseDouble(args[4]);
+				
+				Block thisCommandBlock;
+				
+				
+				try{
+					thisCommandBlock = ((BlockCommandSender)sender).getBlock();
+				}catch(Exception e){
+					showException(e);
+					break;
+				}
+				
+				if(range > 0) TPManager.areaTP(range, thisCommandBlock.getLocation(), x, y, z);
+				else TPManager.TP(Bukkit.getServer().getPlayer(args[5]), thisCommandBlock.getLocation(), x, y, z);
 
 				break;
 			case "gacha":// event gacha <player> <type> <ticket>
@@ -116,6 +140,11 @@ public class NekoEvent extends JavaPlugin {
 				}
 
 				break;
+			case "msg"://event msg <player> <name color> <name> <message>
+				Player player = (Player)Bukkit.getServer().getPlayer(args[1]);
+				
+				player.sendMessage(" " + getChatColor(args[2]) + args[3] + " " + ChatColor.GREEN + ":" + ChatColor.WHITE + args[4]);
+				break;
 			}
 		}
 
@@ -123,7 +152,7 @@ public class NekoEvent extends JavaPlugin {
 	}
 
 	public void showException(Exception _e) {
-		getLogger().info(_e.toString());
+		getLogger().warning(_e.toString());
 	}
 	
 	public static NekoEvent getInstance(){
@@ -229,5 +258,41 @@ public class NekoEvent extends JavaPlugin {
         {
 			if(player!= me) player.sendMessage(str);
         }
+	}
+	
+	public ChatColor getChatColor(String str){
+		switch(str){
+		case "&0":
+			return ChatColor.BLACK;
+		case "&1":
+			return ChatColor.DARK_BLUE;
+		case "&2":
+			return ChatColor.DARK_GREEN;
+		case "&3":
+			return ChatColor.DARK_AQUA;
+		case "&4":
+			return ChatColor.DARK_RED;
+		case "&5":
+			return ChatColor.DARK_PURPLE;
+		case "&6":
+			return ChatColor.GOLD;
+		case "&7":
+			return ChatColor.GRAY;
+		case "&8":
+			return ChatColor.DARK_GRAY;
+		case "&a":
+			return ChatColor.GREEN;
+		case "&b":
+			return ChatColor.AQUA;
+		case "&c":
+			return ChatColor.RED;
+		case "&d":
+			return ChatColor.LIGHT_PURPLE;
+		case "&e":
+			return ChatColor.YELLOW;
+		case "&f":
+		default:
+			return ChatColor.WHITE;
+		}
 	}
 }

@@ -12,8 +12,14 @@ public class TicketManager {
 	
 	public static void give(String s_player, String number){
 		int ticket_number = 0;
+		Player player = null;
 		
-		Player player = Bukkit.getServer().getPlayer(s_player);
+		try{
+			player = Bukkit.getServer().getPlayer(s_player);
+		}catch (Exception e){
+			ne.showException(e);
+			return;
+		}
 		
 		if(ne.checkPlayer(player) == false) return;
 		
