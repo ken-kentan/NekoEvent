@@ -8,7 +8,6 @@ import java.util.Calendar;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
-import org.bukkit.block.CommandBlock;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -106,14 +105,7 @@ public class NekoEvent extends JavaPlugin {
 				
 				for(int i=0; i<3; i++) strLoc[i] = args[i+2];
 				
-				Block thisCommandBlock;
-				
-				try{
-					thisCommandBlock = ((BlockCommandSender)sender).getBlock();
-				}catch(Exception e){
-					showException(e);
-					break;
-				}
+				Block thisCommandBlock = ((BlockCommandSender)sender).getBlock();
 				
 				if(range > 0) TPManager.areaTP(range, thisCommandBlock.getLocation(), strLoc);
 				else TPManager.TP(Bukkit.getServer().getPlayer(args[5]), thisCommandBlock.getLocation(), strLoc);
@@ -143,6 +135,13 @@ public class NekoEvent extends JavaPlugin {
 				Player player = (Player)Bukkit.getServer().getPlayer(args[1]);
 				
 				player.sendMessage(" " + getChatColor(args[2]) + args[3] + ChatColor.GREEN + ": " +ChatColor.WHITE + args[4]);
+				break;
+			case "trigger"://event trigger <x y z> <player> <item_num> <msg_no_hand> <msg_not_match>
+				Block thisCommandBlock1 = ((BlockCommandSender)sender).getBlock();
+				
+				String[] strLoc2 = {args[1],args[2],args[3]};
+				
+				if(TriggerManager.checkItem(args[4],args[5],args[6],args[7])) TriggerManager.setTorch(thisCommandBlock1.getLocation(), strLoc2);
 				break;
 			}
 		}

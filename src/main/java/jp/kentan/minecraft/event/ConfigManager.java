@@ -35,6 +35,12 @@ public class ConfigManager {
 				NekoEvent.buy_name[i] = ne.getConfig().getString("buy.name." + i);
 			}
 		}
+		
+		for (int i=0; i<10; i++){
+			if (ne.getConfig().getString("trigger.item." + i) != null) {
+				TriggerManager.triggerItem[i] = ne.getConfig().getString("trigger.item." + i);
+			}
+		}
 
 		ne.getLogger().info("Done. getBaseConfig from config.yml");
 		ne.getLogger().info("Result. minute:" + TimeManager.minute + " reward_rate:" + GameManager.reward_rate

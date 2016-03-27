@@ -101,12 +101,12 @@ public class TPManager {
 				
 				Location location = new Location(thisLoc.getWorld(), loc[0], loc[1], loc[2]);
 				
+				player.teleport(location);
+				ne.getLogger().info(player.getName() + "を(" + location.getWorld().getName() + "," + loc[0] + "," + loc[1] + "," + loc[2] + ")にareaTPしました。");
+				
 				if(isRelative[0]) loc[0] -= playerLoc.getX();
 				if(isRelative[1]) loc[1] -= playerLoc.getY();
 				if(isRelative[2]) loc[2] -= playerLoc.getZ();
-				
-				player.teleport(location);
-				ne.getLogger().info(player.getName() + "を(" + location.getWorld().getName() + "," + loc[0] + "," + loc[1] + "," + loc[2] + ")にareaTPしました。");
 			}
 		}
 	}
