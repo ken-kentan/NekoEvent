@@ -28,7 +28,7 @@ public class TriggerManager {
 		ItemStack itemStack = player.getInventory().getItemInHand();
 		
 		if(itemStack == null){
-			if(!noItemInHand.equals("null")) player.sendMessage(noItemInHand);
+			if(!noItemInHand.equals("null")) player.sendMessage(" " + noItemInHand);
 			return false;
 		}
 		
@@ -41,7 +41,7 @@ public class TriggerManager {
 			
 			return true;
 		}else{
-			if(!notMatchItem.equals("null")) player.sendMessage(notMatchItem);
+			if(!notMatchItem.equals("null")) player.sendMessage(" " + notMatchItem);
 		}
 		
 		return false;
