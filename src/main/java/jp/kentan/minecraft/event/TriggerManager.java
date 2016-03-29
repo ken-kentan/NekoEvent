@@ -1,6 +1,7 @@
 package jp.kentan.minecraft.event;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -27,8 +28,8 @@ public class TriggerManager {
 		
 		ItemStack itemStack = player.getInventory().getItemInHand();
 		
-		if(itemStack == null){
-			if(!noItemInHand.equals("null")) player.sendMessage(" " + noItemInHand);
+		if(itemStack == null || itemStack.getAmount() < 1){
+			if(!noItemInHand.equals("null")) player.sendMessage(" " + ChatColor.GRAY + ChatColor.ITALIC + noItemInHand);
 			return false;
 		}
 		
@@ -41,7 +42,7 @@ public class TriggerManager {
 			
 			return true;
 		}else{
-			if(!notMatchItem.equals("null")) player.sendMessage(" " + notMatchItem);
+			if(!notMatchItem.equals("null")) player.sendMessage(" " + ChatColor.GRAY + ChatColor.ITALIC + notMatchItem);
 		}
 		
 		return false;
@@ -52,5 +53,7 @@ public class TriggerManager {
 		Location setLoc = new Location(thisLoc.getWorld(), loc[0], loc[1], loc[2]);
 		
 		setLoc.getBlock().setType(Material.REDSTONE_TORCH_ON);
+		
+		ne.getLogger().info("(" + thisLoc.getWorld().getName() + "," + loc[0] + "," + loc[1] + "," + loc[2] + ")にREDSTONE_TORCH_ONをセットしました。");
 	}
 }

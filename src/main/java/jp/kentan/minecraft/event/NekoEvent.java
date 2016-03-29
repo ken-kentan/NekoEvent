@@ -139,9 +139,11 @@ public class NekoEvent extends JavaPlugin {
 			case "trigger"://event trigger <x y z> <player> <item_num> <msg_no_hand> <msg_not_match>
 				Block thisCommandBlock1 = ((BlockCommandSender)sender).getBlock();
 				
-				String[] strLoc2 = {args[1],args[2],args[3]};
+				String[] strLoc1 = {args[1],args[2],args[3]};
 				
-				if(TriggerManager.checkItem(args[4],args[5],args[6],args[7])) TriggerManager.setTorch(thisCommandBlock1.getLocation(), strLoc2);
+				if(TriggerManager.checkItem(args[4],args[5],args[6],args[7])) TriggerManager.setTorch(thisCommandBlock1.getLocation(), strLoc1);
+				break;
+			case "give"://event give <player> <item_num> <cycle>
 				break;
 			}
 		}
