@@ -5,6 +5,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Calendar;
 
+import javax.swing.text.html.HTMLEditorKit.Parser;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
@@ -12,6 +14,7 @@ import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class NekoEvent extends JavaPlugin {
@@ -144,6 +147,13 @@ public class NekoEvent extends JavaPlugin {
 				if(TriggerManager.checkItem(args[4],args[5],args[6],args[7])) TriggerManager.setTorch(thisCommandBlock1.getLocation(), strLoc1);
 				break;
 			case "give"://event give <player> <item_num> <cycle>
+				break;
+			case "remove"://event remove <player> <item name>
+				GameManager.removeItem(args[1], args[2]);
+				break;
+			case "itemStack":
+				ItemStack itemStack = ((Player)sender).getInventory().getItemInHand();
+				sender.sendMessage(itemStack.toString());
 				break;
 			}
 		}

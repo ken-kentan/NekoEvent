@@ -3,6 +3,7 @@ package jp.kentan.minecraft.event;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class GameManager {
 	public static int reward_rate = 0;
@@ -69,5 +70,18 @@ public class GameManager {
 		ne.writeLog("Minigame:" + s_player + " rand:" + rand + " rate:" + reward_rate);
 		
 		if(rand == reward_rate - 1) TicketManager.give(s_player,number);
+	}
+	
+	public static void removeItem(String strPlayer, String strItem){
+		Player player = Bukkit.getServer().getPlayer(strPlayer);
+		
+		for(int i = 0; i < player.getInventory().getSize(); i++) {
+			ItemStack itemS = player.getInventory().getItem(i);
+			if(itemS != null && itemS.toString().indexOf(strItem) != -1){//リンゴ
+				player.getInventory().setItem(i, null);
+				player.updateInventory();
+				ne.getLogger().info(player.getName() + "のインベントリから" + itemS.getType() + "を消去しました。");
+			}
+		}
 	}
 }
