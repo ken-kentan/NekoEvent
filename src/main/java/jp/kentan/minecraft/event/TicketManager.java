@@ -1,7 +1,5 @@
 package jp.kentan.minecraft.event;
 
-import static org.hamcrest.CoreMatchers.nullValue;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -66,7 +64,7 @@ public class TicketManager {
 			try{
 				strItemStack = itemStack.toString();
 			}catch(Exception e){
-				ne.getLogger().warning("例外が発生したためスキップしました。");
+				if(itemStack != null && itemStack.getAmount() > 0) ne.getLogger().warning("例外が発生したためスキップしました。");
 				continue;
 			}
 			
@@ -88,7 +86,7 @@ public class TicketManager {
 			try{
 				strItemStack = itemS.toString();
 			}catch(Exception e){
-				ne.getLogger().warning("例外が発生したためスキップしました。");
+				if(itemS != null && itemS.getAmount() > 0) ne.getLogger().warning("例外が発生したためスキップしました。");
 				continue;
 			}
 			

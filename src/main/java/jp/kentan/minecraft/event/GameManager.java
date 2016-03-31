@@ -82,7 +82,7 @@ public class GameManager {
 			try{
 				strItemStack = itemS.toString();
 			}catch(Exception e){
-				ne.getLogger().warning("例外が発生したためスキップしました。");
+				if(itemS != null && itemS.getAmount() > 0) ne.getLogger().warning("例外が発生したためスキップしました。");
 				continue;
 			}
 

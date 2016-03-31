@@ -55,6 +55,7 @@ public class NekoEvent extends JavaPlugin {
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
 
 		if (cmd.getName().equals("event") && args.length > 0) {
+			Player player = null;
 
 			switch (args[0]) {
 			case "reload":
@@ -135,7 +136,7 @@ public class NekoEvent extends JavaPlugin {
 
 				break;
 			case "msg"://event msg <player> <name color> <name> <message>
-				Player player = (Player)Bukkit.getServer().getPlayer(args[1]);
+				player = (Player)Bukkit.getServer().getPlayer(args[1]);
 				
 				player.sendMessage(" " + getChatColor(args[2]) + args[3] + ChatColor.GREEN + ": " +ChatColor.WHITE + args[4]);
 				break;
@@ -154,6 +155,20 @@ public class NekoEvent extends JavaPlugin {
 			case "itemStack":
 				ItemStack itemStack = ((Player)sender).getInventory().getItemInHand();
 				sender.sendMessage(itemStack.toString());
+				break;
+			case "pass":
+				int numPass = Integer.parseInt(args[1]);
+				player = (Player)Bukkit.getServer().getPlayer(args[2]);
+				
+				switch(args[3]){
+				case "init":
+					String[] loc = {args[5],args[6],args[7]};
+					PasswordManager.init(numPass, args[4],loc);
+					break;
+				case "set":
+					PasswordManager.set(numPass, player, args[4]);
+					break;
+				}
 				break;
 			}
 		}
