@@ -152,7 +152,10 @@ public class NekoEvent extends JavaPlugin {
 			case "remove"://event remove <player> <item name>
 				GameManager.removeItem(args[1], args[2]);
 				break;
-			case "itemStack":
+			case "setAmount"://event setAmount <player> <item name> <item amount>
+				GameManager.setItemAmount(args[1], args[2], args[3]);
+				break;
+			case "itemStack"://event itemStack
 				ItemStack itemStack = ((Player)sender).getInventory().getItemInHand();
 				sender.sendMessage(itemStack.toString());
 				break;
@@ -161,11 +164,11 @@ public class NekoEvent extends JavaPlugin {
 				player = (Player)Bukkit.getServer().getPlayer(args[2]);
 				
 				switch(args[3]){
-				case "init":
+				case "init"://event pass init <pass number> @p <password> <x y z>
 					String[] loc = {args[5],args[6],args[7]};
 					PasswordManager.init(numPass, args[4],loc);
 					break;
-				case "set":
+				case "set"://event pass set <pass number> @p <password>
 					PasswordManager.set(numPass, player, args[4]);
 					break;
 				}

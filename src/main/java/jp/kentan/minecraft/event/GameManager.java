@@ -93,4 +93,35 @@ public class GameManager {
 			}
 		}
 	}
+	
+	public static void setItemAmount(String strPlayer, String strItem, String strAmount){
+		Player player = Bukkit.getServer().getPlayer(strPlayer);
+		int amount = Integer.parseInt(strAmount), sumAmount = 0;
+		
+		for(int i = 0; i < player.getInventory().getSize(); i++) {
+			ItemStack itemS = player.getInventory().getItem(i);
+			String strItemStack = null;
+			
+			try{
+				strItemStack = itemS.toString();
+			}catch(Exception e){
+				if(itemS != null && itemS.getAmount() > 0) ne.getLogger().warning("例外が発生したためスキップしました。");
+				continue;
+			}
+
+			if(itemS != null && strItemStack.indexOf(strItem) != -1){
+				sumAmount += itemS.getAmount();
+				if(sumAmount > amount){
+					int setAmount = itemS.getAmount() - (sumAmount - amount);
+					
+					if(setAmount > 0) itemS.setAmount(setAmount);
+					else player.getInventory().setItem(i, null);
+					
+					player.updateInventory();
+					
+					ne.getLogger().info(player.getName() + "のインベントリから" + itemS.getType() + "を" + setAmount +"個にしました。");
+				}
+			}
+		}
+	}
 }
