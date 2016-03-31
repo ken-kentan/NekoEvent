@@ -77,7 +77,16 @@ public class GameManager {
 		
 		for(int i = 0; i < player.getInventory().getSize(); i++) {
 			ItemStack itemS = player.getInventory().getItem(i);
-			if(itemS != null && itemS.toString().indexOf(strItem) != -1){//リンゴ
+			String strItemStack = null;
+			
+			try{
+				strItemStack = itemS.toString();
+			}catch(Exception e){
+				ne.getLogger().warning("例外が発生したためスキップしました。");
+				continue;
+			}
+
+			if(itemS != null && strItemStack.indexOf(strItem) != -1){
 				player.getInventory().setItem(i, null);
 				player.updateInventory();
 				ne.getLogger().info(player.getName() + "のインベントリから" + itemS.getType() + "を消去しました。");

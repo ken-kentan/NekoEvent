@@ -1,5 +1,7 @@
 package jp.kentan.minecraft.event;
 
+import static org.hamcrest.CoreMatchers.nullValue;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -59,7 +61,16 @@ public class TicketManager {
 		//Get amount of EventTickets
 		for(int i = 0; i < player.getInventory().getSize(); i++) {
 			ItemStack itemStack = player.getInventory().getItem(i);
-			if(itemStack != null && itemStack.toString().indexOf(itemS_str) != -1){
+			String strItemStack = null;
+			
+			try{
+				strItemStack = itemStack.toString();
+			}catch(Exception e){
+				ne.getLogger().warning("例外が発生したためスキップしました。");
+				continue;
+			}
+			
+			if(itemStack != null && strItemStack.indexOf(itemS_str) != -1){
 				player_ticket_amt += itemStack.getAmount();
 			}
 		}
@@ -72,7 +83,16 @@ public class TicketManager {
 
 		for(int i = 0; i < player.getInventory().getSize(); i++) {
 			ItemStack itemS = player.getInventory().getItem(i);
-			if(itemS != null && itemS.toString().indexOf(itemS_str) != -1){
+			String strItemStack = null;
+			
+			try{
+				strItemStack = itemS.toString();
+			}catch(Exception e){
+				ne.getLogger().warning("例外が発生したためスキップしました。");
+				continue;
+			}
+			
+			if(itemS != null && strItemStack.indexOf(itemS_str) != -1){
 				int amt = itemS.getAmount() - ticket_number;
 				
 				//over 1S
