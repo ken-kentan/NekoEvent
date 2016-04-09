@@ -174,17 +174,19 @@ public class NekoEvent extends JavaPlugin {
 				sender.sendMessage(itemStack.toString());
 				break;
 			case "pass":
-				if(isCheckParamLendth(args.length, 8)){
+				if(isCheckParamLendth(args.length, 4)){
 					int numPass = Integer.parseInt(args[1]);
 					player = convertToPlayer(args[2]);
 					
 					switch(args[3]){
 					case "init"://event pass init <pass number> @p <password> <x y z>
-						String[] loc = {args[5],args[6],args[7]};
-						PasswordManager.init(numPass, args[4],loc);
+						if(isCheckParamLendth(args.length, 8)){
+							String[] loc = {args[5],args[6],args[7]};
+							PasswordManager.init(numPass, args[4],loc);
+						}
 						break;
 					case "set"://event pass set <pass number> @p <password>
-						PasswordManager.set(numPass, player, args[4]);
+						if(isCheckParamLendth(args.length, 5)) PasswordManager.set(numPass, player, args[4]);
 						break;
 					}
 				}
@@ -280,7 +282,7 @@ public class NekoEvent extends JavaPlugin {
 		_sender.sendMessage("| " + ChatColor.YELLOW + "/event join set <stage> <stage number> <timer>");
 		_sender.sendMessage("| " + ChatColor.YELLOW + "/event join lock <stage>");
 		_sender.sendMessage("| " + ChatColor.YELLOW + "/event join unlock <stage>");
-		_sender.sendMessage("| " + ChatColor.YELLOW + "/event tp <player> <x ,y, z>");
+		_sender.sendMessage("| " + ChatColor.YELLOW + "/event tp <player> <x y z>");
 		_sender.sendMessage("| " + ChatColor.YELLOW + "/event gacha <player> <type> <ticket>");
 		_sender.sendMessage("| " + ChatColor.YELLOW + "/event special <player> <name>");
 		_sender.sendMessage("| " + ChatColor.YELLOW + "/event buy <player> <type> <ticket>");

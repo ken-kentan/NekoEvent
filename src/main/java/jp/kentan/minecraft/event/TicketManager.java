@@ -12,21 +12,14 @@ public class TicketManager {
 	
 	public static void give(String s_player, String number){
 		int ticket_number = 0;
-		Player player = null;
+		Player player = ne.convertToPlayer(s_player);
 		
-		try{
-			player = Bukkit.getServer().getPlayer(s_player);
-		}catch (Exception e){
-			ne.showException(e);
-			return;
-		}
-		
-		if(ne.checkPlayer(player) == false) return;
+		if(player == null) return;
 		
 		try {
 			ticket_number = Integer.parseInt(number);
 		} catch (NumberFormatException nfex) {
-			ne.showException(nfex);
+			ne.sendErrorMessage(number + "を整数型に変換できませんでした。");
 			return;
 		}
 		
