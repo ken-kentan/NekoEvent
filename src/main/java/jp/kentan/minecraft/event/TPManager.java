@@ -40,7 +40,7 @@ public class TPManager {
 		ne.getLogger().info(player.getName() + "を(" + location.getWorld().getName() + "," + loc[0] + "," + loc[1] + "," + loc[2]+ ")にTPしました。");
 	}
 
-	public static void set(Player player,String strNo, String strName, String strTimer) {
+	public static void set(Player player,String strName, String strNo, String strTimer) {
 		String path = "TP." + strName;
 
 		if (ne.checkPlayer(player) == false) return;
@@ -58,9 +58,9 @@ public class TPManager {
 			return;
 		}
 		
-		ne.getConfig().set(path + ".No", strNo);
+		ne.getConfig().set(path + ".No", stageNumber);
 		ne.getConfig().set(path + ".Lock", false);
-		ne.getConfig().set(path + ".Timer", strTimer);
+		ne.getConfig().set(path + ".Timer", stageTimer);
 
 		Location location = player.getLocation();
 		ne.getConfig().set(path + ".X", location.getX());
@@ -74,7 +74,12 @@ public class TPManager {
 	public static int getTPLocationNumber(String strStage){
 		String path = "TP." + strStage;
 		int stageNumber;
-		stageNumber = ne.getConfig().getInt(path + ".No");
+		stageNumber = ne.getConfig().getInt(path + ".No", -1);
+		
+		if(stageNumber < 0){
+			ne.sendErrorMessage(strStage + "は登録されていません。");
+			return -1;
+		}
 		
 		return stageNumber;
 	}
