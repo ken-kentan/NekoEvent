@@ -9,6 +9,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class TimeManager extends BukkitRunnable{
 	public static int tp = 0, tp_limit = 600, sec = 0, minute = 0, month = 0, day = 0;
+	private static int tpLockTimer[] = new int[20];
 	
 	static NekoEvent ne = NekoEvent.getInstance();
 	
@@ -22,6 +23,9 @@ public class TimeManager extends BukkitRunnable{
     		minute++;
     		if(minute % 60 == 0) ConfigManager.save();
     	}
+    	
+    	for(int i=0; i<20; i++) if(tpLockTimer[i] > 0 && tpLockTimer[i] < 5000) tpLockTimer[i]++;
+    	
     	sec++;
     }
 	
@@ -54,5 +58,20 @@ public class TimeManager extends BukkitRunnable{
 		if(calendar.get(Calendar.MONTH) + 1 == month && calendar.get(Calendar.DATE) == day) return true;
 				
 		return false;
+	}
+	
+	public static void startTPLockTimer(int stageNumber){
+		tpLockTimer[stageNumber] = 1;
+	}
+	
+	public static int getTPLockTimer(int stageNumber){
+		return tpLockTimer[stageNumber];
+	}
+	
+	public static boolean isCheckTPTimer(int stageNumber, int unlockTimer){
+		if(tpLockTimer[stageNumber] > unlockTimer){
+			tpLockTimer[stageNumber] = 0;
+			return true;
+		}else {return false;}
 	}
 }

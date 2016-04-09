@@ -124,4 +124,32 @@ public class GameManager {
 			}
 		}
 	}
+	
+	public static void join(String strPlayer, String strStageName) {
+		String path = "TP." + strStageName;
+		
+		int stageNumber = TPManager.getTPLocationNumber(strStageName),
+			stageTimer = ne.getConfig().getInt(path + ".Timer");;
+		boolean isLock = ne.getConfig().getBoolean(path + ".Lock");
+		
+		if(!isLock || (isLock && TimeManager.isCheckTPTimer(stageNumber, ne.getConfig().getInt(path + ".No")))){
+			if(isLock) lock(strStageName, false);
+			TPManager.TP(strStageName, strPlayer);
+		}else{
+			ne.convertToPlayer(strPlayer).sendMessage(NekoEvent.ne_tag + "現在、" + strStageName + "では参加を受け付けていません。");
+			ne.convertToPlayer(strPlayer).sendMessage(NekoEvent.ne_tag + "参加中のプレイヤーを待つか、" + (stageTimer - TimeManager.getTPLockTimer(stageNumber)) + "秒お待ちください。");
+		}
+	}
+	
+	public static void lock(String strStageName, boolean isLock) {
+		String path = "TP." + strStageName;
+		int stageNumber = TPManager.getTPLocationNumber(strStageName);
+
+		ne.getConfig().set(path + ".Lock", isLock);
+		ne.saveConfig();
+		
+		if(isLock) TimeManager.startTPLockTimer(stageNumber);
+		
+		ne.getLogger().info(strStageName + "のロックを" + isLock + "にしました。");
+	}
 }

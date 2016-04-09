@@ -1,5 +1,7 @@
 package jp.kentan.minecraft.event;
 
+import static org.hamcrest.CoreMatchers.nullValue;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -9,6 +11,7 @@ import javax.swing.text.html.HTMLEditorKit.Parser;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Server;
 import org.bukkit.block.Block;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.Command;
@@ -54,14 +57,19 @@ public class NekoEvent extends JavaPlugin {
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
 
-		if (cmd.getName().equals("event") && args.length > 0) {
+		if (cmd.getName().equals("event")) {
 			Player player = null;
+			Block commandBlock = null;
+			
+			if(args.length == 0 || args[0].equals("help")){
+				showCommandHelp(sender);
+				return true;
+			}
 
 			switch (args[0]) {
 			case "reload":
 
 				ConfigManager.setBase();
-
 				sender.sendMessage(ChatColor.GREEN + "NekoEventの設定を再読み込みしました。");
 
 				break;
@@ -72,105 +80,120 @@ public class NekoEvent extends JavaPlugin {
 				break;
 			case "ticket":// event ticket <player> <number>
 
-				TicketManager.give(args[1], args[2]);
+				if(isCheckParamLendth(args.length, 2)) TicketManager.give(args[1], args[2]);
 
 				break;
 			case "minigame":// event minigame <player> <ticket>
 
-				GameManager.reward(args[1], args[2]);
+				if(isCheckParamLendth(args.length, 2)) GameManager.reward(args[1], args[2]);
 
 				break;
 			case "parkour":// event parkour <stage> <player>
 
-				GameManager.clearParkour(args[1], args[2]);
+				if(isCheckParamLendth(args.length, 2)) GameManager.clearParkour(args[1], args[2]);
 
 				break;
 			case "dungeon":// event dungeon <stage> <number> <player>
 
-				GameManager.clearDungeon(args[1], args[2], args[3]);
+				if(isCheckParamLendth(args.length, 3)) GameManager.clearDungeon(args[1], args[2], args[3]);
 
 				break;
-			case "join":// event join <player> <stage> , event join set <stage>
-
-				if (args[1].equals("set")) { // event tp set <name>
-					if (checkInGame(sender) == true)
-						TPManager.set((Player) sender, args[2]);
-					return true;
+			case "join":// event join <player> <stage> , event join set <stage> <stage number> <timer> ,event join unlock <stage>
+				
+				if(checkPlayer(args[1])){
+					if(isCheckParamLendth(args.length, 2)){
+						GameManager.join(args[1], args[2]);
+					}
+				}else{
+				switch (args[1]) {
+					case "set":
+						if(isCheckParamLendth(args.length, 4) && checkInGame(sender)){
+							TPManager.set((Player)sender, args[2], args[3], args[4]);
+							sender.sendMessage(ChatColor.GREEN + "現在位置を" + args[2] + "のTP位置として自動ﾛｯｸ解除時間" + args[3] + "秒で設定しました。");
+						}
+						break;
+					case "lock":
+						if(isCheckParamLendth(args.length, 2)) GameManager.lock(args[2], true);
+						break;
+					case "unlock":
+						if(isCheckParamLendth(args.length, 2)) GameManager.lock(args[2], false);
+						break;
+					default:
+						sendErrorMessage(args[1] + "は/event joinのパラメータとして不適切です。");
+						break;
+					}
 				}
 
-				if (TimeManager.checkOverTPTime(args[2]) == true)
-					TPManager.singleTP(args[1], args[2]);
-
 				break;
-			case "tp"://event tp <range> <x ,y, z> or /event tp 0 <x ,y, z> <player>
-				float range = Float.parseFloat(args[1]);
-				
-				String[] strLoc = new String[3];
-				
-				for(int i=0; i<3; i++) strLoc[i] = args[i+2];
-				
-				Block thisCommandBlock = ((BlockCommandSender)sender).getBlock();
-				
-				if(range > 0) TPManager.areaTP(range, thisCommandBlock.getLocation(), strLoc);
-				else TPManager.TP(Bukkit.getServer().getPlayer(args[5]), thisCommandBlock.getLocation(), strLoc);
-
+			case "tp"://event tp <player> <x ,y, z>
+				if(isCheckParamLendth(args.length, 4) && isCheckCommandBlock(sender)){
+					player = convertToPlayer(args[1]);
+					String[] strLoc = new String[3];
+					
+					for(int i=0; i<3; i++) strLoc[i] = args[i+2];
+					
+					commandBlock = ((BlockCommandSender)sender).getBlock();
+					
+					TPManager.TP(player, commandBlock.getLocation(), strLoc);
+				}
 				break;
 			case "gacha":// event gacha <player> <type> <ticket>
 
-				if (TicketManager.remove(args[1], args[3]) == true) {
+				if (isCheckParamLendth(args.length, 3) && TicketManager.remove(args[1], args[3])) {
 					processGacha(Bukkit.getServer().getPlayer(args[1]), Integer.parseInt(args[2]));
 				}
 
 				break;
 			case "special":// event special <player> <name>
 
-				if(TimeManager.checkSpecialDay() == true) processSpecial(args[1], args[2]);
+				if(isCheckParamLendth(args.length, 2) && TimeManager.checkSpecialDay()) processSpecial(args[1], args[2]);
 				else Bukkit.getServer().getPlayer(args[1]).sendMessage(ChatColor.YELLOW + "今日はスペシャル対象の日ではありません。");
 
 				break;
 			case "buy":// event buy <player> <type> <ticket>
 
-				if (TicketManager.remove(args[1], args[3]) == true) {
+				if (isCheckParamLendth(args.length, 3) && TicketManager.remove(args[1], args[3]) == true) {
 					processBuy(Bukkit.getServer().getPlayer(args[1]), Integer.parseInt(args[2]));
 				}
 
 				break;
 			case "msg"://event msg <player> <name color> <name> <message>
-				player = (Player)Bukkit.getServer().getPlayer(args[1]);
-				
-				player.sendMessage(" " + getChatColor(args[2]) + args[3] + ChatColor.GREEN + ": " +ChatColor.WHITE + args[4]);
+				if(isCheckParamLendth(args.length, 4)){
+					player = convertToPlayer(args[1]);
+					if(player != null) player.sendMessage(" " + getChatColor(args[2]) + args[3] + ChatColor.GREEN + ": " +ChatColor.WHITE + args[4]);
+				}
 				break;
 			case "trigger"://event trigger <x y z> <player> <item_num> <msg_no_hand> <msg_not_match>
-				Block thisCommandBlock1 = ((BlockCommandSender)sender).getBlock();
+				if(isCheckParamLendth(args.length, 7) && isCheckCommandBlock(sender)){
+					commandBlock = ((BlockCommandSender)sender).getBlock();
+					String[] strLocTrigger = {args[1],args[2],args[3]};
 				
-				String[] strLoc1 = {args[1],args[2],args[3]};
-				
-				if(TriggerManager.checkItem(args[4],args[5],args[6],args[7])) TriggerManager.setTorch(thisCommandBlock1.getLocation(), strLoc1);
+					if(TriggerManager.checkItem(args[4],args[5],args[6],args[7])) TriggerManager.setTorch(commandBlock.getLocation(), strLocTrigger);
+				}
 				break;
 			case "give"://event give <player> <item_num> <cycle>
 				break;
-			case "remove"://event remove <player> <item name>
-				GameManager.removeItem(args[1], args[2]);
-				break;
 			case "setAmount"://event setAmount <player> <item name> <item amount>
-				GameManager.setItemAmount(args[1], args[2], args[3]);
+				if(isCheckParamLendth(args.length, 3)) GameManager.setItemAmount(args[1], args[2], args[3]);
 				break;
 			case "itemStack"://event itemStack
 				ItemStack itemStack = ((Player)sender).getInventory().getItemInHand();
 				sender.sendMessage(itemStack.toString());
 				break;
 			case "pass":
-				int numPass = Integer.parseInt(args[1]);
-				player = (Player)Bukkit.getServer().getPlayer(args[2]);
-				
-				switch(args[3]){
-				case "init"://event pass init <pass number> @p <password> <x y z>
-					String[] loc = {args[5],args[6],args[7]};
-					PasswordManager.init(numPass, args[4],loc);
-					break;
-				case "set"://event pass set <pass number> @p <password>
-					PasswordManager.set(numPass, player, args[4]);
-					break;
+				if(isCheckParamLendth(args.length, 7)){
+					int numPass = Integer.parseInt(args[1]);
+					player = convertToPlayer(args[2]);
+					
+					switch(args[3]){
+					case "init"://event pass init <pass number> @p <password> <x y z>
+						String[] loc = {args[5],args[6],args[7]};
+						PasswordManager.init(numPass, args[4],loc);
+						break;
+					case "set"://event pass set <pass number> @p <password>
+						PasswordManager.set(numPass, player, args[4]);
+						break;
+					}
 				}
 				break;
 			}
@@ -188,10 +211,8 @@ public class NekoEvent extends JavaPlugin {
 	}
 
 	public boolean checkInGame(CommandSender _sender) {
-		if (!(_sender instanceof Player))
-			return false;
-		else
-			return true;
+		if (!(_sender instanceof Player)) return false;
+		else                              return true;
 	}
 
 	public boolean checkPlayer(Player player) {
@@ -201,6 +222,80 @@ public class NekoEvent extends JavaPlugin {
 			return false;
 		}
 		return true;
+	}
+	
+	public boolean checkPlayer(String strPlayer) {
+		Player player = null;
+		
+		try{
+			player = (Player)Bukkit.getServer().getPlayer(strPlayer);
+		}catch(Exception e){ return false;}
+
+		if (!checkInGame(player)) return false;
+		
+		return true;
+	}
+	
+	private boolean isCheckParamLendth(int paramLen, int targetLen) {
+
+		if(paramLen >= targetLen) return true;
+		else{
+			sendErrorMessage("コマンドのパラメータ数が不足しています。");
+			return false;
+		}
+	}
+	
+	private boolean isCheckCommandBlock(CommandSender sender){
+		try{
+			Block tmp = ((BlockCommandSender)sender).getBlock();
+		}catch(Exception e){
+			sendErrorMessage("このコマンドはコマンドブロックから実行してください。");
+			return false;
+		}
+		
+		return true;
+	}
+	
+	public Player convertToPlayer(String strPlayer) {
+		Player player = null;
+		try{
+			player = (Player)Bukkit.getServer().getPlayer(strPlayer);
+		}catch(Exception e){
+			sendErrorMessage(strPlayer + "をPlayer型に変換できませんでした。");
+		}
+		
+		return player;
+	}
+	
+	public void sendErrorMessage(String str){
+		Player mojalion = Bukkit.getServer().getPlayer("mojalion");
+		Player ken_kentan = Bukkit.getServer().getPlayer("ken_kentan");
+		
+		getLogger().warning(str);
+		mojalion.sendMessage(ne_tag + ChatColor.RED + "ERROR:" + ChatColor.WHITE + str);
+		ken_kentan.sendMessage(ne_tag + ChatColor.RED + "ERROR:" + ChatColor.WHITE + str);
+	}
+	
+	private void showCommandHelp(CommandSender _sender){
+		_sender.sendMessage("---------- NekoEventコマンドヘルプ ----------");
+		_sender.sendMessage("| " + ChatColor.YELLOW + "/event ticket <player> <number>");
+		_sender.sendMessage("| " + ChatColor.YELLOW + "/event minigame <player> <ticket>");
+		_sender.sendMessage("| " + ChatColor.YELLOW + "/event parkour <stage> <player>");
+		_sender.sendMessage("| " + ChatColor.YELLOW + "/event dungeon <stage> <number> <player>");
+		_sender.sendMessage("| " + ChatColor.YELLOW + "/event join <player> <stage>");
+		_sender.sendMessage("| " + ChatColor.YELLOW + "/event join set <stage> <stage number> <timer>");
+		_sender.sendMessage("| " + ChatColor.YELLOW + "/event join unlock <stage>");
+		_sender.sendMessage("| " + ChatColor.YELLOW + "/event tp <player> <x ,y, z>");
+		_sender.sendMessage("| " + ChatColor.YELLOW + "/event gacha <player> <type> <ticket>");
+		_sender.sendMessage("| " + ChatColor.YELLOW + "/event special <player> <name>");
+		_sender.sendMessage("| " + ChatColor.YELLOW + "/event buy <player> <type> <ticket>");
+		_sender.sendMessage("| " + ChatColor.YELLOW + "/event msg <player> <name color> <name> <message>");
+		_sender.sendMessage("| " + ChatColor.YELLOW + "/event trigger <x y z> <player> <item_num> <msg_no_hand> <msg_not_match>");
+		_sender.sendMessage("| " + ChatColor.YELLOW + "/event setAmount <player> <item name> <item amount>");
+		_sender.sendMessage("| " + ChatColor.YELLOW + "/event itemStack");
+		_sender.sendMessage("| " + ChatColor.YELLOW + "/event pass init <pass number> @p <password> <x y z>");
+		_sender.sendMessage("| " + ChatColor.YELLOW + "/event pass set <pass number> @p <password>");
+		_sender.sendMessage("---------------------------------------");
 	}
 
 	private static boolean checkBeforeWritefile(File file) {
