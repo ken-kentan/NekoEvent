@@ -95,10 +95,8 @@ public class NekoEvent extends JavaPlugin {
 				break;
 			case "join":// event join <player> <stage> , event join set <stage> <stage number> <timer> ,event join unlock <stage>
 				
-				if(checkPlayer(args[1])){
-					if(isCheckParamLendth(args.length, 3)){
+				if(isCheckParamLendth(args.length, 3) || checkPlayer(args[1])){
 						GameManager.join(args[1], args[2]);
-					}
 				}else{
 				switch (args[1]) {
 					case "set":
@@ -114,7 +112,7 @@ public class NekoEvent extends JavaPlugin {
 						if(isCheckParamLendth(args.length, 3)) GameManager.lock(args[2], false);
 						break;
 					default:
-						sendErrorMessage(args[1] + "は/event joinのパラメータとして不適切です。");
+						if(isCheckParamLendth(args.length, 2)) sendErrorMessage(args[1] + "は/event joinのパラメータとして不適切です。");
 						break;
 					}
 				}
