@@ -93,10 +93,10 @@ public class NekoEvent extends JavaPlugin {
 				if(isCheckParamLength(args.length, 4)) GameManager.clearDungeon(args[1], args[2], args[3]);
 
 				break;
-			case "join":// event join <player> <stage> , event join set <stage> <stage number> <timer> ,event join unlock <stage>
+			case "join":// event join <player> <stage> <join msg>, event join set <stage> <stage number> <timer> ,event join unlock <stage>
 				
-				if(isCheckParamLength(args.length, 3) && checkPlayer(args[1])){
-						GameManager.join(args[1], args[2]);
+				if(checkPlayer(args[1])){
+					if(isCheckParamLength(args.length, 4)) GameManager.join(args[1], args[2], args[3]);
 				}else{
 				switch (args[1]) {
 					case "set":
@@ -249,7 +249,7 @@ public class NekoEvent extends JavaPlugin {
 	public Player convertToPlayer(String strPlayer) {
 		Player player = null;
 		try{
-			player = (Player)Bukkit.getServer().getPlayer(strPlayer);
+			player = Bukkit.getServer().getPlayer(strPlayer);
 		}catch(Exception e){
 			sendErrorMessage(strPlayer + "をPlayer型に変換できませんでした。");
 		}
@@ -272,7 +272,7 @@ public class NekoEvent extends JavaPlugin {
 		_sender.sendMessage("| " + ChatColor.YELLOW + "/event minigame <player> <ticket>");
 		_sender.sendMessage("| " + ChatColor.YELLOW + "/event parkour <stage> <player>");
 		_sender.sendMessage("| " + ChatColor.YELLOW + "/event dungeon <stage> <number> <player>");
-		_sender.sendMessage("| " + ChatColor.YELLOW + "/event join <player> <stage>");
+		_sender.sendMessage("| " + ChatColor.YELLOW + "/event join <player> <stage> <join msg>");
 		_sender.sendMessage("| " + ChatColor.YELLOW + "/event join set <stage> <stage number> <timer>");
 		_sender.sendMessage("| " + ChatColor.YELLOW + "/event join lock <stage>");
 		_sender.sendMessage("| " + ChatColor.YELLOW + "/event join unlock <stage>");
@@ -286,6 +286,7 @@ public class NekoEvent extends JavaPlugin {
 		_sender.sendMessage("| " + ChatColor.YELLOW + "/event itemStack");
 		_sender.sendMessage("| " + ChatColor.YELLOW + "/event pass init <pass number> @p <password> <x y z>");
 		_sender.sendMessage("| " + ChatColor.YELLOW + "/event pass set <pass number> @p <password>");
+		_sender.sendMessage("| " + ChatColor.GRAY + "文字装飾は節記号を使用して下さい。");
 		_sender.sendMessage("---------------------------------------");
 	}
 
@@ -366,6 +367,8 @@ public class NekoEvent extends JavaPlugin {
 		int rand = (int) (Math.random() * 5);
 		
 		if(rand == 0) str = str.replace("Neko", "(^・ω・^)");
+		
+		str = str.replace("{player}", me.getName());
 		
 		for(Player player : Bukkit.getServer().getOnlinePlayers())
         {

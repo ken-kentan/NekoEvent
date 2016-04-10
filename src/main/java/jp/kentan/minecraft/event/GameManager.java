@@ -123,7 +123,7 @@ public class GameManager {
 		}
 	}
 	
-	public static void join(String strPlayer, String strStageName) {
+	public static void join(String strPlayer, String strStageName, String strJoinMsg) {
 		String path = "TP." + strStageName;
 		Player player = ne.convertToPlayer(strPlayer);
 		
@@ -135,7 +135,7 @@ public class GameManager {
 		
 		if(!isLock || (isLock && TimeManager.isCheckTPTimer(stageNumber, stageTimer))){
 			if(isLock) lock(strStageName, false);
-			ne.broadcastAll(player, NekoEvent.ne_tag + ChatColor.BLUE + strPlayer + ChatColor.WHITE + "が" + ChatColor.GOLD + strStageName + ChatColor.WHITE + "に参加しました。");
+			ne.broadcastAll(player, NekoEvent.ne_tag + strJoinMsg);
 			TPManager.TP(strStageName, strPlayer);
 		}else{
 			player.sendMessage(NekoEvent.ne_tag + "現在、" + strStageName + "では参加を受け付けていません。");
