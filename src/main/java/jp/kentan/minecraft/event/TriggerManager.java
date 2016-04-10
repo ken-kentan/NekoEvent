@@ -1,6 +1,5 @@
 package jp.kentan.minecraft.event;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -14,17 +13,16 @@ public class TriggerManager {
 
 	public static boolean checkItem(String strPlayer, String strItemNum, String noItemInHand, String notMatchItem){
 		int item;
-		Player player;
+		Player player = ne.convertToPlayer(strPlayer);
 		
 		try{
-			player = Bukkit.getServer().getPlayer(strPlayer);
 			item = Integer.parseInt(strItemNum);
 		}catch (Exception e){
-			ne.showException(e);
+			ne.sendErrorMessage(strItemNum + "を整数型に変換できませんでした。");
 			return false;
 		}
 		
-		if(!ne.checkPlayer(player)) return false;
+		if(player  == null || !ne.checkPlayer(player)) return false;
 		
 		ItemStack itemStack = player.getInventory().getItemInHand();
 		

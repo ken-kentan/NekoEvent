@@ -98,10 +98,6 @@ public class TPManager {
 		location.setPitch((float) ne.getConfig().getDouble(path + ".Pitch"));
 
 		player.teleport(location);
-
-		// count startne
-		if (TimeManager.tp == 0)
-			TimeManager.tp = 1;
 		
 		ne.getLogger().info(player.getName() + "を" + tp + "にTPしました。");
 	}

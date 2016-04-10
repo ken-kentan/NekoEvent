@@ -10,14 +10,14 @@ public class GameManager {
 	
 	static NekoEvent ne = NekoEvent.getInstance();
 	
-	public static void clearDungeon(String stage,String et_number, String s_player) {
-		String path = s_player + ".dungeon." + stage;
-		Player player = Bukkit.getServer().getPlayer(s_player);
+	public static void clearDungeon(String stage,String et_number, String strPlayer) {
+		String path = strPlayer + ".dungeon." + stage;
+		Player player = ne.convertToPlayer(strPlayer);
 		
-		if(ne.checkPlayer(player) == false) return;
+		if(player == null || !ne.checkPlayer(player)) return;
 		
 		player.sendMessage(ChatColor.RED+ stage + "ダンジョン" + ChatColor.WHITE + "を" + ChatColor.AQUA + "クリア！");
-		ne.writeLog("Dungeon:" + s_player + " clear:" + stage);
+		ne.writeLog("Dungeon:" + strPlayer + " clear:" + stage);
 		
 		if(TimeManager.checkOverDiffMinute(path, 30)){ //if over 30m,reset
 			ne.getConfig().set(path + ".clear", false);
@@ -25,27 +25,25 @@ public class GameManager {
 		}
 
 		if(ne.getConfig().getBoolean(path + ".clear") == false){
-			TicketManager.give(s_player, et_number);
+			TicketManager.give(strPlayer, et_number);
 			ne.getConfig().set(path + ".last_minute", TimeManager.minute);
-			ne.broadcastAll(player, NekoEvent.ne_tag + ChatColor.BLUE + s_player + ChatColor.WHITE + "が、" + ChatColor.RED + stage + "ダンジョン" + ChatColor.WHITE +"をクリアしました！");//
+			ne.broadcastAll(player, NekoEvent.ne_tag + ChatColor.BLUE + strPlayer + ChatColor.WHITE + "が、" + ChatColor.RED + stage + "ダンジョン" + ChatColor.WHITE +"をクリアしました！");//
 		}else{
 			player.sendMessage(ChatColor.YELLOW +"イベントチケットは各ダンジョンで30分おきに入手できます。");
 		}
 		
 		ne.getConfig().set(path + ".clear", true);
 		ne.saveConfig();
-		
-		TimeManager.tp = 0;//reset
 	}
 
-	public static void clearParkour(String stage, String s_player) {
-		String path = s_player + ".parkour." + stage;
-		Player player = Bukkit.getServer().getPlayer(s_player);
+	public static void clearParkour(String stage, String strPlayer) {
+		String path = strPlayer + ".parkour." + stage;
+		Player player = ne.convertToPlayer(strPlayer);
 		
-		if(ne.checkPlayer(player) == false) return;
+		if(player == null || !ne.checkPlayer(player)) return;
 		
 		player.sendMessage(ChatColor.GREEN + stage + "アスレ" + ChatColor.WHITE + "を" + ChatColor.AQUA + "クリア！");
-		ne.writeLog("Parkour:" + s_player + " clear:" + stage);
+		ne.writeLog("Parkour:" + strPlayer + " clear:" + stage);
 		
 		if(TimeManager.checkOverDiffMinute(path, 1440)){ //if over 24h,reset
 			ne.getConfig().set(path + ".clear", false);
@@ -53,9 +51,9 @@ public class GameManager {
 		}
 
 		if(ne.getConfig().getBoolean(path + ".clear") == false){
-			TicketManager.give(s_player, "1");
+			TicketManager.give(strPlayer, "1");
 			ne.getConfig().set(path + ".last_minute", TimeManager.minute);
-			ne.broadcastAll(player, NekoEvent.ne_tag + ChatColor.BLUE + s_player + ChatColor.WHITE + "が、" + ChatColor.GREEN + stage + "アスレ" + ChatColor.WHITE +"をクリアしました！");
+			ne.broadcastAll(player, NekoEvent.ne_tag + ChatColor.BLUE + strPlayer + ChatColor.WHITE + "が、" + ChatColor.GREEN + stage + "アスレ" + ChatColor.WHITE +"をクリアしました！");
 		}else{
 			player.sendMessage(ChatColor.YELLOW +"イベントチケットは各アスレで24時間おきに入手できます。");
 		}
@@ -127,19 +125,21 @@ public class GameManager {
 	
 	public static void join(String strPlayer, String strStageName) {
 		String path = "TP." + strStageName;
+		Player player = ne.convertToPlayer(strPlayer);
 		
 		int stageNumber = TPManager.getTPLocationNumber(strStageName),
 			stageTimer = ne.getConfig().getInt(path + ".Timer");
 		boolean isLock = ne.getConfig().getBoolean(path + ".Lock");
 		
-		if(stageNumber < 0) return;
+		if(stageNumber < 0 || player == null) return;
 		
 		if(!isLock || (isLock && TimeManager.isCheckTPTimer(stageNumber, stageTimer))){
 			if(isLock) lock(strStageName, false);
+			ne.broadcastAll(player, NekoEvent.ne_tag + ChatColor.BLUE + strPlayer + ChatColor.WHITE + "が" + ChatColor.GOLD + strStageName + ChatColor.WHITE + "に参加しました。");
 			TPManager.TP(strStageName, strPlayer);
 		}else{
-			ne.convertToPlayer(strPlayer).sendMessage(NekoEvent.ne_tag + "現在、" + strStageName + "では参加を受け付けていません。");
-			ne.convertToPlayer(strPlayer).sendMessage(NekoEvent.ne_tag + "参加中のプレイヤーを待つか、" + (stageTimer - TimeManager.getTPLockTimer(stageNumber)) + "秒お待ちください。");
+			player.sendMessage(NekoEvent.ne_tag + "現在、" + strStageName + "では参加を受け付けていません。");
+			player.sendMessage(NekoEvent.ne_tag + "参加中のプレイヤーを待つか、" + (stageTimer - TimeManager.getTPLockTimer(stageNumber)) + "秒お待ちください。");
 		}
 	}
 	

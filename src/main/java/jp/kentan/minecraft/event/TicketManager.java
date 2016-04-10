@@ -1,6 +1,5 @@
 package jp.kentan.minecraft.event;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -33,16 +32,16 @@ public class TicketManager {
 		
 	}
 	
-	public static boolean remove(String s_player, String number) {
+	public static boolean remove(String strPlayer, String number) {
 		int ticket_number = 0, player_ticket_amt = 0;
-		Player player = Bukkit.getServer().getPlayer(s_player);
+		Player player = ne.convertToPlayer(strPlayer);
 		
-		if(ne.checkPlayer(player) == false) return false;
+		if(player == null || !ne.checkPlayer(player)) return false;
 		
 		try {
 			ticket_number = Integer.parseInt(number);
 		} catch (NumberFormatException nfex) {
-			ne.showException(nfex);
+			ne.sendErrorMessage(number + "を整数型に変換できませんでした。");
 			return false;
 		}
 		

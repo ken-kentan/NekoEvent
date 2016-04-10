@@ -75,51 +75,51 @@ public class NekoEvent extends JavaPlugin {
 				break;
 			case "ticket":// event ticket <player> <number>
 
-				if(isCheckParamLendth(args.length, 3)) TicketManager.give(args[1], args[2]);
+				if(isCheckParamLength(args.length, 3)) TicketManager.give(args[1], args[2]);
 
 				break;
 			case "minigame":// event minigame <player> <ticket>
 
-				if(isCheckParamLendth(args.length, 3)) GameManager.reward(args[1], args[2]);
+				if(isCheckParamLength(args.length, 3)) GameManager.reward(args[1], args[2]);
 
 				break;
 			case "parkour":// event parkour <stage> <player>
 
-				if(isCheckParamLendth(args.length, 3)) GameManager.clearParkour(args[1], args[2]);
+				if(isCheckParamLength(args.length, 3)) GameManager.clearParkour(args[1], args[2]);
 
 				break;
 			case "dungeon":// event dungeon <stage> <number> <player>
 
-				if(isCheckParamLendth(args.length, 4)) GameManager.clearDungeon(args[1], args[2], args[3]);
+				if(isCheckParamLength(args.length, 4)) GameManager.clearDungeon(args[1], args[2], args[3]);
 
 				break;
 			case "join":// event join <player> <stage> , event join set <stage> <stage number> <timer> ,event join unlock <stage>
 				
-				if(isCheckParamLendth(args.length, 3) || checkPlayer(args[1])){
+				if(isCheckParamLength(args.length, 3) && checkPlayer(args[1])){
 						GameManager.join(args[1], args[2]);
 				}else{
 				switch (args[1]) {
 					case "set":
-						if(isCheckParamLendth(args.length, 5) && checkInGame(sender)){
+						if(isCheckParamLength(args.length, 5) && checkInGame(sender)){
 							TPManager.set((Player)sender, args[2], args[3], args[4]);
 							sender.sendMessage(ChatColor.GREEN + "現在位置を" + args[2] + "(" + args[3] + ")のTP位置として自動ﾛｯｸ解除時間" + args[4] + "秒で設定しました。");
 						}
 						break;
 					case "lock":
-						if(isCheckParamLendth(args.length, 3)) GameManager.lock(args[2], true);
+						if(isCheckParamLength(args.length, 3)) GameManager.lock(args[2], true);
 						break;
 					case "unlock":
-						if(isCheckParamLendth(args.length, 3)) GameManager.lock(args[2], false);
+						if(isCheckParamLength(args.length, 3)) GameManager.lock(args[2], false);
 						break;
 					default:
-						if(isCheckParamLendth(args.length, 2)) sendErrorMessage(args[1] + "は/event joinのパラメータとして不適切です。");
+						if(isCheckParamLength(args.length, 2)) sendErrorMessage(args[1] + "は/event joinのパラメータとして不適切です。");
 						break;
 					}
 				}
 
 				break;
 			case "tp"://event tp <player> <x ,y, z>
-				if(isCheckParamLendth(args.length, 5) && isCheckCommandBlock(sender)){
+				if(isCheckParamLength(args.length, 5) && isCheckCommandBlock(sender)){
 					player = convertToPlayer(args[1]);
 					String[] strLoc = new String[3];
 					
@@ -132,61 +132,59 @@ public class NekoEvent extends JavaPlugin {
 				break;
 			case "gacha":// event gacha <player> <type> <ticket>
 
-				if (isCheckParamLendth(args.length, 4) && TicketManager.remove(args[1], args[3])) {
+				if (isCheckParamLength(args.length, 4) && TicketManager.remove(args[1], args[3])) {
 					processGacha(Bukkit.getServer().getPlayer(args[1]), Integer.parseInt(args[2]));
 				}
 
 				break;
 			case "special":// event special <player> <name>
 
-				if(isCheckParamLendth(args.length, 3) && TimeManager.checkSpecialDay()) processSpecial(args[1], args[2]);
+				if(isCheckParamLength(args.length, 3) && TimeManager.checkSpecialDay()) processSpecial(args[1], args[2]);
 				else Bukkit.getServer().getPlayer(args[1]).sendMessage(ChatColor.YELLOW + "今日はスペシャル対象の日ではありません。");
 
 				break;
 			case "buy":// event buy <player> <type> <ticket>
 
-				if (isCheckParamLendth(args.length, 4) && TicketManager.remove(args[1], args[3]) == true) {
+				if (isCheckParamLength(args.length, 4) && TicketManager.remove(args[1], args[3]) == true) {
 					processBuy(Bukkit.getServer().getPlayer(args[1]), Integer.parseInt(args[2]));
 				}
 
 				break;
 			case "msg"://event msg <player> <name color> <name> <message>
-				if(isCheckParamLendth(args.length, 5)){
+				if(isCheckParamLength(args.length, 5)){
 					player = convertToPlayer(args[1]);
 					if(player != null) player.sendMessage(" " + getChatColor(args[2]) + args[3] + ChatColor.GREEN + ": " +ChatColor.WHITE + args[4]);
 				}
 				break;
 			case "trigger"://event trigger <x y z> <player> <item_num> <msg_no_hand> <msg_not_match>
-				if(isCheckParamLendth(args.length, 8) && isCheckCommandBlock(sender)){
+				if(isCheckParamLength(args.length, 8) && isCheckCommandBlock(sender)){
 					commandBlock = ((BlockCommandSender)sender).getBlock();
 					String[] strLocTrigger = {args[1],args[2],args[3]};
 				
 					if(TriggerManager.checkItem(args[4],args[5],args[6],args[7])) TriggerManager.setTorch(commandBlock.getLocation(), strLocTrigger);
 				}
 				break;
-			case "give"://event give <player> <item_num> <cycle>
-				break;
 			case "setAmount"://event setAmount <player> <item name> <item amount>
-				if(isCheckParamLendth(args.length, 4)) GameManager.setItemAmount(args[1], args[2], args[3]);
+				if(isCheckParamLength(args.length, 4)) GameManager.setItemAmount(args[1], args[2], args[3]);
 				break;
 			case "itemStack"://event itemStack
 				ItemStack itemStack = ((Player)sender).getInventory().getItemInHand();
 				sender.sendMessage(itemStack.toString());
 				break;
 			case "pass":
-				if(isCheckParamLendth(args.length, 4)){
+				if(isCheckParamLength(args.length, 4)){
 					int numPass = Integer.parseInt(args[1]);
 					player = convertToPlayer(args[2]);
 					
 					switch(args[3]){
 					case "init"://event pass init <pass number> @p <password> <x y z>
-						if(isCheckParamLendth(args.length, 8)){
+						if(isCheckParamLength(args.length, 8)){
 							String[] loc = {args[5],args[6],args[7]};
 							PasswordManager.init(numPass, args[4],loc);
 						}
 						break;
 					case "set"://event pass set <pass number> @p <password>
-						if(isCheckParamLendth(args.length, 5)) PasswordManager.set(numPass, player, args[4]);
+						if(isCheckParamLength(args.length, 5)) PasswordManager.set(numPass, player, args[4]);
 						break;
 					}
 				}
@@ -195,10 +193,6 @@ public class NekoEvent extends JavaPlugin {
 		}
 
 		return true;
-	}
-
-	public void showException(Exception _e) {
-		getLogger().warning(_e.toString());
 	}
 	
 	public static NekoEvent getInstance(){
@@ -212,8 +206,8 @@ public class NekoEvent extends JavaPlugin {
 
 	public boolean checkPlayer(Player player) {
 
-		if (checkInGame(player) == false) {
-			getLogger().info("プレイヤー(" + player.getName() + ")が見つかりません。");
+		if (!checkInGame(player)) {
+			sendErrorMessage("プレイヤー(" + player.getName() + ")が見つかりません。");
 			return false;
 		}
 		return true;
@@ -231,7 +225,7 @@ public class NekoEvent extends JavaPlugin {
 		return true;
 	}
 	
-	private boolean isCheckParamLendth(int paramLen, int targetLen) {
+	private boolean isCheckParamLength(int paramLen, int targetLen) {
 
 		if(paramLen >= targetLen) return true;
 		else{
@@ -319,8 +313,7 @@ public class NekoEvent extends JavaPlugin {
 				getLogger().info("ログファイルが見つかりません");
 			}
 		} catch (IOException e) {
-			showException(e);
-			getLogger().info("ログをファイルに書き込めませんでした");
+			sendErrorMessage("ログをファイルに書き込めませんでした");
 		}
 	}
 

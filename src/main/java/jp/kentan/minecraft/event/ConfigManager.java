@@ -12,7 +12,6 @@ public class ConfigManager {
 		TimeManager.minute   = ne.getConfig().getInt("minute");
 		TimeManager.month    = ne.getConfig().getInt("special.month");
 		TimeManager.day      = ne.getConfig().getInt("special.day");
-		TimeManager.tp_limit = ne.getConfig().getInt("TP.tp_limit");
 		
 		NekoEvent.sp_itemid  = ne.getConfig().getString("special.item.ID");
 		NekoEvent.sp_name    = ne.getConfig().getString("special.item.name");
@@ -43,10 +42,10 @@ public class ConfigManager {
 		}
 
 		ne.getLogger().info("Done. getBaseConfig from config.yml");
-		ne.getLogger().info("Result. minute:" + TimeManager.minute + " reward_rate:" + GameManager.reward_rate
-				+ " gacha_numbers:" + NekoEvent.gacha_numbers[0] + "," + NekoEvent.gacha_numbers[1] + ","
-				+ NekoEvent.gacha_numbers[2] + "," + NekoEvent.gacha_numbers[3] + "," + NekoEvent.gacha_numbers[4] + " special m,d:"
-				+ TimeManager.month + "," + TimeManager.day + " TP_limit:" + TimeManager.tp_limit);
+		ne.getLogger().info("Minute => " + TimeManager.minute);
+		ne.getLogger().info("Reward rate => " + GameManager.reward_rate);
+		ne.getLogger().info("Gacha => " + NekoEvent.gacha_numbers[0] + "," + NekoEvent.gacha_numbers[1] + "," + NekoEvent.gacha_numbers[2] + "," + NekoEvent.gacha_numbers[3] + "," + NekoEvent.gacha_numbers[4]);
+		ne.getLogger().info("Special day => " + TimeManager.month + "/" + TimeManager.day);
 	}
 
 	public static void save() {
