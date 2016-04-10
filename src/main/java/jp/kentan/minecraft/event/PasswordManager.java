@@ -21,6 +21,11 @@ public class PasswordManager {
 	public static void set(int numPass, Player player, String pass){
 		StringBuilder sb = new StringBuilder();
 		
+		if(setPassword[numPass] == null){
+			ne.sendErrorMessage("ﾊﾟｽﾜｰﾄﾞ:" + numPass + " が初期化されていないためset出来ませんでした。");
+			return;
+		}
+		
 		sb.append(setPassword[numPass]);
 		sb.append(pass);
 		

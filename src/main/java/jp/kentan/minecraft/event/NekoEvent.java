@@ -36,6 +36,7 @@ public class NekoEvent extends JavaPlugin {
 		}
 
 		ConfigManager.setBase();
+		TimeManager.initTPLockTimer();
 
 		getLogger().info("NekoEventを有効にしました。");
 	}
@@ -51,7 +52,6 @@ public class NekoEvent extends JavaPlugin {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
-
 		if (cmd.getName().equals("event")) {
 			Player player = null;
 			Block commandBlock = null;
@@ -69,9 +69,7 @@ public class NekoEvent extends JavaPlugin {
 
 				break;
 			case "save":
-
 				ConfigManager.save();
-
 				break;
 			case "ticket":// event ticket <player> <number>
 
@@ -98,22 +96,22 @@ public class NekoEvent extends JavaPlugin {
 				if(checkPlayer(args[1])){
 					if(isCheckParamLength(args.length, 4)) GameManager.join(args[1], args[2], args[3]);
 				}else{
-				switch (args[1]) {
-					case "set":
-						if(isCheckParamLength(args.length, 5) && checkInGame(sender)){
-							TPManager.set((Player)sender, args[2], args[3], args[4]);
-							sender.sendMessage(ChatColor.GREEN + "現在位置を" + args[2] + "(" + args[3] + ")のTP位置として自動ﾛｯｸ解除時間" + args[4] + "秒で設定しました。");
-						}
-						break;
-					case "lock":
-						if(isCheckParamLength(args.length, 3)) GameManager.lock(args[2], true);
-						break;
-					case "unlock":
-						if(isCheckParamLength(args.length, 3)) GameManager.lock(args[2], false);
-						break;
-					default:
-						if(isCheckParamLength(args.length, 2)) sendErrorMessage(args[1] + "は/event joinのパラメータとして不適切です。");
-						break;
+					switch (args[1]) {
+						case "set":
+							if(isCheckParamLength(args.length, 5) && checkInGame(sender)){
+								TPManager.set((Player)sender, args[2], args[3], args[4]);
+								sender.sendMessage(ChatColor.GREEN + "現在位置を" + args[2] + "(" + args[3] + ")のTP位置として自動ﾛｯｸ解除時間" + args[4] + "秒で設定しました。");
+							}
+							break;
+						case "lock":
+							if(isCheckParamLength(args.length, 3)) GameManager.lock(args[2], true);
+							break;
+						case "unlock":
+							if(isCheckParamLength(args.length, 3)) GameManager.lock(args[2], false);
+							break;
+						default:
+							if(isCheckParamLength(args.length, 2)) sendErrorMessage(args[1] + "は/event joinのパラメータとして不適切です。");
+							break;
 					}
 				}
 
@@ -140,7 +138,7 @@ public class NekoEvent extends JavaPlugin {
 			case "special":// event special <player> <name>
 
 				if(isCheckParamLength(args.length, 3) && TimeManager.checkSpecialDay()) processSpecial(args[1], args[2]);
-				else Bukkit.getServer().getPlayer(args[1]).sendMessage(ChatColor.YELLOW + "今日はスペシャル対象の日ではありません。");
+				else convertToPlayer(args[1]).sendMessage(ChatColor.YELLOW + "今日はスペシャル対象の日ではありません。");
 
 				break;
 			case "buy":// event buy <player> <type> <ticket>

@@ -21,6 +21,11 @@ public class TimeManager extends BukkitRunnable{
     	for(int i=0; i<20; i++) if(tpLockTimer[i] > 0 && tpLockTimer[i] < 5000) tpLockTimer[i]++;
     }
 	
+	public static void initTPLockTimer(){
+		for(int i=0;i<20;i++) tpLockTimer[i] = -1;
+		ne.getLogger().info("Initialized All TP Lock Timer.");
+	}
+	
 	public static boolean checkOverDiffMinute(String _path, int baseDiff){
 		int last_minute = 0;
 		
@@ -48,7 +53,7 @@ public class TimeManager extends BukkitRunnable{
 	}
 	
 	public static boolean isCheckTPTimer(int stageNumber, int unlockTimer){
-		if(tpLockTimer[stageNumber] > unlockTimer){
+		if(tpLockTimer[stageNumber] == -1 || tpLockTimer[stageNumber] > unlockTimer){
 			tpLockTimer[stageNumber] = 0;
 			return true;
 		}else {return false;}
