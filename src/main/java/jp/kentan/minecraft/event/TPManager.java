@@ -42,7 +42,7 @@ public class TPManager {
 	public static void set(Player player,String strName, String strNo, String strTimer) {
 		String path = "TP." + strName;
 
-		if (ne.checkPlayer(player) == false) return;
+		if (!ne.isCheckPlayerOnline(player)) return;
 		
 		int stageNumber = Integer.parseInt(strNo);
 		int stageTimer = Integer.parseInt(strTimer);
@@ -87,7 +87,7 @@ public class TPManager {
 		Player player = ne.convertToPlayer(strPlayer);
 		String path = "TP." + tp;
 		
-		if (player == null || !ne.checkPlayer(player)) return;
+		if (player == null || !ne.isCheckPlayerOnline(player)) return;
 
 		Location location = player.getLocation();
 		location.setX(ne.getConfig().getDouble(path + ".X"));

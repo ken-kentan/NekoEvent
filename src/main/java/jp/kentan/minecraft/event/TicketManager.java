@@ -9,11 +9,11 @@ public class TicketManager {
 	
 	static NekoEvent ne = NekoEvent.getInstance();
 	
-	public static void give(String s_player, String number){
+	public static void give(String strPlayer, String number){
 		int ticket_number = 0;
-		Player player = ne.convertToPlayer(s_player);
+		Player player = ne.convertToPlayer(strPlayer);
 		
-		if(player == null) return;
+		if(player == null || !ne.isCheckPlayerOnline(player)) return;
 		
 		try {
 			ticket_number = Integer.parseInt(number);
@@ -23,11 +23,11 @@ public class TicketManager {
 		}
 		
 		if(ticket_number > 0){			
-			ne.getServer().dispatchCommand(ne.getServer().getConsoleSender(), "give " + s_player + name.replace("{number}", Integer.toString(ticket_number)));
+			ne.getServer().dispatchCommand(ne.getServer().getConsoleSender(), "give " + strPlayer + name.replace("{number}", Integer.toString(ticket_number)));
 			
 			player.sendMessage(ChatColor.AQUA +" イベントチケット" + ChatColor.WHITE + "を" + ticket_number + "枚" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "しました！");
-			ne.getLogger().info(s_player + "に、イベントチケットを" + ticket_number + "枚追加しました。");
-			ne.writeLog("Ticket:" + s_player + " +" + ticket_number );
+			ne.getLogger().info(strPlayer + "に、イベントチケットを" + ticket_number + "枚追加しました。");
+			ne.writeLog("Ticket:" + strPlayer + " +" + ticket_number );
 		}
 		
 	}
@@ -36,7 +36,7 @@ public class TicketManager {
 		int ticket_number = 0, player_ticket_amt = 0;
 		Player player = ne.convertToPlayer(strPlayer);
 		
-		if(player == null || !ne.checkPlayer(player)) return false;
+		if(player == null || !ne.isCheckPlayerOnline(player)) return false;
 		
 		try {
 			ticket_number = Integer.parseInt(number);

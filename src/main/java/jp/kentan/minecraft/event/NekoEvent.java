@@ -93,12 +93,12 @@ public class NekoEvent extends JavaPlugin {
 				break;
 			case "join":// event join <player> <stage> <join msg>, event join set <stage> <stage number> <timer> ,event join unlock <stage>
 				
-				if(checkPlayer(args[1])){
+				if(isCheckPlayerOnline(args[1], false)){
 					if(isCheckParamLength(args.length, 4)) GameManager.join(args[1], args[2], args[3]);
 				}else{
 					switch (args[1]) {
 						case "set":
-							if(isCheckParamLength(args.length, 5) && checkInGame(sender)){
+							if(isCheckParamLength(args.length, 5) && isCheckPlayerOnline((Player)sender)){
 								TPManager.set((Player)sender, args[2], args[3], args[4]);
 								sender.sendMessage(ChatColor.GREEN + "現在位置を" + args[2] + "(" + args[3] + ")のTP位置として自動ﾛｯｸ解除時間" + args[4] + "秒で設定しました。");
 							}
@@ -197,30 +197,21 @@ public class NekoEvent extends JavaPlugin {
 		return instance;
 	}
 
-	public boolean checkInGame(CommandSender _sender) {
-		if (!(_sender instanceof Player)) return false;
-		else                              return true;
-	}
+	public boolean isCheckPlayerOnline(Player player) {
+		if (player.isOnline()) return true;
+		
+		sendErrorMessage(player + "が見つかりません。");
 
-	public boolean checkPlayer(Player player) {
-
-		if (!checkInGame(player)) {
-			sendErrorMessage("プレイヤー(" + player.getName() + ")が見つかりません。");
-			return false;
-		}
-		return true;
+		return false;
 	}
 	
-	public boolean checkPlayer(String strPlayer) {
-		Player player = null;
+	public boolean isCheckPlayerOnline(String strPlayer, boolean isSendErrorMsg) {
+		Player player = convertToPlayer(strPlayer);
+		if (player != null && player.isOnline()) return true;
 		
-		try{
-			player = (Player)Bukkit.getServer().getPlayer(strPlayer);
-		}catch(Exception e){ return false;}
+		if(isSendErrorMsg) sendErrorMessage(strPlayer + "が見つかりません。");
 
-		if (!checkInGame(player)) return false;
-		
-		return true;
+		return false;
 	}
 	
 	private boolean isCheckParamLength(int paramLen, int targetLen) {
@@ -327,11 +318,11 @@ public class NekoEvent extends JavaPlugin {
 		writeLog("Gacha:" + player.getName() + " get:" + gacha_itemname[type][rand] + "(" + gacha_list[type][rand] + ")");
 	}
 	
-	private void processSpecial(String s_player, String name) {
-		Player player = Bukkit.getServer().getPlayer(s_player);
-		if(checkPlayer(player) == false) return;
+	private void processSpecial(String strPlayer, String name) {
+		Player player = convertToPlayer(strPlayer);
+		if(!isCheckPlayerOnline(player)) return;
 		
-		String path = s_player + ".special." + name;
+		String path = strPlayer + ".special." + name;
 		
 		if(getConfig().getBoolean(path) == false){
 			getConfig().set(path, true);

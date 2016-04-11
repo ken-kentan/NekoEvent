@@ -22,7 +22,7 @@ public class TriggerManager {
 			return false;
 		}
 		
-		if(player  == null || !ne.checkPlayer(player)) return false;
+		if(player  == null || !ne.isCheckPlayerOnline(player)) return false;
 		
 		ItemStack itemStack = player.getInventory().getItemInHand();
 		

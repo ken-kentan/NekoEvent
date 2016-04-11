@@ -14,7 +14,7 @@ public class GameManager {
 		String path = strPlayer + ".dungeon." + stage;
 		Player player = ne.convertToPlayer(strPlayer);
 		
-		if(player == null || !ne.checkPlayer(player)) return;
+		if(player == null || !ne.isCheckPlayerOnline(player)) return;
 		
 		player.sendMessage(ChatColor.RED+ stage + "ダンジョン" + ChatColor.WHITE + "を" + ChatColor.AQUA + "クリア！");
 		ne.writeLog("Dungeon:" + strPlayer + " clear:" + stage);
@@ -40,7 +40,7 @@ public class GameManager {
 		String path = strPlayer + ".parkour." + stage;
 		Player player = ne.convertToPlayer(strPlayer);
 		
-		if(player == null || !ne.checkPlayer(player)) return;
+		if(player == null || !ne.isCheckPlayerOnline(player)) return;
 		
 		player.sendMessage(ChatColor.GREEN + stage + "アスレ" + ChatColor.WHITE + "を" + ChatColor.AQUA + "クリア！");
 		ne.writeLog("Parkour:" + strPlayer + " clear:" + stage);
@@ -146,6 +146,8 @@ public class GameManager {
 	public static void lock(String strStageName, boolean isLock) {
 		String path = "TP." + strStageName;
 		int stageNumber = TPManager.getTPLocationNumber(strStageName);
+		
+		if(stageNumber < 0 || stageNumber >= 20) return;
 
 		ne.getConfig().set(path + ".Lock", isLock);
 		ne.saveConfig();
