@@ -1,5 +1,8 @@
 package jp.kentan.minecraft.event;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -7,7 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public class TriggerManager {
-	public static String triggerItem[] = new String[10];
+	public static List<String> item_list = new ArrayList<String>();
 	
 	static NekoEvent ne = NekoEvent.getInstance();
 
@@ -24,6 +27,11 @@ public class TriggerManager {
 		
 		if(player  == null || !ne.isCheckPlayerOnline(player)) return false;
 		
+		if(item >= item_list.size()){
+			ne.sendErrorMessage("TriggerItem(" + item + ")は登録されていません。");
+			return false;
+		}
+		
 		ItemStack itemStack = player.getInventory().getItemInHand();
 		
 		if(itemStack == null || itemStack.getAmount() < 1){
@@ -31,7 +39,7 @@ public class TriggerManager {
 			return false;
 		}
 		
-		if(itemStack.toString().indexOf(triggerItem[item]) != -1){
+		if(itemStack.toString().indexOf(item_list.get(item)) != -1){
 			int amt = itemStack.getAmount() - 1;
 			
 			itemStack.setAmount(amt);

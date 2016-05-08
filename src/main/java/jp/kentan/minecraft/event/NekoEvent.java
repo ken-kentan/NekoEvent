@@ -3,7 +3,9 @@ package jp.kentan.minecraft.event;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -19,7 +21,8 @@ public class NekoEvent extends JavaPlugin {
 	public static String ne_tag = ChatColor.GRAY + "[" + ChatColor.GOLD  + "Neko" + ChatColor.YELLOW + "Event" + ChatColor.GRAY + "] " + ChatColor.WHITE;
 	public static String sp_itemid, sp_name;
 	public static String gacha_list[][] = new String[5][10], gacha_itemname[][] = new String[5][10];
-	public static String buy_list[] = new String[20], buy_name[] = new String[20];
+	public static List<String> buy_command_list = new ArrayList<String>(),
+							   buy_name_list    = new ArrayList<String>();
 	public static int gacha_numbers[] = new int[5];
 	
 	private static NekoEvent instance;
@@ -342,14 +345,19 @@ public class NekoEvent extends JavaPlugin {
 	}
 	
 	private void processBuy(Player player, int type) {
-		String _command = buy_list[type].replace("{player}", player.getName());
+		if(type >= buy_command_list.size() || type >= buy_name_list.size()){
+			sendErrorMessage(type + "はbuy_commandに登録されていません。");
+			return;
+		}
+		String command = buy_command_list.get(type).replace("{player}", player.getName()),
+			   name    = buy_name_list.get(type);
 
-		getServer().dispatchCommand(getServer().getConsoleSender(), _command);
+		getServer().dispatchCommand(getServer().getConsoleSender(), command);
 
-		player.sendMessage(ChatColor.AQUA + buy_name[type] + ChatColor.WHITE + "を" + ChatColor.GOLD + "購入" + ChatColor.WHITE + "しました！");
-		broadcastAll(player,ne_tag + ChatColor.BLUE + player.getName() + ChatColor.WHITE + "が," + ChatColor.AQUA + buy_name[type] + ChatColor.WHITE + "を" + ChatColor.GOLD + "購入" + ChatColor.WHITE + "しました！");
-		getLogger().info(player.getName() + "にコマンド [" + buy_list[type] + "]を実行しました。");
-		writeLog("Buy:" + player.getName() + " detail:" + buy_name[type] + "(" + buy_list[type] + ")");
+		player.sendMessage(ChatColor.AQUA + buy_name_list.get(type) + ChatColor.WHITE + "を" + ChatColor.GOLD + "購入" + ChatColor.WHITE + "しました！");
+		broadcastAll(player,ne_tag + ChatColor.BLUE + player.getName() + ChatColor.WHITE + "が," + ChatColor.AQUA + name + ChatColor.WHITE + "を" + ChatColor.GOLD + "購入" + ChatColor.WHITE + "しました！");
+		getLogger().info(player.getName() + "にコマンド [" + command + "]を実行しました。");
+		writeLog("Buy:" + player.getName() + " detail:" + name + "(" + command + ")");
 	}
 	
 	public void broadcastAll(Player me, String str){

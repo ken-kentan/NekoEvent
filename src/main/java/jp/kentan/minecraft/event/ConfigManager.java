@@ -2,6 +2,8 @@ package jp.kentan.minecraft.event;
 
 public class ConfigManager {
 	static NekoEvent ne = NekoEvent.getInstance();
+	
+	private static final int kMaxLoopLimit = 100;
 
 	public static void setBase() {
 		ne.reloadConfig();
@@ -19,7 +21,7 @@ public class ConfigManager {
 		GameManager.reward_rate = ne.getConfig().getInt("reward_rate");
 
 		for (int j = 0; j < 5; j++) {
-			for (int i = 0; i < 10; i++) {
+			for (int i = 0; i < kMaxLoopLimit; i++) {
 				if (ne.getConfig().getString("gacha.ID." + j + "_" + i) != null) {
 					NekoEvent.gacha_list[j][i]     = ne.getConfig().getString("gacha.ID." + j + "_" + i);// 0_0
 					NekoEvent.gacha_itemname[j][i] = ne.getConfig().getString("gacha.name." + j + "_" + i);
@@ -28,17 +30,17 @@ public class ConfigManager {
 			}
 		}
 		
-		for (int i = 0; i < 20; i++) {
-			if (ne.getConfig().getString("buy.command." + i) != null) {
-				NekoEvent.buy_list[i] = ne.getConfig().getString("buy.command."+ i);
-				NekoEvent.buy_name[i] = ne.getConfig().getString("buy.name." + i);
-			}
+		for (int i = 0; i < kMaxLoopLimit; i++) {
+			if (ne.getConfig().getString("buy.command." + i) == null) break;
+			
+			NekoEvent.buy_command_list.add(ne.getConfig().getString("buy.command."+ i));
+			NekoEvent.buy_name_list.add(ne.getConfig().getString("buy.name." + i));
 		}
 		
-		for (int i=0; i<10; i++){
-			if (ne.getConfig().getString("trigger.item." + i) != null) {
-				TriggerManager.triggerItem[i] = ne.getConfig().getString("trigger.item." + i);
-			}
+		for (int i=0; i < kMaxLoopLimit; i++){
+			if (ne.getConfig().getString("trigger.item." + i) == null) break;
+			
+			TriggerManager.item_list.add(ne.getConfig().getString("trigger.item." + i));
 		}
 
 		ne.getLogger().info("Done. getBaseConfig from config.yml");
@@ -46,6 +48,8 @@ public class ConfigManager {
 		ne.getLogger().info("Reward rate => " + GameManager.reward_rate);
 		ne.getLogger().info("Gacha => " + NekoEvent.gacha_numbers[0] + "," + NekoEvent.gacha_numbers[1] + "," + NekoEvent.gacha_numbers[2] + "," + NekoEvent.gacha_numbers[3] + "," + NekoEvent.gacha_numbers[4]);
 		ne.getLogger().info("Special day => " + TimeManager.month + "/" + TimeManager.day);
+		ne.getLogger().info("Buy commands => " + NekoEvent.buy_command_list.size());
+		ne.getLogger().info("Trigger items => " + TriggerManager.item_list.size());
 	}
 
 	public static void save() {
