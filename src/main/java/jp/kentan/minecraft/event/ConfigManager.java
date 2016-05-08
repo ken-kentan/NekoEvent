@@ -30,6 +30,11 @@ public class ConfigManager {
 			}
 		}
 		
+		//All List clear
+		NekoEvent.buy_command_list.clear();
+		NekoEvent.buy_name_list.clear();
+		TriggerManager.item_list.clear();
+		
 		for (int i = 0; i < kMaxLoopLimit; i++) {
 			if (ne.getConfig().getString("buy.command." + i) == null) break;
 			
