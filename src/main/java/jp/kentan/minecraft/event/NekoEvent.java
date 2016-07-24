@@ -204,6 +204,13 @@ public class NekoEvent extends JavaPlugin {
 					}
 				}
 				break;
+			case "setspawn":
+				if(isCheckParamLength(args.length, 2) && args.length == 2){
+					gm.setSpawn(args[1]);
+				}else if(isCheckParamLength(args.length, 5)){
+					gm.setSpawn(args[1],args[2],args[3],args[4]);
+				}
+				break;
 			}
 		}
 
@@ -263,7 +270,7 @@ public class NekoEvent extends JavaPlugin {
 		for(Player player : Bukkit.getServer().getOnlinePlayers())
         {
 			if(player.isOp()){
-				player.sendMessage(ne_tag + ChatColor.RED + "ERROR! " + ChatColor.WHITE + str);
+				player.sendMessage(ChatColor.GRAY + "[" + ChatColor.GOLD  + "Neko" + ChatColor.YELLOW + "Event" + ChatColor.RED + " ERROR" + ChatColor.GRAY + "] " + ChatColor.WHITE + str);
 			}
         }
 		
@@ -274,7 +281,7 @@ public class NekoEvent extends JavaPlugin {
 		for(Player player : Bukkit.getServer().getOnlinePlayers())
         {
 			if(player.isOp()){
-				player.sendMessage(ne_tag + ChatColor.AQUA + "Info " + ChatColor.WHITE + str);
+				player.sendMessage(ChatColor.GRAY + "[" + ChatColor.GOLD  + "Neko" + ChatColor.YELLOW + "Event" + ChatColor.AQUA + " Info" + ChatColor.GRAY + "] " + ChatColor.WHITE + str);
 			}
         }
 		
@@ -301,6 +308,7 @@ public class NekoEvent extends JavaPlugin {
 		_sender.sendMessage("| " + ChatColor.YELLOW + "/event itemStack");
 		_sender.sendMessage("| " + ChatColor.YELLOW + "/event pass init <pass number> @p <password> <x y z>");
 		_sender.sendMessage("| " + ChatColor.YELLOW + "/event pass set <pass number> @p <password>");
+		_sender.sendMessage("| " + ChatColor.YELLOW + "/event setspawn @p <x y z>");
 		_sender.sendMessage("| " + ChatColor.GRAY + "文字装飾は節記号を使用して下さい。");
 		_sender.sendMessage("---------------------------------------");
 	}

@@ -2,6 +2,7 @@ package jp.kentan.minecraft.event;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -166,5 +167,45 @@ public class GameManager {
 		if(isLock) time.startTPLockTimer(stageNumber);
 		
 		ne.sendInfoMessage(strStageName + "のロックを" + isLock + "にしました。");
+	}
+	
+	public void setSpawn(String strPlayer){
+		Player player = ne.convertToPlayer(strPlayer);
+		
+		if(player == null) return;
+		
+		Location location = player.getLocation();
+
+		player.setBedSpawnLocation(location, true);
+		player.sendMessage(NekoEvent.ne_tag + "セーブしました!");
+		ne.sendInfoMessage(strPlayer + "のスポーンを(" + location.getWorld().getName() + "," + (int)location.getX() + "," + (int)location.getY() + "," + (int)location.getZ() + 
+				")にセット。");
+	}
+	
+	public void setSpawn(String strPlayer, String strX, String strY, String strZ){
+		Player player = ne.convertToPlayer(strPlayer);
+		Double x = 0.0D, y = 0.0D, z = 0.0D;
+		
+		if(player == null) return;
+		
+		Location location = player.getLocation();
+		
+		try {
+			x = Double.parseDouble(strX);
+			y = Double.parseDouble(strY);
+			z = Double.parseDouble(strZ);
+		} catch (NumberFormatException e) {
+			ne.sendErrorMessage("(" + strX + "," + strY + "," + strZ + ")を座標に変換できませんでした。");
+			return;
+		}
+		
+		location.setX(x);
+		location.setY(y);
+		location.setZ(z);
+
+		player.setBedSpawnLocation(location, true);
+		player.sendMessage(NekoEvent.ne_tag + "セーブしました!");
+		ne.sendInfoMessage(strPlayer + "のスポーンを(" + location.getWorld().getName() + "," + (int)location.getX() + "," + (int)location.getY() + "," + (int)location.getZ() + 
+				")にセット。");
 	}
 }
