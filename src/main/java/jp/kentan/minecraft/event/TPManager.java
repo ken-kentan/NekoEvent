@@ -4,10 +4,13 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 public class TPManager {
-
-	static NekoEvent ne = NekoEvent.getInstance();
+	private NekoEvent ne = null;
 	
-	public static void TP(Player player, Location thisLoc ,String[] strLoc){
+	public TPManager(NekoEvent ne){
+		this.ne = ne;
+	}
+	
+	public void TP(Player player, Location thisLoc ,String[] strLoc){
 		boolean[] isRelative = {false,false,false};
 		double[] loc = {thisLoc.getX(),thisLoc.getY(),thisLoc.getZ()};
 		
@@ -36,10 +39,10 @@ public class TPManager {
 		
 		player.teleport(location);
 	
-		ne.getLogger().info(player.getName() + "を(" + location.getWorld().getName() + "," + loc[0] + "," + loc[1] + "," + loc[2]+ ")にTPしました。");
+		ne.sendInfoMessage(player.getName() + "を(" + location.getWorld().getName() + "," + (int)loc[0] + "," + (int)loc[1] + "," + (int)loc[2]+ ")にTPしました。");
 	}
 
-	public static void set(Player player,String strName, String strNo, String strTimer) {
+	public void set(Player player,String strName, String strNo, String strTimer) {
 		String path = "TP." + strName;
 
 		if (!ne.isCheckPlayerOnline(player)) return;
@@ -70,7 +73,7 @@ public class TPManager {
 		ne.saveConfig();
 	}
 	
-	public static int getTPLocationNumber(String strStage){
+	public int getTPLocationNumber(String strStage){
 		String path = "TP." + strStage;
 		int stageNumber;
 		stageNumber = ne.getConfig().getInt(path + ".No", -1);
@@ -83,7 +86,7 @@ public class TPManager {
 		return stageNumber;
 	}
 
-	public static void TP(String tp, String strPlayer) {
+	public void TP(String tp, String strPlayer) {
 		Player player = ne.convertToPlayer(strPlayer);
 		String path = "TP." + tp;
 		
@@ -98,6 +101,6 @@ public class TPManager {
 
 		player.teleport(location);
 		
-		ne.getLogger().info(player.getName() + "を" + tp + "にTPしました。");
+		ne.sendInfoMessage(player.getName() + "を" + tp + "にTPしました。");
 	}
 }

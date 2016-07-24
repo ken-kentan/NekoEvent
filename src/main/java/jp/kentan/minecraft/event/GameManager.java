@@ -8,9 +8,19 @@ import org.bukkit.inventory.ItemStack;
 public class GameManager {
 	public static int reward_rate = 0;
 	
-	static NekoEvent ne = NekoEvent.getInstance();
+	private NekoEvent ne = null;
+	private TPManager tp = null;
+	private TicketManager ticket = null;
+	private TimeManager time = null;
 	
-	public static void clearDungeon(String stage,String et_number, String strPlayer) {
+	public GameManager(NekoEvent ne, TPManager tp, TicketManager ticket, TimeManager time){
+		this.ne = ne;
+		this.tp = tp;
+		this.ticket = ticket;
+		this.time = time;
+	}
+	
+	public void clearDungeon(String stage,String et_number, String strPlayer) {
 		String path = strPlayer + ".dungeon." + stage;
 		Player player = ne.convertToPlayer(strPlayer);
 		
@@ -19,13 +29,13 @@ public class GameManager {
 		player.sendMessage(ChatColor.RED+ stage + "ダンジョン" + ChatColor.WHITE + "を" + ChatColor.AQUA + "クリア！");
 		ne.writeLog("Dungeon:" + strPlayer + " clear:" + stage);
 		
-		if(TimeManager.checkOverDiffMinute(path, 30)){ //if over 30m,reset
+		if(time.checkOverDiffMinute(path, 30)){ //if over 30m,reset
 			ne.getConfig().set(path + ".clear", false);
 			ne.saveConfig();
 		}
 
 		if(ne.getConfig().getBoolean(path + ".clear") == false){
-			TicketManager.give(strPlayer, et_number);
+			ticket.give(strPlayer, et_number);
 			ne.getConfig().set(path + ".last_minute", TimeManager.minute);
 			ne.broadcastAll(player, NekoEvent.ne_tag + ChatColor.BLUE + strPlayer + ChatColor.WHITE + "が、" + ChatColor.RED + stage + "ダンジョン" + ChatColor.WHITE +"をクリアしました！");//
 		}else{
@@ -36,7 +46,7 @@ public class GameManager {
 		ne.saveConfig();
 	}
 
-	public static void clearParkour(String stage, String strPlayer) {
+	public void clearParkour(String stage, String strPlayer) {
 		String path = strPlayer + ".parkour." + stage;
 		Player player = ne.convertToPlayer(strPlayer);
 		
@@ -45,13 +55,13 @@ public class GameManager {
 		player.sendMessage(ChatColor.GREEN + stage + "アスレ" + ChatColor.WHITE + "を" + ChatColor.AQUA + "クリア！");
 		ne.writeLog("Parkour:" + strPlayer + " clear:" + stage);
 		
-		if(TimeManager.checkOverDiffMinute(path, 1440)){ //if over 24h,reset
+		if(time.checkOverDiffMinute(path, 1440)){ //if over 24h,reset
 			ne.getConfig().set(path + ".clear", false);
 			ne.saveConfig();
 		}
 
-		if(ne.getConfig().getBoolean(path + ".clear") == false){
-			TicketManager.give(strPlayer, "1");
+		if(!ne.getConfig().getBoolean(path + ".clear")){
+			ticket.give(strPlayer, "1");
 			ne.getConfig().set(path + ".last_minute", TimeManager.minute);
 			ne.broadcastAll(player, NekoEvent.ne_tag + ChatColor.BLUE + strPlayer + ChatColor.WHITE + "が、" + ChatColor.GREEN + stage + "アスレ" + ChatColor.WHITE +"をクリアしました！");
 		}else{
@@ -62,15 +72,15 @@ public class GameManager {
 		ne.saveConfig();
 	}
 	
-	public static void reward(String s_player, String number){
+	public void reward(String s_player, String number){
 		int rand = (int) (Math.random()*reward_rate);//0-5
 		
 		ne.writeLog("Minigame:" + s_player + " rand:" + rand + " rate:" + reward_rate);
 		
-		if(rand == reward_rate - 1) TicketManager.give(s_player,number);
+		if(rand == reward_rate - 1) ticket.give(s_player,number);
 	}
 	
-	public static void removeItem(String strPlayer, String strItem){
+	public void removeItem(String strPlayer, String strItem){
 		Player player = Bukkit.getServer().getPlayer(strPlayer);
 		
 		for(int i = 0; i < player.getInventory().getSize(); i++) {
@@ -87,12 +97,12 @@ public class GameManager {
 			if(itemS != null && strItemStack.indexOf(strItem) != -1){
 				player.getInventory().setItem(i, null);
 				player.updateInventory();
-				ne.getLogger().info(player.getName() + "のインベントリから" + itemS.getType() + "を消去しました。");
+				ne.sendInfoMessage(player.getName() + "のインベントリから" + itemS.getType() + "を消去しました。");
 			}
 		}
 	}
 	
-	public static void setItemAmount(String strPlayer, String strItem, String strAmount){
+	public void setItemAmount(String strPlayer, String strItem, String strAmount){
 		Player player = Bukkit.getServer().getPlayer(strPlayer);
 		int amount = Integer.parseInt(strAmount), sumAmount = 0;
 		
@@ -117,43 +127,44 @@ public class GameManager {
 					
 					player.updateInventory();
 					
-					ne.getLogger().info(player.getName() + "のインベントリから" + itemS.getType() + "を" + setAmount +"個にしました。");
+					ne.sendInfoMessage(player.getName() + "のインベントリから" + itemS.getType() + "を" + setAmount +"個にしました。");
 				}
 			}
 		}
 	}
 	
-	public static void join(String strPlayer, String strStageName, String strJoinMsg) {
+	public void join(String strPlayer, String strStageName, String strJoinMsg) {
 		String path = "TP." + strStageName;
 		Player player = ne.convertToPlayer(strPlayer);
 		
-		int stageNumber = TPManager.getTPLocationNumber(strStageName),
+		int stageNumber = tp.getTPLocationNumber(strStageName),
 			stageTimer = ne.getConfig().getInt(path + ".Timer");
 		boolean isLock = ne.getConfig().getBoolean(path + ".Lock");
 		
 		if(stageNumber < 0 || player == null) return;
 		
-		if(!isLock || (isLock && TimeManager.isCheckTPTimer(stageNumber, stageTimer))){
+		if(!isLock || (isLock && time.isCheckTPTimer(stageNumber, stageTimer))){
 			if(isLock) lock(strStageName, false);
 			ne.broadcastAll(player, NekoEvent.ne_tag + strJoinMsg);
-			TPManager.TP(strStageName, strPlayer);
+			tp.TP(strStageName, strPlayer);
+			player.sendMessage(NekoEvent.ne_tag + strStageName + ChatColor.WHITE + "に参加しました。");
 		}else{
 			player.sendMessage(NekoEvent.ne_tag + "現在、" + strStageName + "では参加を受け付けていません。");
-			player.sendMessage(NekoEvent.ne_tag + "参加中のプレイヤーを待つか、" + (stageTimer - TimeManager.getTPLockTimer(stageNumber)) + "秒お待ちください。");
+			player.sendMessage(NekoEvent.ne_tag + "参加中のプレイヤーを待つか、" + (stageTimer - time.getTPLockTimer(stageNumber)) + "秒お待ちください。");
 		}
 	}
 	
-	public static void lock(String strStageName, boolean isLock) {
+	public void lock(String strStageName, boolean isLock) {
 		String path = "TP." + strStageName;
-		int stageNumber = TPManager.getTPLocationNumber(strStageName);
+		int stageNumber = tp.getTPLocationNumber(strStageName);
 		
 		if(stageNumber < 0 || stageNumber >= 20) return;
 
 		ne.getConfig().set(path + ".Lock", isLock);
 		ne.saveConfig();
 		
-		if(isLock) TimeManager.startTPLockTimer(stageNumber);
+		if(isLock) time.startTPLockTimer(stageNumber);
 		
-		ne.getLogger().info(strStageName + "のロックを" + isLock + "にしました。");
+		ne.sendInfoMessage(strStageName + "のロックを" + isLock + "にしました。");
 	}
 }

@@ -12,9 +12,13 @@ import org.bukkit.inventory.ItemStack;
 public class TriggerManager {
 	public static List<String> item_list = new ArrayList<String>();
 	
-	static NekoEvent ne = NekoEvent.getInstance();
+	private NekoEvent ne = null;
+	
+	public TriggerManager(NekoEvent ne){
+		this.ne = ne;
+	}
 
-	public static boolean checkItem(String strPlayer, String strItemNum, String noItemInHand, String notMatchItem){
+	public boolean checkItem(String strPlayer, String strItemNum, String noItemInHand, String notMatchItem){
 		int item;
 		Player player = ne.convertToPlayer(strPlayer);
 		
@@ -32,7 +36,7 @@ public class TriggerManager {
 			return false;
 		}
 		
-		ItemStack itemStack = player.getInventory().getItemInHand();
+		ItemStack itemStack = player.getInventory().getItemInMainHand();
 		
 		if(itemStack == null || itemStack.getAmount() < 1){
 			if(!noItemInHand.equals("null")) player.sendMessage(" " + ChatColor.GRAY + ChatColor.ITALIC + noItemInHand);
@@ -43,7 +47,7 @@ public class TriggerManager {
 			int amt = itemStack.getAmount() - 1;
 			
 			itemStack.setAmount(amt);
-			player.getInventory().setItemInHand(amt > 0 ? itemStack : null);
+			player.getInventory().setItemInMainHand(amt > 0 ? itemStack : null);
 			player.updateInventory();
 			
 			return true;
@@ -54,12 +58,12 @@ public class TriggerManager {
 		return false;
 	}
 	
-	public static void setTorch(Location thisLoc, String[] strLoc){
+	public void setTorch(Location thisLoc, String[] strLoc){
 		double[] loc = {Double.parseDouble(strLoc[0]),Double.parseDouble(strLoc[1]),Double.parseDouble(strLoc[2])};
 		Location setLoc = new Location(thisLoc.getWorld(), loc[0], loc[1], loc[2]);
 		
 		setLoc.getBlock().setType(Material.REDSTONE_TORCH_ON);
 		
-		ne.getLogger().info("(" + thisLoc.getWorld().getName() + "," + loc[0] + "," + loc[1] + "," + loc[2] + ")にREDSTONE_TORCH_ONをセットしました。");
+		ne.sendInfoMessage("(" + thisLoc.getWorld().getName() + "," + loc[0] + "," + loc[1] + "," + loc[2] + ")にREDSTONE_TORCH_ONをセットしました。");
 	}
 }

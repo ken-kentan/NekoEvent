@@ -18,35 +18,49 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class NekoEvent extends JavaPlugin {
+	private ConfigManager config = null;
+	private GameManager gm = null;
+	private TPManager tp = null;
+	private PasswordManager pm = null;
+	private TicketManager ticket = null;
+	private TimeManager time = null;
+	private TriggerManager trigger = null;
+	
 	public static String ne_tag = ChatColor.GRAY + "[" + ChatColor.GOLD  + "Neko" + ChatColor.YELLOW + "Event" + ChatColor.GRAY + "] " + ChatColor.WHITE;
 	public static String sp_itemid, sp_name;
 	public static String gacha_list[][] = new String[5][10], gacha_itemname[][] = new String[5][10];
 	public static List<String> buy_command_list = new ArrayList<String>(),
 							   buy_name_list    = new ArrayList<String>();
 	public static int gacha_numbers[] = new int[5];
-	
-	private static NekoEvent instance;
 
 	@Override
 	public void onEnable() {
 		
-		instance = this;
+		config = new ConfigManager(this);
+		
+		tp = new TPManager(this);
+		ticket = new TicketManager(this);
+		trigger = new TriggerManager(this);
+		
+		time = new TimeManager(this, config);
+		pm = new PasswordManager(this, trigger);
+		gm = new GameManager(this, tp, ticket, time);
 
-		new TimeManager().runTaskTimer(this, 20, 20);// 20 1s 1200 1m
+		time.runTaskTimer(this, 20, 20);// 20 1s 1200 1m
 
 		for (int i = 0; i < 5; i++) {
 			gacha_numbers[i] = -1;
 		}
 
-		ConfigManager.setBase();
-		TimeManager.initTPLockTimer();
+		config.load();
+		time.initTPLockTimer();
 
 		getLogger().info("NekoEventを有効にしました。");
 	}
 
 	@Override
 	public void onDisable() {
-		ConfigManager.save();
+		config.save();
 		
 		Bukkit.getScheduler().cancelTasks(this);
 
@@ -67,50 +81,50 @@ public class NekoEvent extends JavaPlugin {
 			switch (args[0]) {
 			case "reload":
 
-				ConfigManager.setBase();
+				config.load();
 				sender.sendMessage(ChatColor.GREEN + "NekoEventの設定を再読み込みしました。");
 
 				break;
 			case "save":
-				ConfigManager.save();
+				config.save();
 				break;
 			case "ticket":// event ticket <player> <number>
 
-				if(isCheckParamLength(args.length, 3)) TicketManager.give(args[1], args[2]);
+				if(isCheckParamLength(args.length, 3)) ticket.give(args[1], args[2]);
 
 				break;
 			case "minigame":// event minigame <player> <ticket>
 
-				if(isCheckParamLength(args.length, 3)) GameManager.reward(args[1], args[2]);
+				if(isCheckParamLength(args.length, 3)) gm.reward(args[1], args[2]);
 
 				break;
 			case "parkour":// event parkour <stage> <player>
 
-				if(isCheckParamLength(args.length, 3)) GameManager.clearParkour(args[1], args[2]);
+				if(isCheckParamLength(args.length, 3)) gm.clearParkour(args[1], args[2]);
 
 				break;
 			case "dungeon":// event dungeon <stage> <number> <player>
 
-				if(isCheckParamLength(args.length, 4)) GameManager.clearDungeon(args[1], args[2], args[3]);
+				if(isCheckParamLength(args.length, 4)) gm.clearDungeon(args[1], args[2], args[3]);
 
 				break;
 			case "join":// event join <player> <stage> <join msg>, event join set <stage> <stage number> <timer> ,event join unlock <stage>
 				
 				if(isCheckPlayerOnline(args[1], false)){
-					if(isCheckParamLength(args.length, 4)) GameManager.join(args[1], args[2], args[3]);
+					if(isCheckParamLength(args.length, 4)) gm.join(args[1], args[2], args[3]);
 				}else{
 					switch (args[1]) {
 						case "set":
 							if(isCheckParamLength(args.length, 5) && isCheckPlayerOnline((Player)sender)){
-								TPManager.set((Player)sender, args[2], args[3], args[4]);
+								tp.set((Player)sender, args[2], args[3], args[4]);
 								sender.sendMessage(ChatColor.GREEN + "現在位置を" + args[2] + "(" + args[3] + ")のTP位置として自動ﾛｯｸ解除時間" + args[4] + "秒で設定しました。");
 							}
 							break;
 						case "lock":
-							if(isCheckParamLength(args.length, 3)) GameManager.lock(args[2], true);
+							if(isCheckParamLength(args.length, 3)) gm.lock(args[2], true);
 							break;
 						case "unlock":
-							if(isCheckParamLength(args.length, 3)) GameManager.lock(args[2], false);
+							if(isCheckParamLength(args.length, 3)) gm.lock(args[2], false);
 							break;
 						default:
 							if(isCheckParamLength(args.length, 2)) sendErrorMessage(args[1] + "は/event joinのパラメータとして不適切です。");
@@ -128,25 +142,25 @@ public class NekoEvent extends JavaPlugin {
 					
 					commandBlock = ((BlockCommandSender)sender).getBlock();
 					
-					TPManager.TP(player, commandBlock.getLocation(), strLoc);
+					tp.TP(player, commandBlock.getLocation(), strLoc);
 				}
 				break;
 			case "gacha":// event gacha <player> <type> <ticket>
 
-				if (isCheckParamLength(args.length, 4) && TicketManager.remove(args[1], args[3])) {
+				if (isCheckParamLength(args.length, 4) && ticket.remove(args[1], args[3])) {
 					processGacha(Bukkit.getServer().getPlayer(args[1]), Integer.parseInt(args[2]));
 				}
 
 				break;
 			case "special":// event special <player> <name>
 
-				if(isCheckParamLength(args.length, 3) && TimeManager.checkSpecialDay()) processSpecial(args[1], args[2]);
+				if(isCheckParamLength(args.length, 3) && time.checkSpecialDay()) processSpecial(args[1], args[2]);
 				else convertToPlayer(args[1]).sendMessage(ChatColor.YELLOW + "今日はスペシャル対象の日ではありません。");
 
 				break;
 			case "buy":// event buy <player> <type> <ticket>
 
-				if (isCheckParamLength(args.length, 4) && TicketManager.remove(args[1], args[3]) == true) {
+				if (isCheckParamLength(args.length, 4) && ticket.remove(args[1], args[3]) == true) {
 					processBuy(Bukkit.getServer().getPlayer(args[1]), Integer.parseInt(args[2]));
 				}
 
@@ -162,14 +176,14 @@ public class NekoEvent extends JavaPlugin {
 					commandBlock = ((BlockCommandSender)sender).getBlock();
 					String[] strLocTrigger = {args[1],args[2],args[3]};
 				
-					if(TriggerManager.checkItem(args[4],args[5],args[6],args[7])) TriggerManager.setTorch(commandBlock.getLocation(), strLocTrigger);
+					if(trigger.checkItem(args[4],args[5],args[6],args[7])) trigger.setTorch(commandBlock.getLocation(), strLocTrigger);
 				}
 				break;
 			case "setAmount"://event setAmount <player> <item name> <item amount>
-				if(isCheckParamLength(args.length, 4)) GameManager.setItemAmount(args[1], args[2], args[3]);
+				if(isCheckParamLength(args.length, 4)) gm.setItemAmount(args[1], args[2], args[3]);
 				break;
 			case "itemStack"://event itemStack
-				ItemStack itemStack = ((Player)sender).getInventory().getItemInHand();
+				ItemStack itemStack = ((Player)sender).getInventory().getItemInMainHand();
 				sender.sendMessage(itemStack.toString());
 				break;
 			case "pass":
@@ -181,11 +195,11 @@ public class NekoEvent extends JavaPlugin {
 					case "init"://event pass init <pass number> @p <password> <x y z>
 						if(isCheckParamLength(args.length, 8)){
 							String[] loc = {args[5],args[6],args[7]};
-							PasswordManager.init(numPass, args[4],loc);
+							pm.init(numPass, args[4],loc);
 						}
 						break;
 					case "set"://event pass set <pass number> @p <password>
-						if(isCheckParamLength(args.length, 5)) PasswordManager.set(numPass, player, args[4]);
+						if(isCheckParamLength(args.length, 5)) pm.set(numPass, player, args[4]);
 						break;
 					}
 				}
@@ -194,10 +208,6 @@ public class NekoEvent extends JavaPlugin {
 		}
 
 		return true;
-	}
-	
-	public static NekoEvent getInstance(){
-		return instance;
 	}
 
 	public boolean isCheckPlayerOnline(Player player) {
@@ -250,12 +260,25 @@ public class NekoEvent extends JavaPlugin {
 	}
 	
 	public void sendErrorMessage(String str){
-		Player mojalion = Bukkit.getServer().getPlayer("mojalion");
-		Player ken_kentan = Bukkit.getServer().getPlayer("ken_kentan");
+		for(Player player : Bukkit.getServer().getOnlinePlayers())
+        {
+			if(player.isOp()){
+				player.sendMessage(ne_tag + ChatColor.RED + "ERROR! " + ChatColor.WHITE + str);
+			}
+        }
 		
 		getLogger().warning(str);
-		if(mojalion != null) mojalion.sendMessage(ne_tag + ChatColor.RED + "ERROR! " + ChatColor.WHITE + str);
-		if(ken_kentan != null) ken_kentan.sendMessage(ne_tag + ChatColor.RED + "ERROR! " + ChatColor.WHITE + str);
+	}
+	
+	public void sendInfoMessage(String str){
+		for(Player player : Bukkit.getServer().getOnlinePlayers())
+        {
+			if(player.isOp()){
+				player.sendMessage(ne_tag + ChatColor.AQUA + "Info " + ChatColor.WHITE + str);
+			}
+        }
+		
+		getLogger().info(str);
 	}
 	
 	private void showCommandHelp(CommandSender _sender){
@@ -303,7 +326,7 @@ public class NekoEvent extends JavaPlugin {
 
 				filewriter.close();
 			} else {
-				getLogger().info("ログファイルが見つかりません");
+				sendInfoMessage("ログファイルが見つかりません");
 			}
 		} catch (IOException e) {
 			sendErrorMessage("ログをファイルに書き込めませんでした");
@@ -317,7 +340,7 @@ public class NekoEvent extends JavaPlugin {
 
 		player.sendMessage(ChatColor.AQUA + gacha_itemname[type][rand] + ChatColor.WHITE + "を" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "しました！");
 		broadcastAll(player,ne_tag + ChatColor.BLUE + player.getName() + ChatColor.WHITE + "が,ガチャで" + ChatColor.AQUA + gacha_itemname[type][rand] + ChatColor.WHITE + "を" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "しました！");
-		getLogger().info(player.getName() + "にガチャ景品 " + gacha_list[type][rand] + " を追加しました。");
+		sendInfoMessage(player.getName() + "にガチャ景品 " + gacha_list[type][rand] + " を追加しました。");
 		writeLog("Gacha:" + player.getName() + " get:" + gacha_itemname[type][rand] + "(" + gacha_list[type][rand] + ")");
 	}
 	
@@ -340,7 +363,7 @@ public class NekoEvent extends JavaPlugin {
 
 		player.sendMessage(ChatColor.AQUA + sp_name + ChatColor.WHITE + "を" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "しました！");
 		broadcastAll(player,ne_tag + ChatColor.BLUE + player.getName() + ChatColor.WHITE + "が," + ChatColor.AQUA + sp_name + ChatColor.WHITE + "を" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "しました！");
-		getLogger().info(player.getName() + "にスペシャル景品 " + sp_itemid + " を追加しました。");
+		sendInfoMessage(player.getName() + "にスペシャル景品 " + sp_itemid + " を追加しました。");
 		writeLog("Special:" + player.getName() + " get:" + sp_name + "(" + sp_itemid + ")");
 	}
 	
@@ -356,7 +379,7 @@ public class NekoEvent extends JavaPlugin {
 
 		player.sendMessage(ChatColor.AQUA + buy_name_list.get(type) + ChatColor.WHITE + "を" + ChatColor.GOLD + "購入" + ChatColor.WHITE + "しました！");
 		broadcastAll(player,ne_tag + ChatColor.BLUE + player.getName() + ChatColor.WHITE + "が," + ChatColor.AQUA + name + ChatColor.WHITE + "を" + ChatColor.GOLD + "購入" + ChatColor.WHITE + "しました！");
-		getLogger().info(player.getName() + "にコマンド [" + command + "]を実行しました。");
+		sendInfoMessage(player.getName() + "にコマンド [" + command + "]を実行しました。");
 		writeLog("Buy:" + player.getName() + " detail:" + name + "(" + command + ")");
 	}
 	

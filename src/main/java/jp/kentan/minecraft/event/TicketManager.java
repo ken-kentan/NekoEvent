@@ -7,9 +7,13 @@ import org.bukkit.inventory.ItemStack;
 public class TicketManager {
 	public static String name, itemstack;
 	
-	static NekoEvent ne = NekoEvent.getInstance();
+	private NekoEvent ne = null;
 	
-	public static void give(String strPlayer, String number){
+	public TicketManager(NekoEvent ne){
+		this.ne = ne;
+	}
+	
+	public void give(String strPlayer, String number){
 		int ticket_number = 0;
 		Player player = ne.convertToPlayer(strPlayer);
 		
@@ -26,13 +30,13 @@ public class TicketManager {
 			ne.getServer().dispatchCommand(ne.getServer().getConsoleSender(), "give " + strPlayer + name.replace("{number}", Integer.toString(ticket_number)));
 			
 			player.sendMessage(ChatColor.AQUA +" イベントチケット" + ChatColor.WHITE + "を" + ticket_number + "枚" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "しました！");
-			ne.getLogger().info(strPlayer + "に、イベントチケットを" + ticket_number + "枚追加しました。");
+			ne.sendInfoMessage(strPlayer + "に、イベントチケットを" + ticket_number + "枚追加しました。");
 			ne.writeLog("Ticket:" + strPlayer + " +" + ticket_number );
 		}
 		
 	}
 	
-	public static boolean remove(String strPlayer, String number) {
+	public boolean remove(String strPlayer, String number) {
 		int ticket_number = 0, player_ticket_amt = 0;
 		Player player = ne.convertToPlayer(strPlayer);
 		

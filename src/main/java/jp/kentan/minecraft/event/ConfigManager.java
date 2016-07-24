@@ -1,11 +1,14 @@
 package jp.kentan.minecraft.event;
 
 public class ConfigManager {
-	static NekoEvent ne = NekoEvent.getInstance();
-	
+	private NekoEvent ne = null;
 	private static final int kMaxLoopLimit = 100;
+	
+	public ConfigManager(NekoEvent ne){
+		this.ne = ne;
+	}
 
-	public static void setBase() {
+	public void load() {
 		ne.reloadConfig();
 
 		TicketManager.name      = ne.getConfig().getString("ticket.ID");
@@ -48,7 +51,7 @@ public class ConfigManager {
 			TriggerManager.item_list.add(ne.getConfig().getString("trigger.item." + i));
 		}
 
-		ne.getLogger().info("Done. getBaseConfig from config.yml");
+		ne.sendInfoMessage("Done. getBaseConfig from config.yml");
 		ne.getLogger().info("Minute => " + TimeManager.minute);
 		ne.getLogger().info("Reward rate => " + GameManager.reward_rate);
 		ne.getLogger().info("Gacha => " + NekoEvent.gacha_numbers[0] + "," + NekoEvent.gacha_numbers[1] + "," + NekoEvent.gacha_numbers[2] + "," + NekoEvent.gacha_numbers[3] + "," + NekoEvent.gacha_numbers[4]);
@@ -57,10 +60,10 @@ public class ConfigManager {
 		ne.getLogger().info("Trigger items => " + TriggerManager.item_list.size());
 	}
 
-	public static void save() {
+	public void save() {
 		ne.getLogger().info("Saving. minute:" + TimeManager.minute);
 		ne.getConfig().set("minute", TimeManager.minute);
-		ne.getLogger().info("Save success!");
 		ne.saveConfig();
+		ne.getLogger().info("Save success!");
 	}
 }

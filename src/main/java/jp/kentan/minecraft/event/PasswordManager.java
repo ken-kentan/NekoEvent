@@ -4,25 +4,32 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 public class PasswordManager {
-	static NekoEvent ne = NekoEvent.getInstance();
+	private NekoEvent ne = null;
+	private TriggerManager trigger = null;
 	
 	private static String[] password = new String[5];
 	private static String[] setPassword = new String[5];
 	private static String[][] locTorch = new String[5][3];
 	
+	public PasswordManager(NekoEvent ne, TriggerManager trigger){
+		this.ne = ne;
+		this.trigger = trigger;
+	}
 	
-	public static void init(int numPass, String initPass, String[] loc){
+	
+	public void init(int numPass, String initPass, String[] loc){
 		password[numPass] = initPass;
 		setPassword[numPass] = "";
 		locTorch[numPass] = loc;
-		ne.getLogger().info("パスワード:" + numPass + " を " + password[numPass] + " で初期化しました。");
+		ne.sendInfoMessage("パスワード:" + numPass + " を " + password[numPass] + " で初期化しました。");
 	}
 	
-	public static void set(int numPass, Player player, String pass){
+	public void set(int numPass, Player player, String pass){
 		StringBuilder sb = new StringBuilder();
 		
 		if(setPassword[numPass] == null){
 			ne.sendErrorMessage("ﾊﾟｽﾜｰﾄﾞ:" + numPass + " が初期化されていないためset出来ませんでした。");
+			ne.sendErrorMessage("setコマンド以前にinitコマンドが実行されている必要があります。");
 			return;
 		}
 		
@@ -31,20 +38,20 @@ public class PasswordManager {
 		
 		setPassword[numPass] = new String(sb);
 		
-		ne.getLogger().info("パスワード:" + numPass + " に " + setPassword[numPass] + " がセットされました。");
+		ne.sendInfoMessage("パスワード:" + numPass + " に " + setPassword[numPass] + " がセットされました。");
 		
 		if(password[numPass].length() <= setPassword[numPass].length()) run(numPass,player);
 	}
 	
-	private static void run(int numPass, Player player){
+	private void run(int numPass, Player player){
 		if(password[numPass].equals(setPassword[numPass])){
 			setPassword[numPass] = "";
-			ne.getLogger().info("パスワード:" + numPass + " が一致しました。");
-			TriggerManager.setTorch(player.getLocation(), locTorch[numPass]);
+			ne.sendInfoMessage("パスワード:" + numPass + " が一致しました。");
+			trigger.setTorch(player.getLocation(), locTorch[numPass]);
 		}else{
 			setPassword[numPass] = "";
 			player.sendMessage(" " + ChatColor.GRAY + ChatColor.ITALIC + "入力が誤りです。再入力を行ってください。");
-			ne.getLogger().info("パスワード:" + numPass + " が不一致です。");
+			ne.sendInfoMessage("パスワード:" + numPass + " が不一致です。");
 		}
 	}
 }

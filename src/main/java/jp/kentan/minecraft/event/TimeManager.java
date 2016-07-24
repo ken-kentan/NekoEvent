@@ -8,25 +8,31 @@ public class TimeManager extends BukkitRunnable{
 	public static int sec = 0, minute = 0, month = 0, day = 0;
 	private static int tpLockTimer[] = new int[20];
 	
-	static NekoEvent ne = NekoEvent.getInstance();
+	private NekoEvent ne = null;
+	private ConfigManager config = null;
+	
+	public TimeManager(NekoEvent ne, ConfigManager config){
+		this.ne = ne;
+		this.config = config;
+	}
 	
 	@Override
     public void run() {    	
     	if(sec++ >= 59){
     		sec = 0;
     		minute++;
-    		if(minute % 60 == 0) ConfigManager.save();
+    		if(minute % 60 == 0) config.save();
     	}
     	
     	for(int i=0; i<20; i++) if(tpLockTimer[i] > 0 && tpLockTimer[i] < 5000) tpLockTimer[i]++;
     }
 	
-	public static void initTPLockTimer(){
+	public void initTPLockTimer(){
 		for(int i=0;i<20;i++) tpLockTimer[i] = -1;
-		ne.getLogger().info("Initialized All TP Lock Timer.");
+		ne.sendInfoMessage("Initialized All TP Lock Timer.");
 	}
 	
-	public static boolean checkOverDiffMinute(String _path, int baseDiff){
+	public boolean checkOverDiffMinute(String _path, int baseDiff){
 		int last_minute = 0;
 		
 		if(ne.getConfig().getString(_path + ".clear") != null){
@@ -36,7 +42,7 @@ public class TimeManager extends BukkitRunnable{
 		return false;
 	}
 	
-	public static boolean checkSpecialDay(){
+	public boolean checkSpecialDay(){
 		Calendar calendar = Calendar.getInstance();
 		
 		if(calendar.get(Calendar.MONTH) + 1 == month && calendar.get(Calendar.DATE) == day) return true;
@@ -44,15 +50,15 @@ public class TimeManager extends BukkitRunnable{
 		return false;
 	}
 	
-	public static void startTPLockTimer(int stageNumber){
+	public void startTPLockTimer(int stageNumber){
 		tpLockTimer[stageNumber] = 1;
 	}
 	
-	public static int getTPLockTimer(int stageNumber){
+	public int getTPLockTimer(int stageNumber){
 		return tpLockTimer[stageNumber];
 	}
 	
-	public static boolean isCheckTPTimer(int stageNumber, int unlockTimer){
+	public boolean isCheckTPTimer(int stageNumber, int unlockTimer){
 		if(tpLockTimer[stageNumber] == -1 || tpLockTimer[stageNumber] > unlockTimer){
 			tpLockTimer[stageNumber] = 0;
 			return true;
