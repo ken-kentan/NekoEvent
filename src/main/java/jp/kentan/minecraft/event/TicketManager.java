@@ -49,6 +49,8 @@ public class TicketManager {
 			return false;
 		}
 		
+		if(ticket_number <= 0) return true;
+		
 		//Create EventTickets ItemStack
 		String itemS_str = itemstack.replace("{number}", Integer.toString(ticket_number));
 		
