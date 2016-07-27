@@ -91,7 +91,7 @@ public class GameManager {
 			try{
 				strItemStack = itemS.toString();
 			}catch(Exception e){
-				if(itemS != null && itemS.getAmount() > 0) ne.getLogger().warning("例外が発生したためスキップしました。");
+				if(itemS != null && itemS.getAmount() > 0) ne.getLogger().warning("Skip unknown item.");
 				continue;
 			}
 
@@ -114,7 +114,7 @@ public class GameManager {
 			try{
 				strItemStack = itemS.toString();
 			}catch(Exception e){
-				if(itemS != null && itemS.getAmount() > 0) ne.getLogger().warning("例外が発生したためスキップしました。");
+				if(itemS != null && itemS.getAmount() > 0) ne.getLogger().warning("Skip unknown item.");
 				continue;
 			}
 
@@ -128,7 +128,7 @@ public class GameManager {
 					
 					player.updateInventory();
 					
-					ne.sendInfoMessage(player.getName() + "のインベントリから" + itemS.getType() + "を" + setAmount +"個にしました。");
+					ne.sendInfoMessage(player.getName() + "のインベントリから" + itemS.getType() + "を" + amount +"個にしました。");
 				}
 			}
 		}

@@ -18,20 +18,19 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class NekoEvent extends JavaPlugin {
-	private ConfigManager config = null;
-	private GameManager gm = null;
-	private TPManager tp = null;
-	private PasswordManager pm = null;
-	private TicketManager ticket = null;
-	private TimeManager time = null;
-	private TriggerManager trigger = null;
+	private ConfigManager config ;
+	private GameManager gm;
+	private TPManager tp;
+	private PasswordManager pm;
+	private TicketManager ticket;
+	private TimeManager time;
+	private TriggerManager trigger;
+	private GachaManager gacha;
 	
 	public static String ne_tag = ChatColor.GRAY + "[" + ChatColor.GOLD  + "Neko" + ChatColor.YELLOW + "Event" + ChatColor.GRAY + "] " + ChatColor.WHITE;
 	public static String sp_itemid, sp_name;
-	public static String gacha_list[][] = new String[5][10], gacha_itemname[][] = new String[5][10];
 	public static List<String> buy_command_list = new ArrayList<String>(),
 							   buy_name_list    = new ArrayList<String>();
-	public static int gacha_numbers[] = new int[5];
 
 	@Override
 	public void onEnable() {
@@ -45,12 +44,9 @@ public class NekoEvent extends JavaPlugin {
 		time = new TimeManager(this, config);
 		pm = new PasswordManager(this, trigger);
 		gm = new GameManager(this, tp, ticket, time);
+		gacha = new GachaManager(this, config, ticket);
 
 		time.runTaskTimer(this, 20, 20);// 20 1s 1200 1m
-
-		for (int i = 0; i < 5; i++) {
-			gacha_numbers[i] = -1;
-		}
 
 		config.load();
 		time.initTPLockTimer();
@@ -145,10 +141,54 @@ public class NekoEvent extends JavaPlugin {
 					tp.TP(player, commandBlock.getLocation(), strLoc);
 				}
 				break;
-			case "gacha":// event gacha <player> <type> <ticket>
-
-				if (isCheckParamLength(args.length, 4) && ticket.remove(args[1], args[3])) {
-					processGacha(Bukkit.getServer().getPlayer(args[1]), Integer.parseInt(args[2]));
+			case "gacha":
+				if(!isCheckParamLength(args.length, 2)) return true;
+				
+				switch(args[1]){
+				case "create":
+					if(!isCheckParamLength(args.length, 3)) return true;
+					
+					if(gacha.createGacha(args[2])){
+						sender.sendMessage(ne_tag + "Successfully create Gacha(" + args[2] + ").");
+					}else{
+						sendErrorMessage("Gacha(" + args[2] + ")は既に存在するか不正なIDです。");
+					}
+					break;
+				case "info":
+					if(!isCheckParamLength(args.length, 3)) return true;
+					
+					gacha.infoGachaID(args[2], (Player)sender);
+					break;
+				case "list":
+					gacha.infoGachaList((Player)sender);
+					break;
+				case "add":
+					if(!isCheckParamLength(args.length, 4)) return true;
+					
+					String strCommand = "";
+					
+					for(int i = 4; i < args.length; ++i){
+						strCommand = strCommand.concat(args[i]).concat(" ");
+					}
+					
+					gacha.addCommand(args[2], args[3], strCommand);
+					
+					sender.sendMessage(ne_tag + "Successfully add command to Gacha(" + args[2] + ")");
+					sender.sendMessage(ne_tag + "Name: " + args[3]);
+					sender.sendMessage(ne_tag + "Command: " + strCommand);
+					break;
+				case "remove":
+					if(!isCheckParamLength(args.length, 4)) return true;
+					
+					if(gacha.removeCommand(args[2], args[3])){
+						sender.sendMessage(ne_tag + "Gacha(" + args[2] + ")からindex:" + args[3] + "を消去しました.");
+					}
+					break;
+				default:
+					if(!isCheckParamLength(args.length, 4)) return true;
+					
+					gacha.gacha(args[1], args[2], args[3]);
+					break;
 				}
 
 				break;
@@ -309,6 +349,12 @@ public class NekoEvent extends JavaPlugin {
 		_sender.sendMessage("| " + ChatColor.YELLOW + "/event pass init <pass number> @p <password> <x y z>");
 		_sender.sendMessage("| " + ChatColor.YELLOW + "/event pass set <pass number> @p <password>");
 		_sender.sendMessage("| " + ChatColor.YELLOW + "/event setspawn @p <x y z>");
+		_sender.sendMessage("| " + ChatColor.YELLOW + "/event gacha list");
+		_sender.sendMessage("| " + ChatColor.YELLOW + "/event gacha create <gachaID>");
+		_sender.sendMessage("| " + ChatColor.YELLOW + "/event gacha info <gachaID>");
+		_sender.sendMessage("| " + ChatColor.YELLOW + "/event gacha add <gachaID> <name> <command>");
+		_sender.sendMessage("| " + ChatColor.YELLOW + "/event gacha remove <gachaID> <index>");
+		_sender.sendMessage("| " + ChatColor.YELLOW + "/event gacha <gachaID> <ticket cost> @p");
 		_sender.sendMessage("| " + ChatColor.GRAY + "文字装飾は節記号を使用して下さい。");
 		_sender.sendMessage("---------------------------------------");
 	}
@@ -339,17 +385,6 @@ public class NekoEvent extends JavaPlugin {
 		} catch (IOException e) {
 			sendErrorMessage("ログをファイルに書き込めませんでした");
 		}
-	}
-
-	private void processGacha(Player player, int type) {
-		int rand = (int) (Math.random() * (gacha_numbers[type] + 1));// 0-gacha_numbers
-
-		getServer().dispatchCommand(getServer().getConsoleSender(), "give " + player.getName() + gacha_list[type][rand]);
-
-		player.sendMessage(ChatColor.AQUA + gacha_itemname[type][rand] + ChatColor.WHITE + "を" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "しました！");
-		broadcastAll(player,ne_tag + ChatColor.BLUE + player.getName() + ChatColor.WHITE + "が,ガチャで" + ChatColor.AQUA + gacha_itemname[type][rand] + ChatColor.WHITE + "を" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "しました！");
-		sendInfoMessage(player.getName() + "にガチャ景品 " + gacha_list[type][rand] + " を追加しました。");
-		writeLog("Gacha:" + player.getName() + " get:" + gacha_itemname[type][rand] + "(" + gacha_list[type][rand] + ")");
 	}
 	
 	private void processSpecial(String strPlayer, String name) {
