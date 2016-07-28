@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Server;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class GachaManager {
@@ -33,7 +34,7 @@ public class GachaManager {
 		return config.deleteGachaData(strGachaID, Integer.parseInt(strIndex));
 	}
 	
-	public void infoGachaID(String strGachaID, Player player){
+	public void infoGachaID(String strGachaID, CommandSender player){
 		int index = 0;
 		List<String> commandList = config.readGachaCommand(strGachaID);
 		List<String> nameList    = config.readGachaName(strGachaID);
@@ -47,7 +48,7 @@ public class GachaManager {
 		}
 	}
 	
-	public void infoGachaList(Player player){
+	public void infoGachaList(CommandSender player){
 		List<String> gachaList = config.readGachaList();
 		String strGachaList = "";
 		
@@ -55,18 +56,17 @@ public class GachaManager {
 			strGachaList = strGachaList.concat(gachaString).concat("  ");
 		}
 		
-		player.sendMessage(NekoEvent.ne_tag + "Gacha ID List.");
-		player.sendMessage(NekoEvent.ne_tag + strGachaList);
+		player.sendMessage(NekoEvent.ne_tag + "Gacha ID List: " + strGachaList);
 	}
 	
-	public void gacha(String strGachaID,String strCost, String strPlayer) {
+	public void gacha(String strGachaID,String strCost, String strPlayer, boolean isSilent) {
 		List<String> commandList = config.readGachaCommand(strGachaID);
 		List<String> nameList    = config.readGachaName(strGachaID);
 		Player player = ne.convertToPlayer(strPlayer);
 		int index = (int) (Math.random() * (commandList.size()));
 		
 		if(commandList.size() < 1 || nameList.size() < 1 || (commandList.size() != nameList.size())){
-			ne.sendErrorMessage("Gacha(" + strGachaID + ")は存在しないかデータに整合がありません.");
+			ne.sendErrorMessage("Gacha(" + strGachaID + ") is Not Found or Invaild data set.");
 			return;
 		}
 		
@@ -78,9 +78,12 @@ public class GachaManager {
 
 		server.dispatchCommand(server.getConsoleSender(), command);
 
-		player.sendMessage(NekoEvent.ne_tag + ChatColor.AQUA + nameList.get(index) + ChatColor.WHITE + "を" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "！");
-		ne.broadcastAll(player,NekoEvent.ne_tag + ChatColor.BLUE + player.getName() + ChatColor.WHITE + "が,ガチャで" + ChatColor.AQUA + nameList.get(index) + ChatColor.WHITE + "を" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "しました！");
-		ne.sendInfoMessage(player.getName() + "にガチャ景品 " + nameList.get(index) + " を追加.");
+		if(!isSilent){
+			player.sendMessage(NekoEvent.ne_tag + ChatColor.AQUA + nameList.get(index) + ChatColor.WHITE + "を" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "！");
+			ne.broadcastAll(player,NekoEvent.ne_tag + ChatColor.BLUE + player.getName() + ChatColor.WHITE + "が" + ChatColor.AQUA + nameList.get(index) + ChatColor.WHITE + "を" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "しました！");
+		}
+		
+		ne.sendInfoMessage("Gave the " + nameList.get(index) + " to " + strPlayer + " (Silent mode: " + isSilent + ").");
 		ne.writeLog("Gacha:" + player.getName() + " get:" +nameList.get(index) + "(" + command + ")");
 	}
 }

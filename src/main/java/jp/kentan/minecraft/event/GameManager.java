@@ -166,7 +166,12 @@ public class GameManager {
 		
 		if(isLock) time.startTPLockTimer(stageNumber);
 		
-		ne.sendInfoMessage(strStageName + "のロックを" + isLock + "にしました。");
+		if(isLock){
+			ne.sendInfoMessage("Lock the " + strStageName + " game.");
+		}else{
+			ne.sendInfoMessage("Unlock the " + strStageName + " game.");
+		}
+		
 	}
 	
 	public void setSpawn(String strPlayer){
@@ -178,8 +183,7 @@ public class GameManager {
 
 		player.setBedSpawnLocation(location, true);
 		player.sendMessage(NekoEvent.ne_tag + "セーブしました!");
-		ne.sendInfoMessage(strPlayer + "のスポーンを(" + location.getWorld().getName() + "," + (int)location.getX() + "," + (int)location.getY() + "," + (int)location.getZ() + 
-				")にセット。");
+		ne.sendInfoMessage("Set the " + strPlayer + "'s spawn point to (" + location.getWorld().getName() + "," + (int)location.getX() + "," + (int)location.getY() + "," + (int)location.getZ() + ").");
 	}
 	
 	public void setSpawn(String strPlayer, String strX, String strY, String strZ){
@@ -195,7 +199,7 @@ public class GameManager {
 			y = Double.parseDouble(strY);
 			z = Double.parseDouble(strZ);
 		} catch (NumberFormatException e) {
-			ne.sendErrorMessage("(" + strX + "," + strY + "," + strZ + ")を座標に変換できませんでした。");
+			ne.sendErrorMessage("Could not convert (" + strX + "," + strY + "," + strZ + ") to location.");
 			return;
 		}
 		
@@ -205,7 +209,6 @@ public class GameManager {
 
 		player.setBedSpawnLocation(location, true);
 		player.sendMessage(NekoEvent.ne_tag + "セーブしました!");
-		ne.sendInfoMessage(strPlayer + "のスポーンを(" + location.getWorld().getName() + "," + (int)location.getX() + "," + (int)location.getY() + "," + (int)location.getZ() + 
-				")にセット。");
+		ne.sendInfoMessage("Set the " + strPlayer + "'s spawn point to (" + location.getWorld().getName() + "," + (int)location.getX() + "," + (int)location.getY() + "," + (int)location.getZ() + ").");
 	}
 }

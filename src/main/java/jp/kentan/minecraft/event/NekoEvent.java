@@ -157,10 +157,10 @@ public class NekoEvent extends JavaPlugin {
 				case "info":
 					if(!isCheckParamLength(args.length, 3)) return true;
 					
-					gacha.infoGachaID(args[2], (Player)sender);
+					gacha.infoGachaID(args[2], sender);
 					break;
 				case "list":
-					gacha.infoGachaList((Player)sender);
+					gacha.infoGachaList(sender);
 					break;
 				case "add":
 					if(!isCheckParamLength(args.length, 4)) return true;
@@ -187,7 +187,7 @@ public class NekoEvent extends JavaPlugin {
 				default:
 					if(!isCheckParamLength(args.length, 4)) return true;
 					
-					gacha.gacha(args[1], args[2], args[3]);
+					gacha.gacha(args[1], args[2], args[3], (args.length > 4 && args[4].equals("silent")));
 					break;
 				}
 
@@ -260,7 +260,7 @@ public class NekoEvent extends JavaPlugin {
 	public boolean isCheckPlayerOnline(Player player) {
 		if (player.isOnline()) return true;
 		
-		sendErrorMessage(player + "が見つかりません。");
+		sendErrorMessage("The player(" + player + ") Not Found.");
 
 		return false;
 	}
@@ -269,7 +269,7 @@ public class NekoEvent extends JavaPlugin {
 		Player player = convertToPlayer(strPlayer);
 		if (player != null && player.isOnline()) return true;
 		
-		if(isSendErrorMsg) sendErrorMessage(strPlayer + "が見つかりません。");
+		if(isSendErrorMsg) sendErrorMessage("The player(" + player + ") Not Found.");
 
 		return false;
 	}
@@ -278,7 +278,7 @@ public class NekoEvent extends JavaPlugin {
 
 		if(paramLen >= targetLen) return true;
 		else{
-			sendErrorMessage("コマンドのパラメータ数が不足しています。");
+			sendErrorMessage("Missing the number of parameters.");
 			return false;
 		}
 	}
@@ -288,7 +288,7 @@ public class NekoEvent extends JavaPlugin {
 			@SuppressWarnings("unused")
 			Block tmp = ((BlockCommandSender)sender).getBlock();
 		}catch(Exception e){
-			sendErrorMessage("このコマンドはコマンドブロックから実行してください。");
+			sendErrorMessage("This command need to use Command Block.");
 			return false;
 		}
 		
@@ -300,7 +300,7 @@ public class NekoEvent extends JavaPlugin {
 		try{
 			player = Bukkit.getServer().getPlayer(strPlayer);
 		}catch(Exception e){
-			sendErrorMessage(strPlayer + "をPlayer型に変換できませんでした。");
+			sendErrorMessage("Counld not conver the " + strPlayer + " to player.");
 		}
 		
 		return player;
@@ -355,6 +355,7 @@ public class NekoEvent extends JavaPlugin {
 		_sender.sendMessage("| " + ChatColor.YELLOW + "/event gacha add <gachaID> <name> <command>");
 		_sender.sendMessage("| " + ChatColor.YELLOW + "/event gacha remove <gachaID> <index>");
 		_sender.sendMessage("| " + ChatColor.YELLOW + "/event gacha <gachaID> <ticket cost> @p");
+		_sender.sendMessage("| " + ChatColor.YELLOW + "/event gacha <gachaID> <ticket cost> @p silent");
 		_sender.sendMessage("| " + ChatColor.GRAY + "文字装飾は節記号を使用して下さい。");
 		_sender.sendMessage("---------------------------------------");
 	}

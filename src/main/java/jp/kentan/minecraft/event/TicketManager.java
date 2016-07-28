@@ -22,7 +22,7 @@ public class TicketManager {
 		try {
 			ticket_number = Integer.parseInt(number);
 		} catch (NumberFormatException nfex) {
-			ne.sendErrorMessage(number + "を整数型に変換できませんでした。");
+			ne.sendErrorMessage("Could not convert " + number + " to integer.");
 			return;
 		}
 		
@@ -30,7 +30,7 @@ public class TicketManager {
 			ne.getServer().dispatchCommand(ne.getServer().getConsoleSender(), "give " + strPlayer + name.replace("{number}", Integer.toString(ticket_number)));
 			
 			player.sendMessage(ChatColor.AQUA +" イベントチケット" + ChatColor.WHITE + "を" + ticket_number + "枚" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "しました！");
-			ne.sendInfoMessage(strPlayer + "に、イベントチケットを" + ticket_number + "枚追加しました。");
+			ne.sendInfoMessage("Gave the " + ticket_number + " Event Tickets to " + strPlayer + ".");
 			ne.writeLog("Ticket:" + strPlayer + " +" + ticket_number );
 		}
 		
@@ -45,7 +45,7 @@ public class TicketManager {
 		try {
 			ticket_number = Integer.parseInt(number);
 		} catch (NumberFormatException nfex) {
-			ne.sendErrorMessage(number + "を整数型に変換できませんでした。");
+			ne.sendErrorMessage("Could not convert " + number + " to integer.");
 			return false;
 		}
 		
@@ -62,7 +62,7 @@ public class TicketManager {
 			try{
 				strItemStack = itemStack.toString();
 			}catch(Exception e){
-				if(itemStack != null && itemStack.getAmount() > 0) ne.getLogger().warning("例外が発生したためスキップしました。");
+				if(itemStack != null && itemStack.getAmount() > 0) ne.getLogger().warning("Skip An exception.");
 				continue;
 			}
 			
@@ -84,7 +84,7 @@ public class TicketManager {
 			try{
 				strItemStack = itemS.toString();
 			}catch(Exception e){
-				if(itemS != null && itemS.getAmount() > 0) ne.getLogger().warning("例外が発生したためスキップしました。");
+				if(itemS != null && itemS.getAmount() > 0) ne.getLogger().warning("Skip An exception.");
 				continue;
 			}
 			
@@ -105,7 +105,7 @@ public class TicketManager {
 			}
 		}
 		
-		ne.writeLog("Ticket:" + player.getName() + " -" + ticket_number );
+		ne.writeLog("Ticket:" + player.getName() + " -" + number );
 		return true;
 	}
 

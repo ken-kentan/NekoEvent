@@ -39,7 +39,7 @@ public class TPManager {
 		
 		player.teleport(location);
 	
-		ne.sendInfoMessage(player.getName() + "を(" + location.getWorld().getName() + "," + (int)loc[0] + "," + (int)loc[1] + "," + (int)loc[2]+ ")にTPしました。");
+		ne.sendInfoMessage("TP " + player.getName() + " to (" + location.getWorld().getName() + "," + (int)loc[0] + "," + (int)loc[1] + "," + (int)loc[2]+ ").");
 	}
 
 	public void set(Player player,String strName, String strNo, String strTimer) {
@@ -101,6 +101,6 @@ public class TPManager {
 
 		player.teleport(location);
 		
-		ne.sendInfoMessage(player.getName() + "を" + tp + "にTPしました。");
+		ne.sendInfoMessage("TP " + strPlayer + " to " + tp + ".");
 	}
 }
