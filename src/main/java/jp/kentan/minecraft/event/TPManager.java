@@ -42,25 +42,26 @@ public class TPManager {
 		ne.sendInfoMessage("TP " + player.getName() + " to (" + location.getWorld().getName() + "," + (int)loc[0] + "," + (int)loc[1] + "," + (int)loc[2]+ ").");
 	}
 
-	public void set(Player player,String strName, String strNo, String strTimer) {
+	public boolean set(Player player, String strName, String strTimer) {
 		String path = "TP." + strName;
 
-		if (!ne.isCheckPlayerOnline(player)) return;
+		if (!ne.isCheckPlayerOnline(player)){
+			ne.sendErrorMessage("Could not found player " + player.getName() + ".");
+			return false;
+		}
 		
-		int stageNumber = Integer.parseInt(strNo);
 		int stageTimer = Integer.parseInt(strTimer);
 		
-		if(stageNumber < 0 || stageNumber >= 20){
-			ne.sendErrorMessage("ステージナンバーは0~19で指定する必要があります。");
-			return;
+		if(stageTimer < 0 || stageTimer > 3600){
+			ne.sendErrorMessage("自動解除タイマーは1~3600(秒)で指定する必要があります。");
+			return false;
 		}
 		
-		if(stageTimer < 0 || stageNumber > 5000){
-			ne.sendErrorMessage("自動解除タイマーは0~5000で指定する必要があります。");
-			return;
+		if(ne.getConfig().getString(path + ".Lock") != null){
+			ne.sendErrorMessage("Already registered (" + strName + ").");
+			return false;
 		}
 		
-		ne.getConfig().set(path + ".No", stageNumber);
 		ne.getConfig().set(path + ".Lock", false);
 		ne.getConfig().set(path + ".Timer", stageTimer);
 
@@ -71,6 +72,8 @@ public class TPManager {
 		ne.getConfig().set(path + ".Yaw", location.getYaw());
 		ne.getConfig().set(path + ".Pitch", location.getPitch());
 		ne.saveConfig();
+		
+		return true;
 	}
 	
 	public int getTPLocationNumber(String strStage){

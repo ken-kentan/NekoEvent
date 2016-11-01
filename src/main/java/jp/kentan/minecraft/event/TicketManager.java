@@ -5,12 +5,21 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public class TicketManager {
-	public static String name, itemstack;
+	private static String name, itemstack;
 	
 	private NekoEvent ne = null;
 	
 	public TicketManager(NekoEvent ne){
 		this.ne = ne;
+	}
+	
+	public static void setup(String _name, String _itemstack){
+		name = _name;
+		itemstack = _itemstack;
+	}
+	
+	public void give(String strPlayer, int number){
+		give(strPlayer, Integer.toString(number));
 	}
 	
 	public void give(String strPlayer, String number){
@@ -29,7 +38,7 @@ public class TicketManager {
 		if(ticket_number > 0){			
 			ne.getServer().dispatchCommand(ne.getServer().getConsoleSender(), "give " + strPlayer + name.replace("{number}", Integer.toString(ticket_number)));
 			
-			player.sendMessage(ChatColor.AQUA +" イベントチケット" + ChatColor.WHITE + "を" + ticket_number + "枚" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "しました！");
+			player.sendMessage(NekoEvent.CHAT_TAG + ChatColor.AQUA +" イベントチケット" + ChatColor.WHITE + "を" + ticket_number + "枚" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "しました！");
 			ne.sendInfoMessage("Gave the " + ticket_number + " Event Tickets to " + strPlayer + ".");
 			ne.writeLog("Ticket:" + strPlayer + " +" + ticket_number );
 		}
@@ -73,7 +82,7 @@ public class TicketManager {
 		
 		//reject (shortage)
 		if(player_ticket_amt < ticket_number){
-			player.sendMessage( NekoEvent.ne_tag + ChatColor.YELLOW +"イベントチケットが" + (ticket_number - player_ticket_amt) + "枚不足しています。");
+			player.sendMessage(NekoEvent.CHAT_TAG + ChatColor.YELLOW +"イベントチケットが" + (ticket_number - player_ticket_amt) + "枚不足しています。");
 			return false;
 		}
 

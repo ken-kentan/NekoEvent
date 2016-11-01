@@ -6,63 +6,81 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 public class ConfigManager {
-	private NekoEvent ne = null;
-	private static final int kMaxLoopLimit = 100;
+	final public static SimpleDateFormat FORMATER_DAY = new SimpleDateFormat("yyyy/MM/dd");
+	final public static SimpleDateFormat FORMATER_SEC = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 	
-	private final Charset CONFIG_CHAREST = StandardCharsets.UTF_8;
-	private String configGachaFile = null;
+	final private static Charset CONFIG_CHAREST = StandardCharsets.UTF_8;
+	final private static int MAX_LOOP_LIMIT = 100;
 	
-	public ConfigManager(NekoEvent ne){
-		this.ne = ne;
+	private NekoEvent neko;
+	private String configGachaFile;
+	private Logger logger;
+	
+	public ConfigManager(NekoEvent neko){
+		this.neko = neko;
+		this.logger = neko.getLogger();
 		
-		configGachaFile = ne.getDataFolder() + File.separator + "gacha.yml";
+		configGachaFile = neko.getDataFolder() + File.separator + "gacha.yml";
 	}
 
 	public void load() {
-		ne.reloadConfig();
+		neko.reloadConfig();
+		FileConfiguration config = neko.getConfig();
 
-		TicketManager.name      = ne.getConfig().getString("ticket.ID");
-		TicketManager.itemstack = ne.getConfig().getString("ticket.ItemStack");
-
-		TimeManager.minute   = ne.getConfig().getInt("minute");
-		TimeManager.month    = ne.getConfig().getInt("special.month");
-		TimeManager.day      = ne.getConfig().getInt("special.day");
+		String ticket_name      = config.getString("ticket.ID");
+		String ticket_itemstack = config.getString("ticket.ItemStack");
 		
-		NekoEvent.sp_itemid  = ne.getConfig().getString("special.item.ID");
-		NekoEvent.sp_name    = ne.getConfig().getString("special.item.name");
+		TicketManager.setup(ticket_name, ticket_itemstack);
+		
+		Calendar specialDay = new GregorianCalendar();
+		
+		try{
+			specialDay.setTime(FORMATER_DAY.parse(config.getString("special.date")));	
+		}catch (ParseException e) {
+			logger.warning(e.getMessage());
+		}
+		
+		TimeManager.setup(specialDay);
+		
+		NekoEvent.sp_itemid  = config.getString("special.item.ID");
+		NekoEvent.sp_name    = config.getString("special.item.name");
 
-		GameManager.reward_rate = ne.getConfig().getInt("reward_rate");
+		GameManager.reward_rate = config.getInt("reward_rate");
 		
 		//All List clear
 		NekoEvent.buy_command_list.clear();
 		NekoEvent.buy_name_list.clear();
 		TriggerManager.item_list.clear();
 		
-		for (int i = 0; i < kMaxLoopLimit; i++) {
-			if (ne.getConfig().getString("buy.command." + i) == null) break;
+		for (int i = 0; i < MAX_LOOP_LIMIT; i++) {
+			if (config.getString("buy.command." + i) == null) break;
 			
-			NekoEvent.buy_command_list.add(ne.getConfig().getString("buy.command."+ i));
-			NekoEvent.buy_name_list.add(ne.getConfig().getString("buy.name." + i));
+			NekoEvent.buy_command_list.add(config.getString("buy.command."+ i));
+			NekoEvent.buy_name_list.add(config.getString("buy.name." + i));
 		}
 		
-		for (int i=0; i < kMaxLoopLimit; i++){
-			if (ne.getConfig().getString("trigger.item." + i) == null) break;
+		for (int i=0; i < MAX_LOOP_LIMIT; i++){
+			if (config.getString("trigger.item." + i) == null) break;
 			
-			TriggerManager.item_list.add(ne.getConfig().getString("trigger.item." + i));
+			TriggerManager.item_list.add(config.getString("trigger.item." + i));
 		}
 
-		ne.sendInfoMessage("Successfully loaded the config file.");
-		ne.getLogger().info("Minute => " + TimeManager.minute);
-		ne.getLogger().info("Reward rate => " + GameManager.reward_rate);
-		ne.getLogger().info("Special day => " + TimeManager.month + "/" + TimeManager.day);
-		ne.getLogger().info("Buy commands => " + NekoEvent.buy_command_list.size());
-		ne.getLogger().info("Trigger items => " + TriggerManager.item_list.size());
+		neko.sendInfoMessage("Successfully loaded the config file.");
+		logger.info("Reward rate => " + GameManager.reward_rate);
+		logger.info("Special day => " + FORMATER_DAY.format(specialDay.getTime()));
+		logger.info("Buy commands => " + NekoEvent.buy_command_list.size());
+		logger.info("Trigger items => " + TriggerManager.item_list.size());
 	}
 	
 	private List<String> readGachaData(String path) {
@@ -76,7 +94,7 @@ public class ConfigManager {
 
 			list = conf.getStringList(path);
 		} catch (Exception e) {
-			ne.sendErrorMessage(e.getMessage());
+			neko.sendErrorMessage(e.getMessage());
 		}
 
 		return list;
@@ -95,15 +113,20 @@ public class ConfigManager {
 	}
 
 	public void save() {
-		ne.getLogger().info("Saving. minute:" + TimeManager.minute);
-		ne.getConfig().set("minute", TimeManager.minute);
-		ne.saveConfig();
-		ne.getLogger().info("Save success!");
+		
+//		logger.info("Saving. minute:" + TimeManager.minute);
+//		neko.getConfig().set("now", TimeManager.minute);
+		neko.saveConfig();
+		logger.info("Save success!");
+	}
+	
+	public String readString(String path){
+		return neko.getConfig().getString(path);
 	}
 	
 	public void saveGachaData(String strID, String strCommand, String strName){
 		try {
-			File configFile = new File(ne.getDataFolder(), "gacha.yml");
+			File configFile = new File(neko.getDataFolder(), "gacha.yml");
 			String pathCommand = "Gacha." + strID + ".Command";
 			String pathName    = "Gacha." + strID + ".Name";
 
@@ -123,13 +146,13 @@ public class ConfigManager {
 				conf.save(configFile);
 			}
 		} catch (Exception e) {
-			ne.sendErrorMessage(e.getMessage());
+			neko.sendErrorMessage(e.getMessage());
 		}
 	}
 	
 	public boolean saveGachaID(String strID){
 		try {
-			File configFile = new File(ne.getDataFolder(), "gacha.yml");
+			File configFile = new File(neko.getDataFolder(), "gacha.yml");
 
 			if (configFile != null) {
 				FileConfiguration conf = new YamlConfiguration();
@@ -154,7 +177,7 @@ public class ConfigManager {
 	
 	public boolean deleteGachaData(String strID, int index){
 		try {
-			File configFile = new File(ne.getDataFolder(), "gacha.yml");
+			File configFile = new File(neko.getDataFolder(), "gacha.yml");
 			String pathCommand = "Gacha." + strID + ".Command";
 			String pathName    = "Gacha." + strID + ".Name";
 
@@ -174,7 +197,7 @@ public class ConfigManager {
 				conf.save(configFile);
 			}
 		} catch (Exception e) {
-			ne.sendErrorMessage(e.getMessage());
+			neko.sendErrorMessage(e.getMessage());
 			return false;
 		}
 		return true;

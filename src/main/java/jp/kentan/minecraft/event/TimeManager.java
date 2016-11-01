@@ -1,67 +1,91 @@
 package jp.kentan.minecraft.event;
 
+import java.text.ParseException;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class TimeManager extends BukkitRunnable{
-	public static int sec = 0, minute = 0, month = 0, day = 0;
-	private static int tpLockTimer[] = new int[20];
+	private static Calendar specialDay;
+	private static HashMap<String, Integer> lockTimerMap = new HashMap<String, Integer>();
 	
-	private NekoEvent ne = null;
+	private NekoEvent neko = null;
 	private ConfigManager config = null;
 	
-	public TimeManager(NekoEvent ne, ConfigManager config){
-		this.ne = ne;
+	public TimeManager(NekoEvent neko, ConfigManager config){
+		this.neko = neko;
 		this.config = config;
 	}
 	
 	@Override
-    public void run() {    	
-    	if(sec++ >= 59){
-    		sec = 0;
-    		minute++;
-    		if(minute % 60 == 0) config.save();
+    public void run() {
+    	for(Map.Entry<String, Integer> entry : lockTimerMap.entrySet()){
+    		int value = entry.getValue();
+    		entry.setValue(value + 1);
+    		if(value > 3600){ //over 1h
+    			lockTimerMap.remove(entry);
+    		}
     	}
-    	
-    	for(int i=0; i<20; i++) if(tpLockTimer[i] > 0 && tpLockTimer[i] < 5000) tpLockTimer[i]++;
     }
 	
-	public void initTPLockTimer(){
-		for(int i=0;i<20;i++) tpLockTimer[i] = -1;
-		ne.sendInfoMessage("Initialized All TP Lock Timer.");
+	public static void setup(Calendar _specialDay){
+		specialDay = _specialDay;
 	}
 	
-	public boolean checkOverDiffMinute(String _path, int baseDiff){
-		int last_minute = 0;
+	public void initTPLockTimer(){
+		lockTimerMap.clear();
+		neko.sendInfoMessage("Initialized All TP Lock Timer.");
+	}
+	
+	public boolean checkOverDiffMinute(String _path, int diff){
+		final long MILLIS_TO_MINUTE = 60000;
+		long nowTime = Calendar.getInstance().getTimeInMillis(), lastTime = 0;
 		
-		if(ne.getConfig().getString(_path + ".clear") != null){
-			last_minute = ne.getConfig().getInt(_path + ".last_minute");
-			if(Math.abs(minute - last_minute) > baseDiff) return true;
+		String strLastDate = config.readString(_path);
+		
+		if(strLastDate != null){
+			try {
+				lastTime = ConfigManager.FORMATER_SEC.parse(strLastDate).getTime();
+				
+				if((int)((nowTime - lastTime) / MILLIS_TO_MINUTE) > diff){
+					return true;
+				}
+			} catch (ParseException e) {
+				neko.getLogger().warning(e.getMessage());
+			}
+		}else{
+			return true;
 		}
 		return false;
 	}
 	
 	public boolean checkSpecialDay(){
-		Calendar calendar = Calendar.getInstance();
+		Calendar today = Calendar.getInstance();
 		
-		if(calendar.get(Calendar.MONTH) + 1 == month && calendar.get(Calendar.DATE) == day) return true;
+		if(today.get(Calendar.MONTH) == specialDay.get(Calendar.MONTH) && today.get(Calendar.DATE) == specialDay.get(Calendar.DATE)){
+			return true;
+		}
 				
 		return false;
 	}
 	
-	public void startTPLockTimer(int stageNumber){
-		tpLockTimer[stageNumber] = 1;
+	public void startTPLockTimer(String stage){
+		lockTimerMap.put(stage, 0);
+		neko.sendInfoMessage("Start, " + stage + "'s lock timer.");
 	}
 	
-	public int getTPLockTimer(int stageNumber){
-		return tpLockTimer[stageNumber];
+	public int getTPLockTimer(String stage){
+		return lockTimerMap.get(stage);
 	}
 	
-	public boolean isCheckTPTimer(int stageNumber, int unlockTimer){
-		if(tpLockTimer[stageNumber] == -1 || tpLockTimer[stageNumber] > unlockTimer){
-			tpLockTimer[stageNumber] = 0;
+	public boolean isCheckTPTimer(String stage, int unlockTimer){
+		if(lockTimerMap.get(stage) == null || lockTimerMap.get(stage) > unlockTimer){
+			lockTimerMap.remove(stage);
 			return true;
-		}else {return false;}
+		}else {
+			return false;
+		}
 	}
 }

@@ -39,11 +39,11 @@ public class GachaManager {
 		List<String> commandList = config.readGachaCommand(strGachaID);
 		List<String> nameList    = config.readGachaName(strGachaID);
 		
-		player.sendMessage(NekoEvent.ne_tag + "--------- Gacha(" + strGachaID + ")'s info ---------");
+		player.sendMessage(NekoEvent.CHAT_TAG + "--------- Gacha(" + strGachaID + ")'s info ---------");
 		
 		for(String command : commandList){
-			player.sendMessage(NekoEvent.ne_tag + index + " - " + nameList.get(index));
-			player.sendMessage(NekoEvent.ne_tag + index + " - " + command);
+			player.sendMessage(NekoEvent.CHAT_TAG + index + " - " + nameList.get(index));
+			player.sendMessage(NekoEvent.CHAT_TAG + index + " - " + command);
 			index++;
 		}
 	}
@@ -56,7 +56,7 @@ public class GachaManager {
 			strGachaList = strGachaList.concat(gachaString).concat("  ");
 		}
 		
-		player.sendMessage(NekoEvent.ne_tag + "Gacha ID List: " + strGachaList);
+		player.sendMessage(NekoEvent.CHAT_TAG + "Gacha ID List: " + strGachaList);
 	}
 	
 	public void gacha(String strGachaID,String strCost, String strPlayer, boolean isSilent) {
@@ -79,8 +79,8 @@ public class GachaManager {
 		server.dispatchCommand(server.getConsoleSender(), command);
 
 		if(!isSilent){
-			player.sendMessage(NekoEvent.ne_tag + ChatColor.AQUA + nameList.get(index) + ChatColor.WHITE + "を" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "！");
-			ne.broadcastAll(player,NekoEvent.ne_tag + ChatColor.BLUE + player.getName() + ChatColor.WHITE + "が" + ChatColor.AQUA + nameList.get(index) + ChatColor.WHITE + "を" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "しました！");
+			player.sendMessage(NekoEvent.CHAT_TAG + ChatColor.AQUA + nameList.get(index) + ChatColor.WHITE + "を" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "！");
+			ne.broadcast(player,NekoEvent.CHAT_TAG + ChatColor.BLUE + player.getName() + ChatColor.WHITE + "が" + ChatColor.AQUA + nameList.get(index) + ChatColor.WHITE + "を" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "しました！");
 		}
 		
 		ne.sendInfoMessage("Gave the " + nameList.get(index) + " to " + strPlayer + " (Silent mode: " + isSilent + ").");

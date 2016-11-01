@@ -27,14 +27,15 @@ public class NekoEvent extends JavaPlugin {
 	private TriggerManager trigger;
 	private GachaManager gacha;
 	
-	public static String ne_tag = ChatColor.GRAY + "[" + ChatColor.GOLD  + "Neko" + ChatColor.YELLOW + "Event" + ChatColor.GRAY + "] " + ChatColor.WHITE;
+	final public static String CHAT_TAG = ChatColor.GRAY + "[" + ChatColor.GOLD  + "Neko" + ChatColor.YELLOW + "Event" + ChatColor.GRAY + "] " + ChatColor.WHITE;
+	final private static String CHAT_OP_TAG = ChatColor.GRAY + "[" + ChatColor.GOLD  + "Neko" + ChatColor.YELLOW + "Event ";
+	
 	public static String sp_itemid, sp_name;
 	public static List<String> buy_command_list = new ArrayList<String>(),
 							   buy_name_list    = new ArrayList<String>();
 
 	@Override
-	public void onEnable() {
-		
+	public void onEnable() {		
 		config = new ConfigManager(this);
 		
 		tp = new TPManager(this);
@@ -104,16 +105,17 @@ public class NekoEvent extends JavaPlugin {
 				if(isCheckParamLength(args.length, 4)) gm.clearDungeon(args[1], args[2], args[3]);
 
 				break;
-			case "join":// event join <player> <stage> <join msg>, event join set <stage> <stage number> <timer> ,event join unlock <stage>
+			case "join":// event join <player> <stage> <join msg>, event join set <stage> <timer> ,event join unlock <stage>
 				
 				if(isCheckPlayerOnline(args[1], false)){
 					if(isCheckParamLength(args.length, 4)) gm.join(args[1], args[2], args[3]);
 				}else{
 					switch (args[1]) {
 						case "set":
-							if(isCheckParamLength(args.length, 5) && isCheckPlayerOnline((Player)sender)){
-								tp.set((Player)sender, args[2], args[3], args[4]);
-								sender.sendMessage(ChatColor.GREEN + "現在位置を" + args[2] + "(" + args[3] + ")のTP位置として自動ﾛｯｸ解除時間" + args[4] + "秒で設定しました。");
+							if(isCheckParamLength(args.length, 4) && isCheckPlayerOnline((Player)sender)){
+								if(tp.set((Player)sender, args[2], args[3])){
+									sender.sendMessage(ChatColor.GREEN + "現在位置を" + args[2] + "のTP位置として自動ﾛｯｸ解除時間 " + args[3] + "秒で設定しました。");
+								}
 							}
 							break;
 						case "lock":
@@ -149,7 +151,7 @@ public class NekoEvent extends JavaPlugin {
 					if(!isCheckParamLength(args.length, 3)) return true;
 					
 					if(gacha.createGacha(args[2])){
-						sender.sendMessage(ne_tag + "Successfully create Gacha(" + args[2] + ").");
+						sender.sendMessage(CHAT_TAG + "Successfully create Gacha(" + args[2] + ").");
 					}else{
 						sendErrorMessage("Gacha(" + args[2] + ")は既に存在するか不正なIDです。");
 					}
@@ -173,15 +175,15 @@ public class NekoEvent extends JavaPlugin {
 					
 					gacha.addCommand(args[2], args[3], strCommand);
 					
-					sender.sendMessage(ne_tag + "Successfully add command to Gacha(" + args[2] + ")");
-					sender.sendMessage(ne_tag + "Name: " + args[3]);
-					sender.sendMessage(ne_tag + "Command: " + strCommand);
+					sender.sendMessage(CHAT_TAG + "Successfully add command to Gacha(" + args[2] + ")");
+					sender.sendMessage(CHAT_TAG + "Name: " + args[3]);
+					sender.sendMessage(CHAT_TAG + "Command: " + strCommand);
 					break;
 				case "remove":
 					if(!isCheckParamLength(args.length, 4)) return true;
 					
 					if(gacha.removeCommand(args[2], args[3])){
-						sender.sendMessage(ne_tag + "Gacha(" + args[2] + ")からindex:" + args[3] + "を消去しました.");
+						sender.sendMessage(CHAT_TAG + "Gacha(" + args[2] + ")からindex:" + args[3] + "を消去しました.");
 					}
 					break;
 				default:
@@ -310,7 +312,7 @@ public class NekoEvent extends JavaPlugin {
 		for(Player player : Bukkit.getServer().getOnlinePlayers())
         {
 			if(player.isOp()){
-				player.sendMessage(ChatColor.GRAY + "[" + ChatColor.GOLD  + "Neko" + ChatColor.YELLOW + "Event" + ChatColor.RED + " ERROR" + ChatColor.GRAY + "] " + ChatColor.WHITE + str);
+				player.sendMessage(CHAT_OP_TAG + ChatColor.RED + "ERROR" + ChatColor.GRAY + "] " + ChatColor.WHITE + str);
 			}
         }
 		
@@ -321,7 +323,7 @@ public class NekoEvent extends JavaPlugin {
 		for(Player player : Bukkit.getServer().getOnlinePlayers())
         {
 			if(player.isOp()){
-				player.sendMessage(ChatColor.GRAY + "[" + ChatColor.GOLD  + "Neko" + ChatColor.YELLOW + "Event" + ChatColor.AQUA + " Info" + ChatColor.GRAY + "] " + ChatColor.WHITE + str);
+				player.sendMessage(CHAT_OP_TAG + ChatColor.AQUA + "Info" + ChatColor.GRAY + "] " + ChatColor.WHITE + str);
 			}
         }
 		
@@ -335,7 +337,7 @@ public class NekoEvent extends JavaPlugin {
 		_sender.sendMessage("| " + ChatColor.YELLOW + "/event parkour <stage> <player>");
 		_sender.sendMessage("| " + ChatColor.YELLOW + "/event dungeon <stage> <number> <player>");
 		_sender.sendMessage("| " + ChatColor.YELLOW + "/event join <player> <stage> <join msg>");
-		_sender.sendMessage("| " + ChatColor.YELLOW + "/event join set <stage> <stage number> <timer>");
+		_sender.sendMessage("| " + ChatColor.YELLOW + "/event join set <stage> <timer>");
 		_sender.sendMessage("| " + ChatColor.YELLOW + "/event join lock <stage>");
 		_sender.sendMessage("| " + ChatColor.YELLOW + "/event join unlock <stage>");
 		_sender.sendMessage("| " + ChatColor.YELLOW + "/event tp <player> <x y z>");
@@ -406,7 +408,7 @@ public class NekoEvent extends JavaPlugin {
 		getServer().dispatchCommand(getServer().getConsoleSender(), "give " + player.getName() + sp_itemid);
 
 		player.sendMessage(ChatColor.AQUA + sp_name + ChatColor.WHITE + "を" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "しました！");
-		broadcastAll(player,ne_tag + ChatColor.BLUE + player.getName() + ChatColor.WHITE + "が," + ChatColor.AQUA + sp_name + ChatColor.WHITE + "を" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "しました！");
+		broadcast(player,CHAT_TAG + ChatColor.BLUE + player.getName() + ChatColor.WHITE + "が," + ChatColor.AQUA + sp_name + ChatColor.WHITE + "を" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "しました！");
 		sendInfoMessage(player.getName() + "にスペシャル景品 " + sp_itemid + " を追加しました。");
 		writeLog("Special:" + player.getName() + " get:" + sp_name + "(" + sp_itemid + ")");
 	}
@@ -422,12 +424,12 @@ public class NekoEvent extends JavaPlugin {
 		getServer().dispatchCommand(getServer().getConsoleSender(), command);
 
 		player.sendMessage(ChatColor.AQUA + buy_name_list.get(type) + ChatColor.WHITE + "を" + ChatColor.GOLD + "購入" + ChatColor.WHITE + "しました！");
-		broadcastAll(player,ne_tag + ChatColor.BLUE + player.getName() + ChatColor.WHITE + "が," + ChatColor.AQUA + name + ChatColor.WHITE + "を" + ChatColor.GOLD + "購入" + ChatColor.WHITE + "しました！");
+		broadcast(player,CHAT_TAG + ChatColor.BLUE + player.getName() + ChatColor.WHITE + "が," + ChatColor.AQUA + name + ChatColor.WHITE + "を" + ChatColor.GOLD + "購入" + ChatColor.WHITE + "しました！");
 		sendInfoMessage(player.getName() + "にコマンド [" + command + "]を実行しました。");
 		writeLog("Buy:" + player.getName() + " detail:" + name + "(" + command + ")");
 	}
 	
-	public void broadcastAll(Player me, String str){
+	public void broadcast(Player me, String str){
 		int rand = (int) (Math.random() * 5);
 		
 		if(rand == 0) str = str.replace("Neko", "(^・ω・^)");
