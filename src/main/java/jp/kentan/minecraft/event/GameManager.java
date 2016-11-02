@@ -171,7 +171,7 @@ public class GameManager {
 
 		player.setBedSpawnLocation(location, true);
 		player.sendMessage(NekoEvent.CHAT_TAG + "セーブしました!");
-		NekoEvent.sendInfoMessage(strPlayer + "のスポーンを(" + location.getWorld().getName() + "," + (int)location.getX() + "," + (int)location.getY() + "," + (int)location.getZ() + ")ni"
+		NekoEvent.sendInfoMessage(strPlayer + "のスポーンを(" + location.getWorld().getName() + "," + (int)location.getX() + "," + (int)location.getY() + "," + (int)location.getZ() + ")にセット."
 				+ "にセット.");
 	}
 	
@@ -186,6 +186,6 @@ public class GameManager {
 
 		player.setBedSpawnLocation(location, true);
 		player.sendMessage(NekoEvent.CHAT_TAG + "セーブしました!");
-		NekoEvent.sendInfoMessage("Set the " + strPlayer + "'s spawn point to (" + location.getWorld().getName() + "," + (int)location.getX() + "," + (int)location.getY() + "," + (int)location.getZ() + ").");
+		NekoEvent.sendInfoMessage(strPlayer + "のスポーンを(" + location.getWorld().getName() + "," + (int)location.getX() + "," + (int)location.getY() + "," + (int)location.getZ() + ")にセット.");
 	}
 }

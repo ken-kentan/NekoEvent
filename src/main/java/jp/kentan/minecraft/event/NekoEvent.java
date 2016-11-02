@@ -50,8 +50,8 @@ public class NekoEvent extends JavaPlugin {
 
 		config.load();
 		time.initTPLockTimer();
-
-		getLogger().info("NekoEventを有効にしました.");
+		
+		sendInfoMessage("NekoEventを有効にしました.");
 	}
 
 	@Override
@@ -60,7 +60,7 @@ public class NekoEvent extends JavaPlugin {
 		
 		Bukkit.getScheduler().cancelTasks(this);
 
-		getLogger().info("NekoEventを無効にしました.");
+		sendInfoMessage("NekoEventを無効にしました.");
 	}
 
 	@Override
@@ -253,27 +253,13 @@ public class NekoEvent extends JavaPlugin {
 				}
 				break;
 			case "log"://event log <page>
-				int page = 0, cnt;
+				int page = 0;
 				
 				if(args.length >= 2){
 					page = Math.max(Utils.parseInt(args[1]), 0);
 				}
 				
-				cnt = (page + 1) * 10 + 1;
-				
-				sender.sendMessage(CHAT_TAG + "イベントログ " + page + "ページ");
-				List<String> log = Log.read(page);
-				StringBuilder builder = new StringBuilder();
-				
-				for(String line : log){
-					builder.append(--cnt);
-					builder.append(":");
-					builder.append(line);
-					
-					sender.sendMessage(builder.toString());
-					
-					builder.setLength(0);
-				}
+				Log.refer(sender, page);
 				break;
 			}
 		}
@@ -285,7 +271,7 @@ public class NekoEvent extends JavaPlugin {
 
 		if(paramLen >= targetLen) return true;
 		else{
-			sendErrorMessage("Missing the number of parameters.");
+			sendErrorMessage("ｺﾏﾝﾄﾞのﾊﾟﾗﾒｰﾀ数が不足しています.");
 			return false;
 		}
 	}

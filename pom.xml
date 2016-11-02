@@ -39,5 +39,5 @@
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
-	<version>1.11.25</version>
+	<version>1.12.26</version>
 </project>

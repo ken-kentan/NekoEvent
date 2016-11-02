@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import org.bukkit.command.CommandSender;
+
 public class Log {
 	final private static File path = new File("./plugins/NekoEvent/log.txt");
 
@@ -34,7 +36,7 @@ public class Log {
 		}
 	}
 
-	public static List<String> read(int page) {
+	private static List<String> read(int page) {
 		List<String> list = new ArrayList<String>();
 
 		try {
@@ -51,11 +53,9 @@ public class Log {
 				for (int i = 0; i < end; ++i) {
 					String buff = buffReader.readLine();
 
-					if (i < start)
-						continue;
+					if (i < start) continue;
 
-					if (buff == null)
-						break;
+					if (buff == null) break;
 
 					list.add(buff);
 				}
@@ -69,6 +69,26 @@ public class Log {
 		}
 
 		return list;
+	}
+	
+	public static void refer(CommandSender sender, int page){
+		int cnt = (page + 1) * 10 + 1;
+		
+		sender.sendMessage(NekoEvent.CHAT_TAG + "イベントログ<" + page + "ページ>");
+		List<String> log = Log.read(page);
+		StringBuilder builder = new StringBuilder();
+		
+		String format = "%" + String.valueOf(cnt).length() + "s";
+		
+		for(String line : log){
+			builder.append(String.format(format, --cnt));
+			builder.append(":");
+			builder.append(line);
+			
+			sender.sendMessage(builder.toString());
+			
+			builder.setLength(0);
+		}
 	}
 
 	private static boolean isAvailableFile() {
