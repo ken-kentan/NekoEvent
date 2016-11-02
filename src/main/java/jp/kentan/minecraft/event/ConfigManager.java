@@ -13,8 +13,10 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 
 public class ConfigManager {
 	final public static SimpleDateFormat FORMATER_DAY = new SimpleDateFormat("yyyy/MM/dd");
@@ -122,6 +124,36 @@ public class ConfigManager {
 	
 	public String readString(String path){
 		return neko.getConfig().getString(path);
+	}
+	
+	public Location readLocation(Player player, String path){
+		Location location = player.getLocation();		
+		FileConfiguration config = neko.getConfig();
+		
+		try{
+			location.setX(config.getDouble(path + ".X"));
+			location.setY(config.getDouble(path + ".Y"));
+			location.setZ(config.getDouble(path + ".Z"));
+			location.setYaw((float) config.getDouble(path + ".Yaw"));
+			location.setPitch((float) config.getDouble(path + ".Pitch"));
+		}catch(Exception e){
+			NekoEvent.sendErrorMessage("readLocationｴﾗｰ:" + e.getMessage());
+			return null;
+		}
+		
+		return location;
+	}
+	
+	public void saveLocation(Location location, String path){
+		FileConfiguration config = neko.getConfig();
+		
+		config.set(path + ".X", location.getX());
+		config.set(path + ".Y", location.getY());
+		config.set(path + ".Z", location.getZ());
+		config.set(path + ".Yaw", location.getYaw());
+		config.set(path + ".Pitch", location.getPitch());
+		
+		neko.saveConfig();
 	}
 	
 	public void saveGachaData(String strID, String strCommand, String strName){

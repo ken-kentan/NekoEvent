@@ -4,10 +4,12 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 public class TPManager {
-	private NekoEvent ne = null;
+	private NekoEvent ne;
+	private ConfigManager config;
 	
-	public TPManager(NekoEvent ne){
+	public TPManager(NekoEvent ne, ConfigManager config){
 		this.ne = ne;
+		this.config = config;
 	}
 	
 	public void TP(Player player, Location thisLoc ,String[] strLoc){
@@ -63,30 +65,13 @@ public class TPManager {
 		
 		ne.getConfig().set(path + ".Lock", false);
 		ne.getConfig().set(path + ".Timer", stageTimer);
-
-		Location location = player.getLocation();
-		ne.getConfig().set(path + ".X", location.getX());
-		ne.getConfig().set(path + ".Y", location.getY());
-		ne.getConfig().set(path + ".Z", location.getZ());
-		ne.getConfig().set(path + ".Yaw", location.getYaw());
-		ne.getConfig().set(path + ".Pitch", location.getPitch());
-		ne.saveConfig();
+		
+		config.saveLocation(player.getLocation(), path);
 		
 		return true;
 	}
 	
-	public int getTPLocationNumber(String strStage){
-		String path = "TP." + strStage;
-		int stageNumber;
-		stageNumber = ne.getConfig().getInt(path + ".No", -1);
-		
-		if(stageNumber < 0){
-			NekoEvent.sendErrorMessage(strStage + "は登録されていません.");
-			return -1;
-		}
-		
-		return stageNumber;
-	}
+
 
 	public void TP(String tp, String strPlayer) {
 		Player player = Utils.toPlayer(strPlayer);
@@ -94,12 +79,9 @@ public class TPManager {
 		
 		if (player == null || !Utils.isOnline(player)) return;
 
-		Location location = player.getLocation();
-		location.setX(ne.getConfig().getDouble(path + ".X"));
-		location.setY(ne.getConfig().getDouble(path + ".Y"));
-		location.setZ(ne.getConfig().getDouble(path + ".Z"));
-		location.setYaw((float) ne.getConfig().getDouble(path + ".Yaw"));
-		location.setPitch((float) ne.getConfig().getDouble(path + ".Pitch"));
+		Location location = config.readLocation(player, path);
+		
+		if(location == null) return;
 
 		player.teleport(location);
 		

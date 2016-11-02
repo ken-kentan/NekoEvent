@@ -37,7 +37,7 @@ public class NekoEvent extends JavaPlugin {
 		
 		config = new ConfigManager(this);
 		
-		tp = new TPManager(this);
+		tp = new TPManager(this, config);
 		ticket = new TicketManager(this);
 		trigger = new TriggerManager();
 		
@@ -250,6 +250,28 @@ public class NekoEvent extends JavaPlugin {
 					gm.setSpawn(args[1]);
 				}else if(isCheckParamLength(args.length, 5)){
 					gm.setSpawn(args[1],args[2],args[3],args[4]);
+				}
+				break;
+			case "log"://event log <page>
+				int page = 0, cnt = 1 + page * 10;
+				
+				if(args.length >= 2){
+					page = Utils.parseInt(args[1]);
+					if(page < 0) page = 0;
+				}
+				
+				sender.sendMessage(CHAT_TAG + "イベントログ " + page + "ページ");
+				List<String> log = Log.read(page);
+				StringBuilder builder = new StringBuilder();
+				
+				for(String line : log){
+					builder.append(cnt++);
+					builder.append(":");
+					builder.append(line);
+					
+					sender.sendMessage(builder.toString());
+					
+					builder.setLength(0);
 				}
 				break;
 			}

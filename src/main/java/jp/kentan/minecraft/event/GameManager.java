@@ -130,11 +130,10 @@ public class GameManager {
 		String path = "TP." + strStageName;
 		Player player = Utils.toPlayer(strPlayer);
 		
-		int stageNumber = tp.getTPLocationNumber(strStageName),
-			stageTimer = ne.getConfig().getInt(path + ".Timer");
+		int stageTimer = ne.getConfig().getInt(path + ".Timer");
 		boolean isLock = ne.getConfig().getBoolean(path + ".Lock");
 		
-		if(stageNumber < 0 || player == null) return;
+		if(player == null) return;
 		
 		if(!isLock || (isLock && time.isCheckTPTimer(strStageName, stageTimer))){
 			if(isLock) lock(strStageName, false);
@@ -149,9 +148,6 @@ public class GameManager {
 	
 	public void lock(String strStageName, boolean isLock) {
 		String path = "TP." + strStageName;
-		int stageNumber = tp.getTPLocationNumber(strStageName);
-		
-		if(stageNumber < 0 || stageNumber >= 20) return;
 
 		ne.getConfig().set(path + ".Lock", isLock);
 		ne.saveConfig();
