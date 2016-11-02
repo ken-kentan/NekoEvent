@@ -253,19 +253,20 @@ public class NekoEvent extends JavaPlugin {
 				}
 				break;
 			case "log"://event log <page>
-				int page = 0, cnt = 1 + page * 10;
+				int page = 0, cnt;
 				
 				if(args.length >= 2){
-					page = Utils.parseInt(args[1]);
-					if(page < 0) page = 0;
+					page = Math.max(Utils.parseInt(args[1]), 0);
 				}
+				
+				cnt = (page + 1) * 10 + 1;
 				
 				sender.sendMessage(CHAT_TAG + "イベントログ " + page + "ページ");
 				List<String> log = Log.read(page);
 				StringBuilder builder = new StringBuilder();
 				
 				for(String line : log){
-					builder.append(cnt++);
+					builder.append(--cnt);
 					builder.append(":");
 					builder.append(line);
 					
@@ -339,6 +340,7 @@ public class NekoEvent extends JavaPlugin {
 		_sender.sendMessage("| " + ChatColor.YELLOW + "/event gacha remove <gachaID> <index>");
 		_sender.sendMessage("| " + ChatColor.YELLOW + "/event gacha <gachaID> <ticket cost> @p");
 		_sender.sendMessage("| " + ChatColor.YELLOW + "/event gacha <gachaID> <ticket cost> @p silent");
+		_sender.sendMessage("| " + ChatColor.YELLOW + "/event log <page>");
 		_sender.sendMessage("| " + ChatColor.GRAY + "文字装飾は節記号を使用して下さい。");
 		_sender.sendMessage("---------------------------------------");
 	}
