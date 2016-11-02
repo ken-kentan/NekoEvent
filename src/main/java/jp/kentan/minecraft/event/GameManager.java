@@ -27,12 +27,12 @@ public class GameManager {
 	
 	public void clearDungeon(String stage,String et_number, String strPlayer) {
 		String path = strPlayer + ".dungeon." + stage;
-		Player player = ne.convertToPlayer(strPlayer);
+		Player player = Utils.toPlayer(strPlayer);
 		
-		if(player == null || !ne.isCheckPlayerOnline(player)) return;
+		if(player == null || !Utils.isOnline(player)) return;
 		
 		player.sendMessage(NekoEvent.CHAT_TAG + ChatColor.RED + stage + "ダンジョン" + MSG_CLEAR);
-		ne.writeLog("Dungeon:" + strPlayer + " clear:" + stage);
+		Log.write("Dungeon:" + strPlayer + " clear:" + stage);
 		
 		if(time.checkOverDiffMinute(path + ".last_date", 30)){ //if over 30m,reset
 			ne.getConfig().set(path + ".last_date", ConfigManager.FORMATER_SEC.format(Calendar.getInstance().getTime()));
@@ -47,12 +47,12 @@ public class GameManager {
 
 	public void clearParkour(String stage, String strPlayer) {
 		String path = strPlayer + ".parkour." + stage;
-		Player player = ne.convertToPlayer(strPlayer);
+		Player player = Utils.toPlayer(strPlayer);
 		
-		if(player == null || !ne.isCheckPlayerOnline(player)) return;
+		if(player == null || !Utils.isOnline(player)) return;
 		
 		player.sendMessage(NekoEvent.CHAT_TAG + ChatColor.GREEN + stage + "アスレ" + MSG_CLEAR);
-		ne.writeLog("Parkour:" + strPlayer + " clear:" + stage);
+		Log.write("Parkour:" + strPlayer + " clear:" + stage);
 		
 		if(time.checkOverDiffMinute(path + ".last_date", 1440)){ //if over 24h,reset
 			ne.getConfig().set(path + ".last_date", ConfigManager.FORMATER_SEC.format(Calendar.getInstance().getTime()));
@@ -68,7 +68,7 @@ public class GameManager {
 	public void reward(String s_player, String number){
 		int rand = (int) (Math.random()*reward_rate);//0-5
 		
-		ne.writeLog("Minigame:" + s_player + " rand:" + rand + " rate:" + reward_rate);
+		Log.write("Minigame:" + s_player + " rand:" + rand + " rate:" + reward_rate);
 		
 		if(rand == reward_rate - 1) ticket.give(s_player,number);
 	}
@@ -90,7 +90,7 @@ public class GameManager {
 			if(itemS != null && strItemStack.indexOf(strItem) != -1){
 				player.getInventory().setItem(i, null);
 				player.updateInventory();
-				ne.sendInfoMessage(player.getName() + "のインベントリから" + itemS.getType() + "を消去しました。");
+				NekoEvent.sendInfoMessage(player.getName() + "のインベントリから" + itemS.getType() + "を消去しました.");
 			}
 		}
 	}
@@ -120,7 +120,7 @@ public class GameManager {
 					
 					player.updateInventory();
 					
-					ne.sendInfoMessage(player.getName() + "のインベントリから" + itemS.getType() + "を" + amount +"個にしました。");
+					NekoEvent.sendInfoMessage(player.getName() + "のインベントリから" + itemS.getType() + "を" + amount +"個にしました。");
 				}
 			}
 		}
@@ -128,7 +128,7 @@ public class GameManager {
 	
 	public void join(String strPlayer, String strStageName, String strJoinMsg) {
 		String path = "TP." + strStageName;
-		Player player = ne.convertToPlayer(strPlayer);
+		Player player = Utils.toPlayer(strPlayer);
 		
 		int stageNumber = tp.getTPLocationNumber(strStageName),
 			stageTimer = ne.getConfig().getInt(path + ".Timer");
@@ -159,15 +159,15 @@ public class GameManager {
 		if(isLock) time.startTPLockTimer(strStageName);
 		
 		if(isLock){
-			ne.sendInfoMessage("Lock the " + strStageName + " game.");
+			NekoEvent.sendInfoMessage(strStageName + "をロック.");
 		}else{
-			ne.sendInfoMessage("Unlock the " + strStageName + " game.");
+			NekoEvent.sendInfoMessage(strStageName + "のロックを解除.");
 		}
 		
 	}
 	
 	public void setSpawn(String strPlayer){
-		Player player = ne.convertToPlayer(strPlayer);
+		Player player = Utils.toPlayer(strPlayer);
 		
 		if(player == null) return;
 		
@@ -175,32 +175,21 @@ public class GameManager {
 
 		player.setBedSpawnLocation(location, true);
 		player.sendMessage(NekoEvent.CHAT_TAG + "セーブしました!");
-		ne.sendInfoMessage("Set the " + strPlayer + "'s spawn point to (" + location.getWorld().getName() + "," + (int)location.getX() + "," + (int)location.getY() + "," + (int)location.getZ() + ").");
+		NekoEvent.sendInfoMessage(strPlayer + "のスポーンを(" + location.getWorld().getName() + "," + (int)location.getX() + "," + (int)location.getY() + "," + (int)location.getZ() + ")ni"
+				+ "にセット.");
 	}
 	
 	public void setSpawn(String strPlayer, String strX, String strY, String strZ){
-		Player player = ne.convertToPlayer(strPlayer);
-		Double x = 0.0D, y = 0.0D, z = 0.0D;
+		Player player = Utils.toPlayer(strPlayer);
 		
 		if(player == null) return;
 		
-		Location location = player.getLocation();
+		Location location = Utils.toLocation(player, strX, strY, strZ);
 		
-		try {
-			x = Double.parseDouble(strX);
-			y = Double.parseDouble(strY);
-			z = Double.parseDouble(strZ);
-		} catch (NumberFormatException e) {
-			ne.sendErrorMessage("Could not convert (" + strX + "," + strY + "," + strZ + ") to location.");
-			return;
-		}
-		
-		location.setX(x);
-		location.setY(y);
-		location.setZ(z);
+		if(location == null) return;
 
 		player.setBedSpawnLocation(location, true);
 		player.sendMessage(NekoEvent.CHAT_TAG + "セーブしました!");
-		ne.sendInfoMessage("Set the " + strPlayer + "'s spawn point to (" + location.getWorld().getName() + "," + (int)location.getX() + "," + (int)location.getY() + "," + (int)location.getZ() + ").");
+		NekoEvent.sendInfoMessage("Set the " + strPlayer + "'s spawn point to (" + location.getWorld().getName() + "," + (int)location.getX() + "," + (int)location.getY() + "," + (int)location.getZ() + ").");
 	}
 }

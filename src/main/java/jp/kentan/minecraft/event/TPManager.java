@@ -15,7 +15,7 @@ public class TPManager {
 		double[] loc = {thisLoc.getX(),thisLoc.getY(),thisLoc.getZ()};
 		
 		if(player == null){
-			ne.sendErrorMessage("変数playerが空です。");
+			NekoEvent.sendErrorMessage("変数playerが空です.");
 			return;
 		}
 		
@@ -39,26 +39,25 @@ public class TPManager {
 		
 		player.teleport(location);
 	
-		ne.sendInfoMessage("TP " + player.getName() + " to (" + location.getWorld().getName() + "," + (int)loc[0] + "," + (int)loc[1] + "," + (int)loc[2]+ ").");
+		NekoEvent.sendInfoMessage("TP " + player.getName() + "(" + location.getWorld().getName() + "," + (int)loc[0] + "," + (int)loc[1] + "," + (int)loc[2]+ ").");
 	}
 
 	public boolean set(Player player, String strName, String strTimer) {
 		String path = "TP." + strName;
 
-		if (!ne.isCheckPlayerOnline(player)){
-			ne.sendErrorMessage("Could not found player " + player.getName() + ".");
+		if (!Utils.isOnline(player)){
 			return false;
 		}
 		
 		int stageTimer = Integer.parseInt(strTimer);
 		
 		if(stageTimer < 0 || stageTimer > 3600){
-			ne.sendErrorMessage("自動解除タイマーは1~3600(秒)で指定する必要があります。");
+			NekoEvent.sendErrorMessage("自動解除タイマーは1~3600(秒)で指定する必要があります.");
 			return false;
 		}
 		
 		if(ne.getConfig().getString(path + ".Lock") != null){
-			ne.sendErrorMessage("Already registered (" + strName + ").");
+			NekoEvent.sendErrorMessage(strName + "は既に登録されています.");
 			return false;
 		}
 		
@@ -82,7 +81,7 @@ public class TPManager {
 		stageNumber = ne.getConfig().getInt(path + ".No", -1);
 		
 		if(stageNumber < 0){
-			ne.sendErrorMessage(strStage + "は登録されていません。");
+			NekoEvent.sendErrorMessage(strStage + "は登録されていません.");
 			return -1;
 		}
 		
@@ -90,10 +89,10 @@ public class TPManager {
 	}
 
 	public void TP(String tp, String strPlayer) {
-		Player player = ne.convertToPlayer(strPlayer);
+		Player player = Utils.toPlayer(strPlayer);
 		String path = "TP." + tp;
 		
-		if (player == null || !ne.isCheckPlayerOnline(player)) return;
+		if (player == null || !Utils.isOnline(player)) return;
 
 		Location location = player.getLocation();
 		location.setX(ne.getConfig().getDouble(path + ".X"));
@@ -104,6 +103,6 @@ public class TPManager {
 
 		player.teleport(location);
 		
-		ne.sendInfoMessage("TP " + strPlayer + " to " + tp + ".");
+		NekoEvent.sendInfoMessage("TP " + strPlayer + "(" + tp + ").");
 	}
 }

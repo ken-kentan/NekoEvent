@@ -1,10 +1,6 @@
 package jp.kentan.minecraft.event;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -26,6 +22,7 @@ public class NekoEvent extends JavaPlugin {
 	private TimeManager time;
 	private TriggerManager trigger;
 	private GachaManager gacha;
+	private static NekoEvent neko;
 	
 	final public static String CHAT_TAG = ChatColor.GRAY + "[" + ChatColor.GOLD  + "Neko" + ChatColor.YELLOW + "Event" + ChatColor.GRAY + "] " + ChatColor.WHITE;
 	final private static String CHAT_OP_TAG = ChatColor.GRAY + "[" + ChatColor.GOLD  + "Neko" + ChatColor.YELLOW + "Event ";
@@ -35,15 +32,17 @@ public class NekoEvent extends JavaPlugin {
 							   buy_name_list    = new ArrayList<String>();
 
 	@Override
-	public void onEnable() {		
+	public void onEnable() {
+		neko = this;
+		
 		config = new ConfigManager(this);
 		
 		tp = new TPManager(this);
 		ticket = new TicketManager(this);
-		trigger = new TriggerManager(this);
+		trigger = new TriggerManager();
 		
 		time = new TimeManager(this, config);
-		pm = new PasswordManager(this, trigger);
+		pm = new PasswordManager(trigger);
 		gm = new GameManager(this, tp, ticket, time);
 		gacha = new GachaManager(this, config, ticket);
 
@@ -52,7 +51,7 @@ public class NekoEvent extends JavaPlugin {
 		config.load();
 		time.initTPLockTimer();
 
-		getLogger().info("NekoEventを有効にしました。");
+		getLogger().info("NekoEventを有効にしました.");
 	}
 
 	@Override
@@ -61,7 +60,7 @@ public class NekoEvent extends JavaPlugin {
 		
 		Bukkit.getScheduler().cancelTasks(this);
 
-		getLogger().info("NekoEventを無効にしました。");
+		getLogger().info("NekoEventを無効にしました.");
 	}
 
 	@Override
@@ -107,12 +106,12 @@ public class NekoEvent extends JavaPlugin {
 				break;
 			case "join":// event join <player> <stage> <join msg>, event join set <stage> <timer> ,event join unlock <stage>
 				
-				if(isCheckPlayerOnline(args[1], false)){
+				if(Utils.isOnline(args[1])){
 					if(isCheckParamLength(args.length, 4)) gm.join(args[1], args[2], args[3]);
 				}else{
 					switch (args[1]) {
 						case "set":
-							if(isCheckParamLength(args.length, 4) && isCheckPlayerOnline((Player)sender)){
+							if(isCheckParamLength(args.length, 4) && Utils.isOnline((Player)sender)){
 								if(tp.set((Player)sender, args[2], args[3])){
 									sender.sendMessage(ChatColor.GREEN + "現在位置を" + args[2] + "のTP位置として自動ﾛｯｸ解除時間 " + args[3] + "秒で設定しました。");
 								}
@@ -132,8 +131,8 @@ public class NekoEvent extends JavaPlugin {
 
 				break;
 			case "tp"://event tp <player> <x ,y, z>
-				if(isCheckParamLength(args.length, 5) && isCheckCommandBlock(sender)){
-					player = convertToPlayer(args[1]);
+				if(isCheckParamLength(args.length, 5) && Utils.isCommandBlock(sender)){
+					player = Utils.toPlayer(args[1]);
 					String[] strLoc = new String[3];
 					
 					for(int i=0; i<3; i++) strLoc[i] = args[i+2];
@@ -197,7 +196,7 @@ public class NekoEvent extends JavaPlugin {
 			case "special":// event special <player> <name>
 
 				if(isCheckParamLength(args.length, 3) && time.checkSpecialDay()) processSpecial(args[1], args[2]);
-				else convertToPlayer(args[1]).sendMessage(ChatColor.YELLOW + "今日はスペシャル対象の日ではありません。");
+				else Utils.toPlayer(args[1]).sendMessage(ChatColor.YELLOW + "今日はスペシャル対象の日ではありません。");
 
 				break;
 			case "buy":// event buy <player> <type> <ticket>
@@ -209,12 +208,12 @@ public class NekoEvent extends JavaPlugin {
 				break;
 			case "msg"://event msg <player> <name color> <name> <message>
 				if(isCheckParamLength(args.length, 5)){
-					player = convertToPlayer(args[1]);
+					player = Utils.toPlayer(args[1]);
 					if(player != null) player.sendMessage(" " + getChatColor(args[2]) + args[3] + ChatColor.GREEN + ": " +ChatColor.WHITE + args[4]);
 				}
 				break;
 			case "trigger"://event trigger <x y z> <player> <item_num> <msg_no_hand> <msg_not_match>
-				if(isCheckParamLength(args.length, 8) && isCheckCommandBlock(sender)){
+				if(isCheckParamLength(args.length, 8) && Utils.isCommandBlock(sender)){
 					commandBlock = ((BlockCommandSender)sender).getBlock();
 					String[] strLocTrigger = {args[1],args[2],args[3]};
 				
@@ -231,7 +230,7 @@ public class NekoEvent extends JavaPlugin {
 			case "pass":
 				if(isCheckParamLength(args.length, 4)){
 					int numPass = Integer.parseInt(args[1]);
-					player = convertToPlayer(args[2]);
+					player = Utils.toPlayer(args[2]);
 					
 					switch(args[3]){
 					case "init"://event pass init <pass number> @p <password> <x y z>
@@ -258,23 +257,6 @@ public class NekoEvent extends JavaPlugin {
 
 		return true;
 	}
-
-	public boolean isCheckPlayerOnline(Player player) {
-		if (player.isOnline()) return true;
-		
-		sendErrorMessage("The player(" + player + ") Not Found.");
-
-		return false;
-	}
-	
-	public boolean isCheckPlayerOnline(String strPlayer, boolean isSendErrorMsg) {
-		Player player = convertToPlayer(strPlayer);
-		if (player != null && player.isOnline()) return true;
-		
-		if(isSendErrorMsg) sendErrorMessage("The player(" + player + ") Not Found.");
-
-		return false;
-	}
 	
 	private boolean isCheckParamLength(int paramLen, int targetLen) {
 
@@ -285,30 +267,7 @@ public class NekoEvent extends JavaPlugin {
 		}
 	}
 	
-	private boolean isCheckCommandBlock(CommandSender sender){
-		try{
-			@SuppressWarnings("unused")
-			Block tmp = ((BlockCommandSender)sender).getBlock();
-		}catch(Exception e){
-			sendErrorMessage("This command need to use Command Block.");
-			return false;
-		}
-		
-		return true;
-	}
-	
-	public Player convertToPlayer(String strPlayer) {
-		Player player = null;
-		try{
-			player = Bukkit.getServer().getPlayer(strPlayer);
-		}catch(Exception e){
-			sendErrorMessage("Counld not conver the " + strPlayer + " to player.");
-		}
-		
-		return player;
-	}
-	
-	public void sendErrorMessage(String str){
+	public static void sendErrorMessage(String str){
 		for(Player player : Bukkit.getServer().getOnlinePlayers())
         {
 			if(player.isOp()){
@@ -316,10 +275,10 @@ public class NekoEvent extends JavaPlugin {
 			}
         }
 		
-		getLogger().warning(str);
+		neko.getLogger().warning(str);
 	}
 	
-	public void sendInfoMessage(String str){
+	public static void sendInfoMessage(String str){
 		for(Player player : Bukkit.getServer().getOnlinePlayers())
         {
 			if(player.isOp()){
@@ -327,7 +286,7 @@ public class NekoEvent extends JavaPlugin {
 			}
         }
 		
-		getLogger().info(str);
+		neko.getLogger().info(str);
 	}
 	
 	private void showCommandHelp(CommandSender _sender){
@@ -361,38 +320,10 @@ public class NekoEvent extends JavaPlugin {
 		_sender.sendMessage("| " + ChatColor.GRAY + "文字装飾は節記号を使用して下さい。");
 		_sender.sendMessage("---------------------------------------");
 	}
-
-	private static boolean checkBeforeWritefile(File file) {
-		if (file.exists()) {
-			if (file.isFile() && file.canWrite())
-				return true;
-		}
-		return false;
-	}
-
-	public void writeLog(String _str) {
-		try {
-			File file = new File("plugins/NekoEvent/log.txt");
-
-			if (checkBeforeWritefile(file)) {
-				FileWriter filewriter = new FileWriter(file, true);
-
-				Calendar calendar = Calendar.getInstance();
-
-				filewriter.write("[" + calendar.getTime().toString() + "]" + _str + "\r\n");
-
-				filewriter.close();
-			} else {
-				sendInfoMessage("ログファイルが見つかりません");
-			}
-		} catch (IOException e) {
-			sendErrorMessage("ログをファイルに書き込めませんでした");
-		}
-	}
 	
 	private void processSpecial(String strPlayer, String name) {
-		Player player = convertToPlayer(strPlayer);
-		if(!isCheckPlayerOnline(player)) return;
+		Player player = Utils.toPlayer(strPlayer);
+		if(!Utils.isOnline(player)) return;
 		
 		String path = strPlayer + ".special." + name;
 		
@@ -410,7 +341,7 @@ public class NekoEvent extends JavaPlugin {
 		player.sendMessage(ChatColor.AQUA + sp_name + ChatColor.WHITE + "を" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "しました！");
 		broadcast(player,CHAT_TAG + ChatColor.BLUE + player.getName() + ChatColor.WHITE + "が," + ChatColor.AQUA + sp_name + ChatColor.WHITE + "を" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "しました！");
 		sendInfoMessage(player.getName() + "にスペシャル景品 " + sp_itemid + " を追加しました。");
-		writeLog("Special:" + player.getName() + " get:" + sp_name + "(" + sp_itemid + ")");
+		Log.write("Special:" + player.getName() + " get:" + sp_name + "(" + sp_itemid + ")");
 	}
 	
 	private void processBuy(Player player, int type) {
@@ -426,7 +357,7 @@ public class NekoEvent extends JavaPlugin {
 		player.sendMessage(ChatColor.AQUA + buy_name_list.get(type) + ChatColor.WHITE + "を" + ChatColor.GOLD + "購入" + ChatColor.WHITE + "しました！");
 		broadcast(player,CHAT_TAG + ChatColor.BLUE + player.getName() + ChatColor.WHITE + "が," + ChatColor.AQUA + name + ChatColor.WHITE + "を" + ChatColor.GOLD + "購入" + ChatColor.WHITE + "しました！");
 		sendInfoMessage(player.getName() + "にコマンド [" + command + "]を実行しました。");
-		writeLog("Buy:" + player.getName() + " detail:" + name + "(" + command + ")");
+		Log.write("Buy:" + player.getName() + " detail:" + name + "(" + command + ")");
 	}
 	
 	public void broadcast(Player me, String str){

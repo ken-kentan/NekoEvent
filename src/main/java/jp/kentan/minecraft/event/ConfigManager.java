@@ -76,7 +76,7 @@ public class ConfigManager {
 			TriggerManager.item_list.add(config.getString("trigger.item." + i));
 		}
 
-		neko.sendInfoMessage("Successfully loaded the config file.");
+		NekoEvent.sendInfoMessage("設定ファイルの読み込みに成功.");
 		logger.info("Reward rate => " + GameManager.reward_rate);
 		logger.info("Special day => " + FORMATER_DAY.format(specialDay.getTime()));
 		logger.info("Buy commands => " + NekoEvent.buy_command_list.size());
@@ -94,7 +94,7 @@ public class ConfigManager {
 
 			list = conf.getStringList(path);
 		} catch (Exception e) {
-			neko.sendErrorMessage(e.getMessage());
+			NekoEvent.sendErrorMessage(e.getMessage());
 		}
 
 		return list;
@@ -146,7 +146,7 @@ public class ConfigManager {
 				conf.save(configFile);
 			}
 		} catch (Exception e) {
-			neko.sendErrorMessage(e.getMessage());
+			NekoEvent.sendErrorMessage(e.getMessage());
 		}
 	}
 	
@@ -197,7 +197,7 @@ public class ConfigManager {
 				conf.save(configFile);
 			}
 		} catch (Exception e) {
-			neko.sendErrorMessage(e.getMessage());
+			NekoEvent.sendErrorMessage(e.getMessage());
 			return false;
 		}
 		return true;

@@ -62,11 +62,11 @@ public class GachaManager {
 	public void gacha(String strGachaID,String strCost, String strPlayer, boolean isSilent) {
 		List<String> commandList = config.readGachaCommand(strGachaID);
 		List<String> nameList    = config.readGachaName(strGachaID);
-		Player player = ne.convertToPlayer(strPlayer);
+		Player player = Utils.toPlayer(strPlayer);
 		int index = (int) (Math.random() * (commandList.size()));
 		
 		if(commandList.size() < 1 || nameList.size() < 1 || (commandList.size() != nameList.size())){
-			ne.sendErrorMessage("Gacha(" + strGachaID + ") is Not Found or Invaild data set.");
+			NekoEvent.sendErrorMessage("Gacha(" + strGachaID + ")は存在しないか、コマンドデータが破損しています.");
 			return;
 		}
 		
@@ -83,7 +83,7 @@ public class GachaManager {
 			ne.broadcast(player,NekoEvent.CHAT_TAG + ChatColor.BLUE + player.getName() + ChatColor.WHITE + "が" + ChatColor.AQUA + nameList.get(index) + ChatColor.WHITE + "を" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "しました！");
 		}
 		
-		ne.sendInfoMessage("Gave the " + nameList.get(index) + " to " + strPlayer + " (Silent mode: " + isSilent + ").");
-		ne.writeLog("Gacha:" + player.getName() + " get:" +nameList.get(index) + "(" + command + ")");
+		NekoEvent.sendInfoMessage("Gachaコマンド " + nameList.get(index) + " を " + strPlayer + " に実行しました(Silent : " + isSilent + ").");
+		Log.write("Gacha:" + player.getName() + " get:" +nameList.get(index) + "(" + command + ")");
 	}
 }

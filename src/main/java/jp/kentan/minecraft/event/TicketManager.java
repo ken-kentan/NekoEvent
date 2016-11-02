@@ -23,40 +23,26 @@ public class TicketManager {
 	}
 	
 	public void give(String strPlayer, String number){
-		int ticket_number = 0;
-		Player player = ne.convertToPlayer(strPlayer);
+		int ticket_number = Utils.parseInt(number);
+		Player player = Utils.toPlayer(strPlayer);
 		
-		if(player == null || !ne.isCheckPlayerOnline(player)) return;
-		
-		try {
-			ticket_number = Integer.parseInt(number);
-		} catch (NumberFormatException nfex) {
-			ne.sendErrorMessage("Could not convert " + number + " to integer.");
-			return;
-		}
+		if(player == null || !Utils.isOnline(player)) return;
 		
 		if(ticket_number > 0){			
 			ne.getServer().dispatchCommand(ne.getServer().getConsoleSender(), "give " + strPlayer + name.replace("{number}", Integer.toString(ticket_number)));
 			
 			player.sendMessage(NekoEvent.CHAT_TAG + ChatColor.AQUA +" イベントチケット" + ChatColor.WHITE + "を" + ticket_number + "枚" + ChatColor.GOLD + "ゲット" + ChatColor.WHITE + "しました！");
-			ne.sendInfoMessage("Gave the " + ticket_number + " Event Tickets to " + strPlayer + ".");
-			ne.writeLog("Ticket:" + strPlayer + " +" + ticket_number );
+			NekoEvent.sendInfoMessage("ｲﾍﾞﾝﾄﾁｹｯﾄ +" + ticket_number + "枚(" + strPlayer + ").");
+			Log.write("Ticket:" + strPlayer + " +" + ticket_number );
 		}
 		
 	}
 	
 	public boolean remove(String strPlayer, String number) {
-		int ticket_number = 0, player_ticket_amt = 0;
-		Player player = ne.convertToPlayer(strPlayer);
+		int ticket_number = Utils.parseInt(number), player_ticket_amt = 0;
+		Player player = Utils.toPlayer(strPlayer);
 		
-		if(player == null || !ne.isCheckPlayerOnline(player)) return false;
-		
-		try {
-			ticket_number = Integer.parseInt(number);
-		} catch (NumberFormatException nfex) {
-			ne.sendErrorMessage("Could not convert " + number + " to integer.");
-			return false;
-		}
+		if(player == null || !Utils.isOnline(player)) return false;
 		
 		if(ticket_number <= 0) return true;
 		
@@ -114,7 +100,7 @@ public class TicketManager {
 			}
 		}
 		
-		ne.writeLog("Ticket:" + player.getName() + " -" + number );
+		Log.write("Ticket:" + player.getName() + " -" + number );
 		return true;
 	}
 

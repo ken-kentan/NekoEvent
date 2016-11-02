@@ -8,6 +8,8 @@ import java.util.Map;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class TimeManager extends BukkitRunnable{
+	final static long MILLIS_TO_MINUTE = 60000;
+	
 	private static Calendar specialDay;
 	private static HashMap<String, Integer> lockTimerMap = new HashMap<String, Integer>();
 	
@@ -36,11 +38,10 @@ public class TimeManager extends BukkitRunnable{
 	
 	public void initTPLockTimer(){
 		lockTimerMap.clear();
-		neko.sendInfoMessage("Initialized All TP Lock Timer.");
+		NekoEvent.sendInfoMessage("lockTimerを初期化.");
 	}
 	
 	public boolean checkOverDiffMinute(String _path, int diff){
-		final long MILLIS_TO_MINUTE = 60000;
 		long nowTime = Calendar.getInstance().getTimeInMillis(), lastTime = 0;
 		
 		String strLastDate = config.readString(_path);
@@ -73,7 +74,7 @@ public class TimeManager extends BukkitRunnable{
 	
 	public void startTPLockTimer(String stage){
 		lockTimerMap.put(stage, 0);
-		neko.sendInfoMessage("Start, " + stage + "'s lock timer.");
+		NekoEvent.sendInfoMessage("lockTimer(" + stage + ")を開始.");
 	}
 	
 	public int getTPLockTimer(String stage){
