@@ -16,14 +16,13 @@ public class Utils {
 		
 		try{
 			player = SERVER.getPlayer(strPlayer);
-		}catch (Exception e) {
-			NekoEvent.sendErrorMessage("ﾌﾟﾚｲﾔｰ変換ｴﾗｰ:" + e.getMessage());
-			return null;
-		}finally {
 			if(!strPlayer.equals(player.getName())){
 				NekoEvent.sendErrorMessage("ﾌﾟﾚｲﾔｰ変換ｴﾗｰ: 変換不一致");
 				return null;
 			}
+		}catch (Exception e) {
+			NekoEvent.sendErrorMessage("ﾌﾟﾚｲﾔｰ変換ｴﾗｰ:" + e.getMessage());
+			return null;
 		}
 		
 		return player;

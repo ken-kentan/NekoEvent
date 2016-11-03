@@ -105,28 +105,28 @@ public class NekoEvent extends JavaPlugin {
 
 				break;
 			case "join":// event join <player> <stage> <join msg>, event join set <stage> <timer> ,event join unlock <stage>
-				
-				if(Utils.isOnline(args[1])){
-					if(isCheckParamLength(args.length, 4)) gm.join(args[1], args[2], args[3]);
-				}else{
-					switch (args[1]) {
-						case "set":
-							if(isCheckParamLength(args.length, 4) && Utils.isOnline((Player)sender)){
-								if(tp.set((Player)sender, args[2], args[3])){
-									sender.sendMessage(ChatColor.GREEN + "現在位置を" + args[2] + "のTP位置として自動ﾛｯｸ解除時間 " + args[3] + "秒で設定しました。");
-								}
-							}
-							break;
-						case "lock":
-							if(isCheckParamLength(args.length, 3)) gm.lock(args[2], true);
-							break;
-						case "unlock":
-							if(isCheckParamLength(args.length, 3)) gm.lock(args[2], false);
-							break;
-						default:
-							if(isCheckParamLength(args.length, 2)) sendErrorMessage(args[1] + "は/event joinのパラメータとして不適切です。");
-							break;
+				switch (args[1]) {
+				case "set":
+					if (isCheckParamLength(args.length, 4) && Utils.isOnline((Player) sender)) {
+						if (tp.set((Player) sender, args[2], args[3])) {
+							sender.sendMessage(
+									ChatColor.GREEN + "現在位置を" + args[2] + "のTP位置として自動ﾛｯｸ解除時間 " + args[3] + "秒で設定しました。");
+						}
 					}
+					break;
+				case "lock":
+					if (isCheckParamLength(args.length, 3)) gm.lock(args[2], true);
+					break;
+				case "unlock":
+					if (isCheckParamLength(args.length, 3)) gm.lock(args[2], false);
+					break;
+				default:
+					if (Utils.isOnline(args[1])) {
+						if (isCheckParamLength(args.length, 4)) gm.join(args[1], args[2], args[3]);
+					}else{
+						sendErrorMessage(args[1] + "は/event join のﾊﾟﾗﾒｰﾀとして不適切です.");
+					}
+					break;
 				}
 
 				break;
