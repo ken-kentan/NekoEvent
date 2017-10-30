@@ -216,7 +216,6 @@ public class PasswordManager implements ConfigListener<Password>{
         sender.sendMessage("| " + ChatColor.AQUA + "INPUT_MSG [message]            (入力時に表示, {buff}は入力ﾊﾞｯﾌｧで置換)");
         sender.sendMessage("| " + ChatColor.AQUA + "CLEAR_MSG [message]            (入力リセット時に表示)");
         sender.sendMessage("| " + ChatColor.GRAY + "[]は必須,<>は任意,()は説明です.");
-        sender.sendMessage("| " + ChatColor.GRAY + "[message]では{name}でキー名に置換されます.");
         sender.sendMessage("---------------------------------------");
     }
 
