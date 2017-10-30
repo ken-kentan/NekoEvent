@@ -1,0 +1,22 @@
+group 'jp.kentan.minecraft.neko_event'
+version '2.0.0'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+
+    maven {
+        name = "Spigot"
+        url "https://hub.spigotmc.org/nexus/content/groups/public"
+    }
+}
+
+dependencies {
+//    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compileOnly 'org.bukkit:bukkit:1.12-R0.1-SNAPSHOT'
+}
+
+compileJava.options.encoding = 'UTF-8'
