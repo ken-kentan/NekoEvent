@@ -100,7 +100,7 @@ public class PasswordConfigProvider {
 
         if(!save(new LinkedHashMap<String, Object>(){
             {
-                put(path + ".default", defaultPass);
+                put(path + ".default", (defaultPass != null) ? defaultPass : "");
 
                 if(blockMaterial != null){
                     put(path + ".Block.material", blockMaterial.toString());

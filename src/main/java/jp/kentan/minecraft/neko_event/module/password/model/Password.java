@@ -71,6 +71,7 @@ public class Password {
 
     public PasswordResult input(String text){
         if(mPassword.length() <= 0){
+            mInputBuffer.setLength(0);
             return PasswordResult.NOT_MATCH;
         }
 
