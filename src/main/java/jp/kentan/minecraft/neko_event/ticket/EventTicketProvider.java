@@ -35,8 +35,6 @@ public class EventTicketProvider {
         meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 
         TICKET_ITEM_STACK.setItemMeta(meta);
-
-        Log.info("EventTicketProvider created.");
     }
 
     public static boolean give(Player player, int amount){
