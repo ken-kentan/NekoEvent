@@ -26,11 +26,13 @@ public class PlayerEventListener implements Listener{
 
         if(inEventWorld(player)){
             SCHEDULER.scheduleSyncDelayedTask(PLUGIN, () -> {
+                if(!player.isDead()) return;
+
                 player.spigot().respawn();
 
                 player.getActivePotionEffects().clear();
                 player.setFireTicks(0);
-            });
+            }, 10L);
         }
     }
 
