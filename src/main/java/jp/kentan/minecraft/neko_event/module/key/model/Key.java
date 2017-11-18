@@ -1,6 +1,7 @@
 package jp.kentan.minecraft.neko_event.module.key.model;
 
 import jp.kentan.minecraft.neko_event.config.provider.KeyConfigProvider;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -12,6 +13,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+
 
 public class Key {
     private final static DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(ZoneId.systemDefault());
@@ -214,14 +216,14 @@ public class Key {
 
             itemStack.setItemMeta(meta);
 
-            if(!mItemStack.isSimilar(itemStack) || strPeriod.length() < 26){
+            if(!isSimilar(itemStack) || strPeriod.length() < 26){
                 return KeyResult.NOT_MATCH;
             }
 
             if(!withinPeriod(strPeriod.substring(10))){
                 return KeyResult.EXPIRED;
             }
-        }else if(!mItemStack.isSimilar(itemStack)){
+        }else if(!isSimilar(itemStack)){
             return KeyResult.NOT_MATCH;
         }
 
@@ -250,5 +252,15 @@ public class Key {
 
     private static String getPeriodTime(int offsetMinutes){
         return DATE_FORMAT.format(ZonedDateTime.now().plusMinutes(offsetMinutes));
+    }
+
+    private boolean isSimilar(ItemStack stack) {
+        if (stack == null) {
+            return false;
+        }
+        if (stack == mItemStack) {
+            return true;
+        }
+        return mItemStack.getType() == stack.getType() && mItemStack.hasItemMeta() == stack.hasItemMeta() && (!mItemStack.hasItemMeta() || Bukkit.getItemFactory().equals(mItemStack.getItemMeta(), stack.getItemMeta()));
     }
 }
