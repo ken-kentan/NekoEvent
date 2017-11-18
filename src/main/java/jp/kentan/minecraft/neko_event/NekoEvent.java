@@ -3,6 +3,7 @@ package jp.kentan.minecraft.neko_event;
 import jp.kentan.minecraft.neko_event.config.ConfigManager;
 import jp.kentan.minecraft.neko_event.game.dungeon.DungeonManager;
 import jp.kentan.minecraft.neko_event.gacha.GachaManager;
+import jp.kentan.minecraft.neko_event.listener.PlayerEventListener;
 import jp.kentan.minecraft.neko_event.listener.SignEventListener;
 import jp.kentan.minecraft.neko_event.game.parkour.ParkourManager;
 import jp.kentan.minecraft.neko_event.module.key.KeyManager;
@@ -44,6 +45,7 @@ public class NekoEvent extends JavaPlugin {
         PasswordManager.setup(this);
 
         getServer().getPluginManager().registerEvents(new SignEventListener(), this);
+        getServer().getPluginManager().registerEvents(new PlayerEventListener(this), this);
 
         Log.info("有効化しました.");
     }
