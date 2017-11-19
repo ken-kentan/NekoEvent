@@ -104,6 +104,11 @@ public class NekoEvent extends JavaPlugin {
                     GameUtil.placeBlockByDelay((BlockCommandSender)sender, NekoUtil.toInteger(args[1]), new String[]{args[2], args[3], args[4]});
                 }
                 break;
+            case "reset_status":
+                if(NekoUtil.checkParams(params, 1)){
+                    GameUtil.resetPlayerStatus(args[1]);
+                }
+                break;
             case "test":
                 ItemStack itemStack = ((Player)sender).getInventory().getItemInMainHand();
                 sender.sendMessage(itemStack.getItemMeta() + "");
@@ -127,6 +132,7 @@ public class NekoEvent extends JavaPlugin {
         sender.sendMessage("| " + ChatColor.YELLOW + "/event setspawn [player] <x y z> (相対指定時の基準はｺﾏﾝﾄﾞﾌﾞﾛｯｸ座標)");
         sender.sendMessage("| " + ChatColor.YELLOW + "/event jump [player] [height] [length] (各値は小数点係数)");
         sender.sendMessage("| " + ChatColor.YELLOW + "/event random [x y z] [x y z] <x y z> (座標は複数指定可能. 0.5s後に消滅)");
+        sender.sendMessage("| " + ChatColor.YELLOW + "/event reset_status [player] (プレイヤーのステータスをリセットして体力20)");
         sender.sendMessage("| " + ChatColor.YELLOW + "/event delay [seconds] [x y z]");
         sender.sendMessage("| " + ChatColor.YELLOW + "/event reload");
         sender.sendMessage("| " + ChatColor.YELLOW + "/event help");

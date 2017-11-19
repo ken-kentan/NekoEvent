@@ -30,7 +30,7 @@ public class PlayerEventListener implements Listener{
 
                 player.spigot().respawn();
 
-                player.getActivePotionEffects().clear();
+                player.getActivePotionEffects().forEach(effect -> player.removePotionEffect(effect.getType()));
                 player.setFireTicks(0);
             }, 10L);
         }

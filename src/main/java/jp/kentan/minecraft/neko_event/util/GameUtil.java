@@ -2,6 +2,7 @@ package jp.kentan.minecraft.neko_event.util;
 
 import jp.kentan.minecraft.neko_event.util.math.MersenneTwisterFast;
 import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -69,5 +70,23 @@ public class GameUtil {
 
         player.playSound(location, Sound.ENTITY_GHAST_SHOOT, 1f, 1f);
         player.setVelocity(direction);
+    }
+
+
+    public static void resetPlayerStatus(String playerName){
+        final Player player = NekoUtil.toPlayer(playerName);
+
+        if(player == null){
+            return;
+        }
+
+        player.getActivePotionEffects().forEach(e -> player.removePotionEffect(e.getType()));
+        player.setFireTicks(0);
+
+        final double maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+
+        if(maxHealth >= 1.0D) {
+            player.setHealth(maxHealth);
+        }
     }
 }
