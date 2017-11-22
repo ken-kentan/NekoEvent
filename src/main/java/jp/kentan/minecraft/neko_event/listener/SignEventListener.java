@@ -7,6 +7,7 @@ import jp.kentan.minecraft.neko_event.spawn.SpawnManager;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -34,7 +35,7 @@ public class SignEventListener implements Listener {
         sSpawnSignListener = listener;
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onSignChanged(SignChangeEvent event) {
         if(!event.getPlayer().isOp() || !event.getLine(0).equals("[event]")){
             return;
@@ -56,7 +57,7 @@ public class SignEventListener implements Listener {
         }
     }
 
-    @EventHandler (ignoreCancelled = true)
+    @EventHandler (priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerInteract(PlayerInteractEvent event) {
         final BlockState blockState = event.getClickedBlock().getState();
 
