@@ -113,6 +113,9 @@ public class NekoEvent extends JavaPlugin {
                 ItemStack itemStack = ((Player)sender).getInventory().getItemInMainHand();
                 sender.sendMessage(itemStack.getItemMeta() + "");
                 break;
+            case "bed":
+                ((Player)sender).setBedSpawnLocation(((Player) sender).getLocation(), true);
+                break;
             case "reload":
                 mConfigManager.reload();
                 break;

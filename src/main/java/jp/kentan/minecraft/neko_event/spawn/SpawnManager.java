@@ -8,8 +8,9 @@ import jp.kentan.minecraft.neko_event.util.Log;
 import jp.kentan.minecraft.neko_event.util.NekoUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.entity.Player;
@@ -51,12 +52,23 @@ public class SpawnManager implements SignListener {
     }
 
     public static void setSpawn(Player player, Location location, boolean isSendMessage){
-
-        while (location.getBlock().getType() != Material.AIR){
-            location.add(0D, 1D, 0D);
-        }
+        int maxOffset = 1;
 
         location.setY(Math.ceil(location.getY()));
+
+        while (!canSetBedSpawn(location.getBlock())){
+            if(--maxOffset < 0){
+                if(isSendMessage){
+                    player.sendMessage(NekoEvent.PREFIX + ChatColor.RED + "セーブに失敗しました. 位置を変更して下さい!");
+                }else{
+                    Log.error(player.getName() + "のスポーンセット" + NekoUtil.toString(location) + "に失敗しました.");
+                }
+
+                return;
+            }
+
+            location.add(0D, 1D, 0D);
+        }
 
         player.setBedSpawnLocation(location, true);
 
@@ -85,6 +97,10 @@ public class SpawnManager implements SignListener {
         }
 
         return true;
+    }
+
+    private static boolean canSetBedSpawn(Block block){
+        return !block.isLiquid() && block.getRelative(BlockFace.UP).isEmpty();
     }
 
     @Override

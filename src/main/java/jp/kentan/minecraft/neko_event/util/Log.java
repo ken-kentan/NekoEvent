@@ -3,6 +3,7 @@ package jp.kentan.minecraft.neko_event.util;
 import org.bukkit.ChatColor;
 import org.bukkit.Server;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Log {
@@ -30,7 +31,7 @@ public class Log {
     }
 
     public static void error(final String str){
-        sLogger.warning(str);
+        sLogger.severe(str);
         sendMessageToOp(PREFIX_ERROR + str);
     }
 
