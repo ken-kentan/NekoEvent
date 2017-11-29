@@ -223,6 +223,7 @@ public class KeyManager implements ConfigListener<Key>{
                 }
                 break;
             default:
+                break;
         }
     }
 
@@ -234,6 +235,51 @@ public class KeyManager implements ConfigListener<Key>{
         }
 
         use(player, id);
+    }
+
+    public static boolean removeFormInventory(Player player, String id){
+        final Key key = sKeyMap.get(id);
+
+        if(key == null){
+            Log.error("キー({id})は存在しません.".replace("{id}",id));
+            return false;
+        }
+
+        ItemStack handItem = player.getInventory().getItemInMainHand();
+
+        switch (key.match(handItem)) {
+            case MATCH:
+                int amount = handItem.getAmount() - key.getAmount();
+                player.getInventory().getItemInMainHand().setAmount(amount);
+                return true;
+            case SHORT_AMOUNT:
+                if(key.hasShortAmountMessage()){
+                    player.sendMessage(key.getShortAmountMessage());
+                }
+            default:
+                return false;
+        }
+    }
+
+    public static String getKeyName(String id){
+        final Key key = sKeyMap.get(id);
+
+        if(key == null){
+            return null;
+        }
+
+        return key.getName() + ' ' + ChatColor.RESET + key.getAmount() + "個";
+    }
+
+    public static int getKeyAmount(String id){
+        final Key key = sKeyMap.get(id);
+
+        if(key == null){
+            Log.error("キー({id})は存在しません.".replace("{id}",id));
+            return 0;
+        }
+
+        return key.getAmount();
     }
 
     static void sendList(CommandSender sender){

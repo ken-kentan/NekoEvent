@@ -7,9 +7,11 @@ import jp.kentan.minecraft.neko_event.config.provider.SignConfigProvider;
 import jp.kentan.minecraft.neko_event.gacha.model.Gacha;
 import jp.kentan.minecraft.neko_event.listener.SignEventListener;
 import jp.kentan.minecraft.neko_event.listener.SignListener;
+import jp.kentan.minecraft.neko_event.module.key.KeyManager;
 import jp.kentan.minecraft.neko_event.ticket.EventTicketProvider;
 import jp.kentan.minecraft.neko_event.util.Log;
 import jp.kentan.minecraft.neko_event.util.NekoUtil;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.*;
 import org.bukkit.block.Sign;
 import org.bukkit.command.CommandSender;
@@ -21,6 +23,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class GachaManager implements SignListener, ConfigListener<Gacha> {
@@ -96,8 +99,15 @@ public class GachaManager implements SignListener, ConfigListener<Gacha> {
     }
 
     private static void play(Player player, String gachaId, int ticketCost){
-
         if(ticketCost > 0 && !EventTicketProvider.remove(player, ticketCost)) {
+            return;
+        }
+
+        play(player, gachaId);
+    }
+
+    private static void play(Player player, String gachaId, String keyId){
+        if(!KeyManager.removeFormInventory(player, keyId)) {
             return;
         }
 
@@ -141,12 +151,18 @@ public class GachaManager implements SignListener, ConfigListener<Gacha> {
     }
 
     private static boolean hasGachaMetadata(Sign sign){
-        if(!SignConfigProvider.hasMetadata(sign.getLocation(), GACHA_ID_METADATA_KEY)){
-            Log.error("看板" + NekoUtil.toString(sign.getLocation()) + "にﾒﾀﾃﾞｰﾀ(gachaId)が不足しています.");
+        Location location = sign.getLocation();
+
+        if(!SignConfigProvider.hasMetadata(location, GACHA_ID_METADATA_KEY)){
+            Log.error("看板" + NekoUtil.toString(location) + "にﾒﾀﾃﾞｰﾀ(gachaId)が不足しています.");
             return false;
         }
-        if(!SignConfigProvider.hasMetadata(sign.getLocation(), GACHA_TICKET_COST_METADATA_KEY)){
-            Log.error("看板" + NekoUtil.toString(sign.getLocation()) + "にﾒﾀﾃﾞｰﾀ(gachaTicketCost)が不足しています.");
+
+        boolean hasTicketCost = SignConfigProvider.hasMetadata(location, GACHA_TICKET_COST_METADATA_KEY);
+        boolean hasKeyId = SignConfigProvider.hasMetadata(location, GACHA_KEY_ID_METADATA_KEY);
+
+        if(!hasTicketCost && !hasKeyId){
+            Log.error("看板" + NekoUtil.toString(location) + "にﾒﾀﾃﾞｰﾀ(gachaTicketCost)または(gachaKeyId)が不足しています.");
             return false;
         }
 
@@ -161,13 +177,16 @@ public class GachaManager implements SignListener, ConfigListener<Gacha> {
     public void onSignChanged(SignChangeEvent event) {
         final Player player = event.getPlayer();
         final String gachaId = event.getLine(2);
-        final String strTicketCost = event.getLine(3);
+        final String strCostData = event.getLine(3);
 
-        final int ticketCost;
-        if(strTicketCost == null || strTicketCost.length() <= 0){
-            ticketCost = 0;
-        }else{
-            ticketCost = NekoUtil.toInteger(strTicketCost);
+        int ticketCost = 0;
+        String keyId = null;
+        if(strCostData != null && strCostData.length() > 0){
+            if(StringUtils.isNumeric(strCostData)){
+                ticketCost = NekoUtil.toInteger(strCostData);
+            }else{
+                keyId = strCostData;
+            }
         }
 
         final Gacha gacha = sGachaMap.get(gachaId);
@@ -180,9 +199,13 @@ public class GachaManager implements SignListener, ConfigListener<Gacha> {
         final Sign sign = (Sign)event.getBlock().getState();
 
         //看板のメタデータにガチャ情報を保存
-        Map<String, Object> metadataMap = new HashMap<>();
+        Map<String, Object> metadataMap = new LinkedHashMap<>();
         metadataMap.put(GACHA_ID_METADATA_KEY, gachaId);
         metadataMap.put(GACHA_TICKET_COST_METADATA_KEY, ticketCost);
+
+        if(keyId != null) {
+            metadataMap.put(GACHA_KEY_ID_METADATA_KEY, keyId);
+        }
 
         if(!SignConfigProvider.saveMetadata(sign.getLocation(), metadataMap)){
             Log.error("看板ﾒﾀﾃﾞｰﾀの保存に失敗しました.");
@@ -191,12 +214,20 @@ public class GachaManager implements SignListener, ConfigListener<Gacha> {
 
         event.setLine(0, GACHA_SIGN_INDEX);
         event.setLine(1, gacha.getName());
-        event.setLine(2, "");
 
-        if(ticketCost > 0) {
-            event.setLine(3, GACHA_SIGN_TICKET_COST.replace("{amount}", strTicketCost));
-        }else{
-            event.setLine(3, GACHA_SIGN_TICKET_COST_FREE);
+        if(keyId == null) { //Event ticket
+            event.setLine(2, "");
+
+            if(ticketCost > 0) {
+                event.setLine(3, GACHA_SIGN_TICKET_COST.replace("{amount}", strCostData));
+            }else{
+                event.setLine(3, GACHA_SIGN_TICKET_COST_FREE);
+            }
+        }else{ //key item
+            event.setLine(2, GACHA_SIGN_KEY_COST.replace("{amount}", Integer.toString(KeyManager.getKeyAmount(keyId))));
+
+            final String keyName = KeyManager.getKeyName(keyId);
+            event.setLine(3, (keyName != null) ? keyName : keyId);
         }
     }
 
@@ -207,14 +238,20 @@ public class GachaManager implements SignListener, ConfigListener<Gacha> {
         }
 
         final String gachaId = (String) SignConfigProvider.getMetadata(sign.getLocation(), GACHA_ID_METADATA_KEY);
+
         final int ticketCost = (int) SignConfigProvider.getMetadata(sign.getLocation(), GACHA_TICKET_COST_METADATA_KEY);
+        final String keyId = (String) SignConfigProvider.getMetadata(sign.getLocation(), GACHA_KEY_ID_METADATA_KEY);
 
         if(!sGachaMap.containsKey(gachaId)){
             Log.error(GACHA_ID_NOT_FOUND.replace("{id}",gachaId));
             return;
         }
 
-        play(event.getPlayer(), gachaId, ticketCost);
+        if(keyId == null) { //Event ticket
+            play(event.getPlayer(), gachaId, ticketCost);
+        }else{ //Key item
+            play(event.getPlayer(), gachaId, keyId);
+        }
     }
 
     @Override
@@ -225,9 +262,12 @@ public class GachaManager implements SignListener, ConfigListener<Gacha> {
 
     private final static String GACHA_ID_METADATA_KEY = "gachaId";
     private final static String GACHA_TICKET_COST_METADATA_KEY = "gachaTicketCost";
+    private final static String GACHA_KEY_ID_METADATA_KEY = "gachaKeyId";
 
     public final static String GACHA_SIGN_INDEX = ChatColor.translateAlternateColorCodes('&', "&8&l[&d&lガチャ&8&l]");
-    private final static String GACHA_SIGN_TICKET_COST = ChatColor.translateAlternateColorCodes('&', "&9&n1プレイ&r &a&n{amount}枚");
+    private final static String GACHA_SIGN_PLAY = ChatColor.translateAlternateColorCodes('&', "&9&n1プレイ");
+    private final static String GACHA_SIGN_TICKET_COST = GACHA_SIGN_PLAY + ChatColor.translateAlternateColorCodes('&', "&r &a&n{amount}枚");
+    private final static String GACHA_SIGN_KEY_COST = GACHA_SIGN_PLAY + ChatColor.translateAlternateColorCodes('&', "&r &a&n{amount}個");
     private final static String GACHA_SIGN_TICKET_COST_FREE = ChatColor.translateAlternateColorCodes('&', "&c無料");
 
     private final static String GACHA_ID_LIST_TEXT = ChatColor.translateAlternateColorCodes('&', "&7--------- &dガチャ一覧 &7---------&r");
