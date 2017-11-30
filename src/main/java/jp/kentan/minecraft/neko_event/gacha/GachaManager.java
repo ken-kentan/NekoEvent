@@ -8,7 +8,7 @@ import jp.kentan.minecraft.neko_event.gacha.model.Gacha;
 import jp.kentan.minecraft.neko_event.listener.SignEventListener;
 import jp.kentan.minecraft.neko_event.listener.SignListener;
 import jp.kentan.minecraft.neko_event.module.key.KeyManager;
-import jp.kentan.minecraft.neko_event.ticket.EventTicketProvider;
+import jp.kentan.minecraft.neko_event.ticket.TicketProvider;
 import jp.kentan.minecraft.neko_event.util.Log;
 import jp.kentan.minecraft.neko_event.util.NekoUtil;
 import org.apache.commons.lang.StringUtils;
@@ -44,13 +44,7 @@ public class GachaManager implements SignListener, ConfigListener<Gacha> {
         plugin.getCommand("gacha").setExecutor(new GachaCommandExecutor());
     }
 
-    public static void play(Player player, String gachaId){
-        if(!sGachaMap.containsKey(gachaId)){
-            Log.error(GACHA_ID_NOT_FOUND.replace("{id}", gachaId));
-            return;
-        }
-
-        final Gacha gacha = sGachaMap.get(gachaId);
+    private static void play(Player player, Gacha gacha){
         Gacha.Component component = gacha.getByRandom();
 
         final Location location = player.getLocation();
@@ -70,7 +64,7 @@ public class GachaManager implements SignListener, ConfigListener<Gacha> {
                 NekoUtil.broadcastMessage(NekoEvent.PREFIX + broadcastMsg, player);
             }
 
-            Log.info(player.getName() + "にｶﾞﾁｬ(" + gachaId + ")で" + component.getName() + ChatColor.RESET + "を与えました.");
+            Log.info(player.getName() + "にｶﾞﾁｬ(" + gacha.getId() + ")で" + component.getName() + ChatColor.RESET + "を与えました.");
 
             soundEffect = Sound.ENTITY_PLAYER_LEVELUP;
         }else{ //はずれ
@@ -86,6 +80,16 @@ public class GachaManager implements SignListener, ConfigListener<Gacha> {
         }
     }
 
+    public static void play(Player player, String gachaId){
+        Gacha gacha = sGachaMap.get(gachaId);
+        if(gacha == null){
+            Log.error(GACHA_ID_NOT_FOUND.replace("{id}", gachaId));
+            return;
+        }
+
+        play(player, gacha);
+    }
+
     static void play(String playerName, String gachaId, String ticketCost){
         Player player = NekoUtil.toPlayer(playerName);
 
@@ -93,17 +97,29 @@ public class GachaManager implements SignListener, ConfigListener<Gacha> {
             return;
         }
 
-        if(ticketCost == null || EventTicketProvider.remove(player, NekoUtil.toInteger(ticketCost))) {
-            play(player, gachaId);
+        Gacha gacha = sGachaMap.get(gachaId);
+        if(gacha == null){
+            Log.error(GACHA_ID_NOT_FOUND.replace("{id}", gachaId));
+            return;
+        }
+
+        if(ticketCost == null || TicketProvider.remove(player, NekoUtil.toInteger(ticketCost), gacha.isRequireVoteTicket())) {
+            play(player, gacha);
         }
     }
 
     private static void play(Player player, String gachaId, int ticketCost){
-        if(ticketCost > 0 && !EventTicketProvider.remove(player, ticketCost)) {
+        Gacha gacha = sGachaMap.get(gachaId);
+        if(gacha == null){
+            Log.error(GACHA_ID_NOT_FOUND.replace("{id}", gachaId));
             return;
         }
 
-        play(player, gachaId);
+        if(ticketCost > 0 && !TicketProvider.remove(player, ticketCost, gacha.isRequireVoteTicket())) {
+            return;
+        }
+
+        play(player, gacha);
     }
 
     private static void play(Player player, String gachaId, String keyId){
@@ -111,7 +127,13 @@ public class GachaManager implements SignListener, ConfigListener<Gacha> {
             return;
         }
 
-        play(player, gachaId);
+        Gacha gacha = sGachaMap.get(gachaId);
+        if(gacha == null){
+            Log.error(GACHA_ID_NOT_FOUND.replace("{id}", gachaId));
+            return;
+        }
+
+        play(player, gacha);
     }
 
     static void sendList(CommandSender sender){

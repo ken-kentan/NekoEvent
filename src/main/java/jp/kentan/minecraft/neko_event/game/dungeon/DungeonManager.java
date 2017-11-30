@@ -9,7 +9,7 @@ import jp.kentan.minecraft.neko_event.gacha.GachaManager;
 import jp.kentan.minecraft.neko_event.listener.SignEventListener;
 import jp.kentan.minecraft.neko_event.listener.SignListener;
 import jp.kentan.minecraft.neko_event.spawn.SpawnManager;
-import jp.kentan.minecraft.neko_event.ticket.EventTicketProvider;
+import jp.kentan.minecraft.neko_event.ticket.TicketProvider;
 import jp.kentan.minecraft.neko_event.util.Log;
 import jp.kentan.minecraft.neko_event.util.NekoUtil;
 import org.bukkit.Bukkit;
@@ -162,7 +162,7 @@ public class DungeonManager implements SignListener, ConfigListener<Dungeon> {
             if(DungeonConfigProvider.hasClearedToday(player.getUniqueId(), id)){
                 player.sendMessage(EVENT_TICKET_ONCE_A_DAY_MSG);
             }else {
-                EventTicketProvider.give(player, dungeon.getRewardTicketAmount());
+                TicketProvider.give(player, dungeon.getRewardTicketAmount(), false);
             }
         }
 

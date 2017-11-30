@@ -11,15 +11,16 @@ public class Gacha {
 
     private List<Component> mGacha = new ArrayList<>();
     private String mId, mName, mGetMsg, mMissMsg, mBroadcastMsg;
-    private boolean mEnableEffect;
+    private boolean mEnableEffect, mRequireVoteTicket;
 
-    public Gacha(String id, String name, String getMsg, String missMsg, String broadcastMsg, boolean enableEffect){
+    public Gacha(String id, String name, String getMsg, String missMsg, String broadcastMsg, boolean enableEffect, boolean requireVoteTicket){
         mId = id;
         mName = ChatColor.translateAlternateColorCodes('&', name);
         mGetMsg  = (getMsg != null) ? ChatColor.translateAlternateColorCodes('&', getMsg) : null;
         mMissMsg = (missMsg != null) ? ChatColor.translateAlternateColorCodes('&', missMsg) : null;
         mBroadcastMsg = (broadcastMsg != null) ? ChatColor.translateAlternateColorCodes('&', broadcastMsg) : null;
         mEnableEffect = enableEffect;
+        mRequireVoteTicket = requireVoteTicket;
     }
 
     public void add(String name, List<String> command){
@@ -28,6 +29,10 @@ public class Gacha {
 
     public Component getByRandom(){
         return mGacha.get(RANDOM.nextInt(mGacha.size()));
+    }
+
+    public String getId() {
+        return mId;
     }
 
     public String getName(){
@@ -52,6 +57,10 @@ public class Gacha {
 
     public boolean enableEffect(){
         return mEnableEffect;
+    }
+
+    public boolean isRequireVoteTicket() {
+        return mRequireVoteTicket;
     }
 
     public boolean hasGetMessage(){

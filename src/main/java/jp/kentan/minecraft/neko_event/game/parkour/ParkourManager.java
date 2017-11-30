@@ -8,7 +8,7 @@ import jp.kentan.minecraft.neko_event.listener.SignEventListener;
 import jp.kentan.minecraft.neko_event.listener.SignListener;
 import jp.kentan.minecraft.neko_event.game.parkour.model.Parkour;
 import jp.kentan.minecraft.neko_event.spawn.SpawnManager;
-import jp.kentan.minecraft.neko_event.ticket.EventTicketProvider;
+import jp.kentan.minecraft.neko_event.ticket.TicketProvider;
 import jp.kentan.minecraft.neko_event.util.Log;
 import jp.kentan.minecraft.neko_event.util.NekoUtil;
 import org.bukkit.ChatColor;
@@ -144,7 +144,7 @@ public class ParkourManager implements SignListener, ConfigListener<Parkour> {
         if(ParkourConfigProvider.hasClearedToday(player.getUniqueId(), id)){
             player.sendMessage(EVENT_TICKET_ONCE_A_DAY_MSG);
         }else {
-            if(EventTicketProvider.give(player, 1)){
+            if(TicketProvider.give(player, 1, false)){
                 player.sendMessage(EVENT_TICKET_GET_MSG);
             }
         }

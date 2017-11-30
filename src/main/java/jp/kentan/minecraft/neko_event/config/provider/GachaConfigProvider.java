@@ -51,7 +51,8 @@ public class GachaConfigProvider {
                         config.getString(path + ".getMsg"),
                         config.getString(path + ".missMsg"),
                         config.getString(path + ".broadcastMsg"),
-                        config.getBoolean(path + ".enableEffect", true)
+                        config.getBoolean(path + ".enableEffect", true),
+                        config.getBoolean(path + ".requireVoteTicket", false)
                 );
 
                 final String componentsPath = "Gacha." + id + ".components";

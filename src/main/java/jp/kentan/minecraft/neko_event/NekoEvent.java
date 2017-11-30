@@ -10,7 +10,7 @@ import jp.kentan.minecraft.neko_event.module.key.KeyManager;
 import jp.kentan.minecraft.neko_event.module.password.PasswordManager;
 import jp.kentan.minecraft.neko_event.spawn.SpawnManager;
 import jp.kentan.minecraft.neko_event.teleport.TeleportProvider;
-import jp.kentan.minecraft.neko_event.ticket.EventTicketProvider;
+import jp.kentan.minecraft.neko_event.ticket.TicketProvider;
 import jp.kentan.minecraft.neko_event.util.GameUtil;
 import jp.kentan.minecraft.neko_event.util.Log;
 import jp.kentan.minecraft.neko_event.util.NekoUtil;
@@ -36,7 +36,6 @@ public class NekoEvent extends JavaPlugin {
         mConfigManager = new ConfigManager(getDataFolder());
 
 
-        EventTicketProvider.setup();
         SpawnManager.setup();
         DungeonManager.setup(this);
         ParkourManager.setup(this);
@@ -70,8 +69,8 @@ public class NekoEvent extends JavaPlugin {
                     return true;
                 }
 
-                if(EventTicketProvider.give(args[1], args[2])) {
-                    Log.warn(sender.getName() + "が{sender}にイベントチケットを{amount}枚与えました.".replace("{sender}", args[1]).replace("{amount}", args[2]));
+                if(TicketProvider.give(args[1], args[2], params > 2)) {
+                    Log.warn(sender.getName() + "が{sender}にチケットを{amount}枚与えました.".replace("{sender}", args[1]).replace("{amount}", args[2]));
                 }
                 break;
             case "tp":
