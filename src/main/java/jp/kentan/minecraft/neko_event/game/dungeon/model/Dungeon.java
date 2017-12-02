@@ -19,7 +19,7 @@ public class Dungeon {
 
     private Boolean mEnableClearSound;
 
-    private int mRewardTicketAmount = 0;
+    private int mRewardTicketAmount;
     private String mRewardGachaId;
 
     private BukkitTask mLockTask;
@@ -87,7 +87,7 @@ public class Dungeon {
             mEnableClearSound = enableClearSound;
         }
 
-        if(rewordTicketAmount > 0){
+        if(rewordTicketAmount >= 0){
             mRewardTicketAmount = rewordTicketAmount;
         }
 

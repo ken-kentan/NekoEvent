@@ -1,5 +1,6 @@
 package jp.kentan.minecraft.neko_event.listener;
 
+import jp.kentan.minecraft.neko_event.util.GameUtil;
 import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
@@ -31,6 +32,8 @@ public class PlayerEventListener implements Listener{
         if(isInEventWorld(player)){
             SCHEDULER.scheduleSyncDelayedTask(PLUGIN, () -> {
                 if(!player.isDead()) return;
+
+//              GameUtil.removeVanishingItem(player);
 
                 player.spigot().respawn();
 

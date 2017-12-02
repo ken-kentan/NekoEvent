@@ -64,7 +64,7 @@ public class KeyConfigProvider {
                         config.getString(path + ".matchMsg"),
                         config.getString(path + ".notMatchMsg"),
                         config.getString(path + ".expiredMsg"),
-                        config.getString(path + ".shotAmountMsg")
+                        config.getString(path + ".shortAmountMsg")
                 );
 
                 keyMap.put(id, key);

@@ -4,7 +4,10 @@ import jp.kentan.minecraft.neko_event.util.math.MersenneTwisterFast;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.command.BlockCommandSender;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.Vector;
@@ -87,6 +90,22 @@ public class GameUtil {
 
         if(maxHealth >= 1.0D) {
             player.setHealth(maxHealth);
+        }
+    }
+
+    public static void removeVanishingItem(Player player){
+        Inventory inventory = player.getInventory();
+
+        for(int i = 0, size = inventory.getSize(); i < size; ++i){
+            ItemStack item = inventory.getItem(i);
+
+            if(item == null){
+                continue;
+            }
+
+            if(item.getEnchantmentLevel(Enchantment.VANISHING_CURSE) > 0){
+                inventory.setItem(i, null);
+            }
         }
     }
 }

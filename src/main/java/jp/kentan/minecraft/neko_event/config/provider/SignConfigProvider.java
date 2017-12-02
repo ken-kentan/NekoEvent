@@ -110,7 +110,7 @@ public class SignConfigProvider {
             }
 
             String signIndex = null;
-            for(int i = 0; i < 100; ++i){
+            for(int i = 0; i < 500; ++i){
                 if(!config.isConfigurationSection("Sign." + i)){
                     signIndex = Integer.toString(i);
                     break;

@@ -123,7 +123,7 @@ public class GachaManager implements SignListener, ConfigListener<Gacha> {
     }
 
     private static void play(Player player, String gachaId, String keyId){
-        if(!KeyManager.removeFormInventory(player, keyId)) {
+        if(!KeyManager.use(player, keyId)) {
             return;
         }
 

@@ -182,12 +182,12 @@ public class KeyManager implements ConfigListener<Key>{
     }
 
 
-    private static void use(Player player, String id){
+    public static boolean use(Player player, String id){
         Key key = sKeyMap.get(id);
 
-        if(key == null){
+        if(key == null){Log.info("Hi");
             Log.error("キー({id})は存在しません.".replace("{id}",id));
-            return;
+            return false;
         }
 
         ItemStack handItem = player.getInventory().getItemInMainHand();
@@ -206,7 +206,7 @@ public class KeyManager implements ConfigListener<Key>{
                 if(key.hasMatchMessage()){
                     player.sendMessage(key.getMatchMessage());
                 }
-                break;
+                return true;
             case NOT_MATCH:
                 if(key.hasNotMatchMessage()){
                     player.sendMessage(key.getNotMatchMessage());
@@ -225,6 +225,8 @@ public class KeyManager implements ConfigListener<Key>{
             default:
                 break;
         }
+
+        return false;
     }
 
     static void use(String playerName, String id){
@@ -235,30 +237,6 @@ public class KeyManager implements ConfigListener<Key>{
         }
 
         use(player, id);
-    }
-
-    public static boolean removeFormInventory(Player player, String id){
-        final Key key = sKeyMap.get(id);
-
-        if(key == null){
-            Log.error("キー({id})は存在しません.".replace("{id}",id));
-            return false;
-        }
-
-        ItemStack handItem = player.getInventory().getItemInMainHand();
-
-        switch (key.match(handItem)) {
-            case MATCH:
-                int amount = handItem.getAmount() - key.getAmount();
-                player.getInventory().getItemInMainHand().setAmount(amount);
-                return true;
-            case SHORT_AMOUNT:
-                if(key.hasShortAmountMessage()){
-                    player.sendMessage(key.getShortAmountMessage());
-                }
-            default:
-                return false;
-        }
     }
 
     public static String getKeyName(String id){
@@ -390,9 +368,8 @@ public class KeyManager implements ConfigListener<Key>{
                 PERIOD = NekoUtil.toInteger(map.remove(PERIOD_KEY).get(0));
             }
 
-            List<String> location = new ArrayList<>();
             if(map.containsKey(BLOCK_LOCATION_KEY)) {
-                location.addAll(map.remove(BLOCK_LOCATION_KEY));
+                List<String> location = new ArrayList<>(map.remove(BLOCK_LOCATION_KEY));
 
                 if (location.size() > 0) {
                     if (location.get(0).equals("HERE")) {

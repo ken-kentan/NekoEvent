@@ -61,9 +61,9 @@ public class TicketProvider {
             return false;
         }
 
-        for(int i = 0; i < inventory.getSize(); ++i){
+        for(int i = 0, size = inventory.getSize(); i < size; ++i){
             final ItemStack item = inventory.getItem(i);
-            if((isRequireVoteTicket && !VOTE_TICKET.isSimilar(playerName, item) || (!isRequireVoteTicket && !isEventTicket(playerName, item)))){
+            if(item == null || (isRequireVoteTicket && !VOTE_TICKET.isSimilar(playerName, item) || (!isRequireVoteTicket && !isEventTicket(playerName, item)))){
                 continue;
             }
 

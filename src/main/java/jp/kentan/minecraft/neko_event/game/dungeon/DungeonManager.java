@@ -455,7 +455,7 @@ public class DungeonManager implements SignListener, ConfigListener<Dungeon> {
             }
 
             if(mRewordTicketAmount < 0){
-                Log.error("ｲﾍﾞﾝﾄﾁｹｯﾄ報酬は1枚以上を指定して下さい.");
+                Log.error("ｲﾍﾞﾝﾄﾁｹｯﾄ報酬は0枚以上を指定して下さい.");
                 throw new Exception("Invalid ticket amount.");
             }
 
