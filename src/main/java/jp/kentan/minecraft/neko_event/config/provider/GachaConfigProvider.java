@@ -60,13 +60,13 @@ public class GachaConfigProvider {
                 components.forEach(index -> {
                     final String indexPath = componentsPath + "." + index;
 
-                    for(int i = config.getInt(indexPath + ".amount", 1); i > 0; --i) {
-                        gacha.add(
-                                config.getString(indexPath + ".name"),
-                                config.getStringList(indexPath + ".commands"));
-                    }
+                    gacha.add(
+                            config.getString(indexPath + ".name"),
+                            config.getDouble(indexPath + ".probability"),
+                            config.getStringList(indexPath + ".commands"));
                 });
 
+                gacha.normalizeIfNeed();
                 gachaMap.put(id, gacha);
             });
 

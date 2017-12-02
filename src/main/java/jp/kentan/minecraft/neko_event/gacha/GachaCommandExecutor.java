@@ -6,6 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 public class GachaCommandExecutor implements CommandExecutor {
 
@@ -22,6 +23,11 @@ public class GachaCommandExecutor implements CommandExecutor {
             case "play":
                 if(NekoUtil.checkParams(params, 2)){
                     GachaManager.play(args[2], args[1], (params > 3) ? args[3] : null);
+                }
+                break;
+            case "demo":
+                if(NekoUtil.checkParams(params, 2) && NekoUtil.isPlayer(sender)){
+                    GachaManager.demo((Player)sender, args[1], args[2]);
                 }
                 break;
             case "list":
@@ -45,6 +51,7 @@ public class GachaCommandExecutor implements CommandExecutor {
     private static void sendHelp(CommandSender sender){
         sender.sendMessage("---------- NekoEvent Gachaコマンドヘルプ ----------");
         sender.sendMessage("| " + ChatColor.LIGHT_PURPLE + "/gacha play [player] [gachaId] <ticketCost>");
+        sender.sendMessage("| " + ChatColor.LIGHT_PURPLE + "/gacha demo [gachaId] [times]");
         sender.sendMessage("| " + ChatColor.LIGHT_PURPLE + "/gacha list");
         sender.sendMessage("| " + ChatColor.LIGHT_PURPLE + "/gacha info [gachaId]");
         sender.sendMessage("| " + ChatColor.LIGHT_PURPLE + "/gacha reload");

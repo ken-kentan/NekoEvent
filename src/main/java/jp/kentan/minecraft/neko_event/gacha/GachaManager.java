@@ -136,6 +136,37 @@ public class GachaManager implements SignListener, ConfigListener<Gacha> {
         play(player, gacha);
     }
 
+    static void demo(Player player, String gachaId, String strTimes){
+        Gacha gacha = sGachaMap.get(gachaId);
+        if(gacha == null){
+            Log.error(GACHA_ID_NOT_FOUND.replace("{id}", gachaId));
+            return;
+        }
+
+        int limit = NekoUtil.toInteger(strTimes);
+
+        if(limit > 1000000){
+            player.sendMessage(NekoEvent.PREFIX + ChatColor.YELLOW + "100万回以上は指定出来ません.");
+            return;
+        }
+
+        Map<String, Integer> resultMap = new HashMap<>();
+
+        for(int i=0; i<limit; ++i){
+            final String key = gacha.getByRandom().getName();
+
+            if(resultMap.containsKey(key)){
+                resultMap.replace(key, resultMap.get(key) + 1);
+            }else{
+                resultMap.put(key, 1);
+            }
+        }
+
+        player.sendMessage(NekoEvent.PREFIX + "ｶﾞﾁｬ(" + gachaId + ")を" + limit + "回引いた結果");
+
+        resultMap.forEach((s, i) -> player.sendMessage(s + ": " + i + "回"));
+    }
+
     static void sendList(CommandSender sender){
         StringBuilder builder = new StringBuilder(GACHA_ID_LIST_TEXT + "\n");
 
