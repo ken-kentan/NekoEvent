@@ -144,7 +144,7 @@ public class ParkourManager implements SignListener, ConfigListener<Parkour> {
         if(ParkourConfigProvider.hasClearedToday(player.getUniqueId(), id)){
             player.sendMessage(EVENT_TICKET_ONCE_A_DAY_MSG);
         }else {
-            if(TicketProvider.give(player, 1, false)){
+            if(TicketProvider.giveEventTicket(player, 1)){
                 player.sendMessage(EVENT_TICKET_GET_MSG);
             }
         }

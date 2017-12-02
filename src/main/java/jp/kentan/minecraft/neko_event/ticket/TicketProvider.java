@@ -33,14 +33,20 @@ public class TicketProvider {
         return true;
     }
 
-    public static boolean give(String playerName, String amount, boolean isVoteTicket) {
+    public static void giveEventTicket(String playerName, String amount) {
         Player player = NekoUtil.toPlayer(playerName);
 
-        return give(player, NekoUtil.toInteger(amount), isVoteTicket);
+        give(player, EVENT_TICKET, NekoUtil.toInteger(amount));
     }
 
-    public static boolean give(Player player, int amount, boolean isVoteTicket) {
-        return player != null && give(player, isVoteTicket ? VOTE_TICKET : EVENT_TICKET , amount);
+    public static boolean giveEventTicket(Player player, int amount) {
+        return give(player, EVENT_TICKET, amount);
+    }
+
+    public static void giveVoteTicket(String playerName, String amount) {
+        Player player = NekoUtil.toPlayer(playerName);
+
+        give(player, VOTE_TICKET, NekoUtil.toInteger(amount));
     }
 
     public static boolean remove(Player player, int amount, boolean isRequireVoteTicket){

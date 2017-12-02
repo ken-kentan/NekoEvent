@@ -162,7 +162,7 @@ public class DungeonManager implements SignListener, ConfigListener<Dungeon> {
             if(DungeonConfigProvider.hasClearedToday(player.getUniqueId(), id)){
                 player.sendMessage(EVENT_TICKET_ONCE_A_DAY_MSG);
             }else {
-                TicketProvider.give(player, dungeon.getRewardTicketAmount(), false);
+                TicketProvider.giveEventTicket(player, dungeon.getRewardTicketAmount());
             }
         }
 

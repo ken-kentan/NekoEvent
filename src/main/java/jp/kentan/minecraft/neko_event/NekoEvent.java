@@ -64,13 +64,16 @@ public class NekoEvent extends JavaPlugin {
         }
 
         switch (args[0]){
-            case "ticket":
-                if(!NekoUtil.checkParams(params, 2)){
-                    return true;
+            case "eticket":
+                if(NekoUtil.checkParams(params, 2)){
+                    TicketProvider.giveEventTicket(args[1], args[2]);
+                    Log.warn(sender.getName() + "が{sender}にイベントチケットを{amount}枚与えました.".replace("{sender}", args[1]).replace("{amount}", args[2]));
                 }
-
-                if(TicketProvider.give(args[1], args[2], params > 2)) {
-                    Log.warn(sender.getName() + "が{sender}にチケットを{amount}枚与えました.".replace("{sender}", args[1]).replace("{amount}", args[2]));
+                break;
+            case "vticket":
+                if(NekoUtil.checkParams(params, 2)){
+                    TicketProvider.giveVoteTicket(args[1], args[2]);
+                    Log.warn(sender.getName() + "が{sender}に投票限定チケットを{amount}枚与えました.".replace("{sender}", args[1]).replace("{amount}", args[2]));
                 }
                 break;
             case "tp":
@@ -128,7 +131,8 @@ public class NekoEvent extends JavaPlugin {
 
     private static void sendHelp(CommandSender sender){
         sender.sendMessage("---------- NekoEvent コマンドヘルプ ----------");
-        sender.sendMessage("| " + ChatColor.YELLOW + "/event ticket [player] [amount]");
+        sender.sendMessage("| " + ChatColor.YELLOW + "/event eticket [player] [amount]");
+        sender.sendMessage("| " + ChatColor.YELLOW + "/event vticket [player] [amount]");
         sender.sendMessage("| " + ChatColor.YELLOW + "/event tp [player] [x y z] (相対指定時の基準はプレイヤー座標)");
         sender.sendMessage("| " + ChatColor.YELLOW + "/event msg [player] [sender] [message] ([sender]にnullを指定で[message]のみ表示)");
         sender.sendMessage("| " + ChatColor.YELLOW + "/event setspawn [player] <x y z> (相対指定時の基準はｺﾏﾝﾄﾞﾌﾞﾛｯｸ座標)");
