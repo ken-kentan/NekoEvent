@@ -185,7 +185,7 @@ public class KeyManager implements ConfigListener<Key>{
     public static boolean use(Player player, String id){
         Key key = sKeyMap.get(id);
 
-        if(key == null){Log.info("Hi");
+        if(key == null){
             Log.error("キー({id})は存在しません.".replace("{id}",id));
             return false;
         }
