@@ -94,8 +94,18 @@ public class DungeonManager implements SignListener, ConfigListener<Dungeon> {
         }
 
         if(dungeon.isLock()){
-            String strSec = Integer.toString(dungeon.getLockTimer());
-            player.sendMessage(NekoEvent.PREFIX + DUNGEON_LOCK_TEXT.replace("{name}",dungeon.getName()).replace("{sec}", strSec));
+            final int sec = dungeon.getLockTimer();
+
+            final String strTime;
+            String strSec = Integer.toString(sec % 60);
+
+            if(sec >= 60) {
+                strTime = Integer.toString(sec / 60) + '分' + strSec + '秒';
+            }else{
+                strTime = strSec + '秒';
+            }
+
+            player.sendMessage(NekoEvent.PREFIX + DUNGEON_LOCK_TEXT.replace("{name}",dungeon.getName()).replace("{time}", strTime));
             return;
         }
 
@@ -360,7 +370,7 @@ public class DungeonManager implements SignListener, ConfigListener<Dungeon> {
 
     private final static String DUNGEON_NOT_FOUND_TEXT = "ダンジョン({id})が存在しません.";
     private final static String DUNGEON_LOCK_TEXT =
-            ChatColor.translateAlternateColorCodes('&',"{name}&rは&cロック中&rです！ &b{sec}秒&rお待ちください...");
+            ChatColor.translateAlternateColorCodes('&',"{name}&rは&cロック中&rです！ &b{time}&rお待ちください...");
     private final static String EVENT_TICKET_ONCE_A_DAY_MSG =
             NekoEvent.PREFIX + ChatColor.translateAlternateColorCodes('&',"&7各ダンジョンの&6&lイベントチケット&7報酬は,&c1日1回&7です.");
 
