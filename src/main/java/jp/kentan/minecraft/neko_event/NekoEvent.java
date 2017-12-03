@@ -96,6 +96,11 @@ public class NekoEvent extends JavaPlugin {
                     GameUtil.jumpPlayer(args[1], NekoUtil.toDouble(args[2]), NekoUtil.toDouble(args[3]));
                 }
                 break;
+            case "exp":
+                if(NekoUtil.checkParams(params, 2)){
+                    GameUtil.giveExp(NekoUtil.toPlayer(args[1]), NekoUtil.toInteger(args[2]));
+                }
+                break;
             case "random":
                 if(NekoUtil.checkParams(params, 6) && NekoUtil.checkCommandBlock(sender)){
                     GameUtil.placeBlockByRandom((BlockCommandSender)sender, args, 1);
@@ -114,9 +119,6 @@ public class NekoEvent extends JavaPlugin {
             case "test":
                 ItemStack itemStack = ((Player)sender).getInventory().getItemInMainHand();
                 sender.sendMessage(itemStack.getItemMeta() + "");
-                break;
-            case "bed":
-                ((Player)sender).setBedSpawnLocation(((Player) sender).getLocation(), true);
                 break;
             case "reload":
                 mConfigManager.reload();
@@ -137,6 +139,7 @@ public class NekoEvent extends JavaPlugin {
         sender.sendMessage("| " + ChatColor.YELLOW + "/event msg [player] [sender] [message] ([sender]にnullを指定で[message]のみ表示)");
         sender.sendMessage("| " + ChatColor.YELLOW + "/event setspawn [player] <x y z> (相対指定時の基準はｺﾏﾝﾄﾞﾌﾞﾛｯｸ座標)");
         sender.sendMessage("| " + ChatColor.YELLOW + "/event jump [player] [height] [length] (各値は小数点係数)");
+        sender.sendMessage("| " + ChatColor.YELLOW + "/event exp [player] [value] (経験値ｵｰﾌﾞをドロップ)");
         sender.sendMessage("| " + ChatColor.YELLOW + "/event random [x y z] [x y z] <x y z> (座標は複数指定可能. 0.5s後に消滅)");
         sender.sendMessage("| " + ChatColor.YELLOW + "/event reset_status [player] (プレイヤーのステータスをリセットして体力20)");
         sender.sendMessage("| " + ChatColor.YELLOW + "/event delay [seconds] [x y z]");

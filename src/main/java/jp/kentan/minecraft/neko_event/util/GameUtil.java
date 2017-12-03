@@ -5,6 +5,8 @@ import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -90,6 +92,16 @@ public class GameUtil {
 
         if(maxHealth >= 1.0D) {
             player.setHealth(maxHealth);
+        }
+    }
+
+    public static void giveExp(final Player player, final int value){
+        if(player != null) {
+            final Location location = player.getLocation();
+            location.add(0D, 0.5D, 0D);
+
+            final ExperienceOrb expOrb = (ExperienceOrb) location.getWorld().spawnEntity(location, EntityType.EXPERIENCE_ORB);
+            expOrb.setExperience(value);
         }
     }
 
