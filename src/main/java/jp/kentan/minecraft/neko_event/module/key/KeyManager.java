@@ -57,7 +57,7 @@ public class KeyManager implements ConfigListener<Key>{
         if(key == null){
             player.sendMessage(NekoEvent.PREFIX + ChatColor.YELLOW + "作成に失敗しました.");
         }else{
-            Log.info("{player}がキー({id})を{item}で作成しました.".replace("{player}", player.getName()).replace("{id}",id).replace("{name}", key.getName()));
+            Log.info("{player}がキー({id})を{name}で作成しました.".replace("{player}", player.getName()).replace("{id}",id).replace("{name}", key.getName()));
             sKeyMap.put(id, key);
         }
     }
