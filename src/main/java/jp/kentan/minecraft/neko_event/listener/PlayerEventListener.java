@@ -33,7 +33,7 @@ public class PlayerEventListener implements Listener{
             SCHEDULER.scheduleSyncDelayedTask(PLUGIN, () -> {
                 if(!player.isDead()) return;
 
-//              GameUtil.removeVanishingItem(player);
+              GameUtil.removeVanishingItem(player);
 
                 player.spigot().respawn();
 
@@ -56,7 +56,6 @@ public class PlayerEventListener implements Listener{
 
     }
     private static boolean isInEventWorld(World word){
-        final String worldName = word.getName();
-        return worldName.equals("Ivents_World") || worldName.equals("EventWorld");
+        return word.getName().equals("EventWorld");
     }
 }
