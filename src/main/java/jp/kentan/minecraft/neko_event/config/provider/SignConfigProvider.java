@@ -54,6 +54,12 @@ public class SignConfigProvider {
                         config.getDouble(path + ".Location.z")
                 );
 
+                //ワールドが見つからない場合は消去せずスキップ
+                if(location.getWorld() == null){
+                    Log.warn("看板(" + index + ")が見つかりませんでした.");
+                    return;
+                }
+
                 if(!(location.getBlock().getState() instanceof Sign)){
                     config.set(path, null);
                     Log.warn("看板" + NekoUtil.toString(location) + "が見つかりませんでした.");

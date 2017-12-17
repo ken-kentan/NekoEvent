@@ -7,12 +7,10 @@ import java.io.*;
 
 public class ConfigManager {
 
-    private final String CONFIG_PATH;
     private final File mDataFolder;
 
     public ConfigManager(File dataFolder){
         mDataFolder = dataFolder;
-        CONFIG_PATH = dataFolder + File.separator + "config.yml";
 
         SignConfigProvider.setup(dataFolder);
         GachaConfigProvider.setup(dataFolder);
@@ -38,11 +36,11 @@ public class ConfigManager {
 
     public void reload(){
         SignConfigProvider.setup(mDataFolder);
-        GachaConfigProvider.setup(mDataFolder);
-        DungeonConfigProvider.setup(mDataFolder);
-        ParkourConfigProvider.setup(mDataFolder);
         PlayerConfigProvider.setup(mDataFolder);
-        KeyConfigProvider.setup(mDataFolder);
-        PasswordConfigProvider.setup(mDataFolder);
+        GachaConfigProvider.load();
+        DungeonConfigProvider.load();
+        ParkourConfigProvider.load();
+        KeyConfigProvider.load();
+        PasswordConfigProvider.load();
     }
 }
