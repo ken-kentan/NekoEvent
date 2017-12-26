@@ -74,6 +74,7 @@ public class DungeonConfigProvider {
                         config.getString(path + ".Clear.broadcastMsg"),
                         config.getString(path + ".Clear.titleText"),
                         config.getBoolean(path + ".Clear.enableSound"),
+                        config.getString(path + ".TimedOut.broadcastMsg"),
                         config.getInt(path + ".Reward.ticketAmount"),
                         config.getString(path + ".Reward.gachaId")
                 );
@@ -92,7 +93,7 @@ public class DungeonConfigProvider {
 
     public static Dungeon create(String id, String name, Location joinLocation, Location clearLocation, String joinPlayerMsg,
                                            String joinBroadcastMsg, String clearPlayerMsg, String clearBroadcastMsg, String clearTitleText,
-                                           Boolean enableClearSound, int rewardTicketAmount, String rewordGachaId) {
+                                           Boolean enableClearSound, String timedOutBroadcastMsg, int rewardTicketAmount, String rewordGachaId) {
         final String path = "Dungeon." + id;
 
         try {
@@ -137,6 +138,7 @@ public class DungeonConfigProvider {
                 put(path + ".Clear.broadcastMsg", clearBroadcastMsg);
                 put(path + ".Clear.titleText", clearTitleText);
                 put(path + ".Clear.enableSound", enableClearSound);
+                put(path + ".TimedOut.broadcastMsg", timedOutBroadcastMsg);
 
                 put(path + ".Reward.ticketAmount", rewardTicketAmount);
                 put(path + ".Reward.gachaId", rewordGachaId);
@@ -145,11 +147,11 @@ public class DungeonConfigProvider {
             return null;
         }
 
-        return new Dungeon(id, name, joinLocation, clearLocation, joinPlayerMsg, joinBroadcastMsg, clearPlayerMsg, clearBroadcastMsg, clearTitleText, enableClearSound, rewardTicketAmount, rewordGachaId);
+        return new Dungeon(id, name, joinLocation, clearLocation, joinPlayerMsg, joinBroadcastMsg, clearPlayerMsg, clearBroadcastMsg, clearTitleText, enableClearSound, timedOutBroadcastMsg, rewardTicketAmount, rewordGachaId);
     }
 
     public static boolean update(String id, Location joinLocation, Location clearLocation, String joinPlayerMsg, String joinBroadcastMsg, String clearPlayerMsg,
-                                        String clearBroadcastMsg, String clearTitleText, Boolean enableClearSound, int rewardTicketAmount, String rewardGachaId) {
+                                        String clearBroadcastMsg, String clearTitleText, Boolean enableClearSound, String timedOutBroadcastMsg, int rewardTicketAmount, String rewardGachaId) {
         final String path = "Dungeon." + id;
 
         try {
@@ -204,6 +206,10 @@ public class DungeonConfigProvider {
                 }
                 if(enableClearSound != null){
                     put(path + ".Clear.enableSound", enableClearSound);
+                }
+
+                if(timedOutBroadcastMsg != null){
+                    put(path + ".TimedOut.broadcastMsg", timedOutBroadcastMsg);
                 }
 
                 if(rewardTicketAmount > 0) {

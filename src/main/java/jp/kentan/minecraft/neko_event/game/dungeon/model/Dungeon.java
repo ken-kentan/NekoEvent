@@ -2,6 +2,7 @@ package jp.kentan.minecraft.neko_event.game.dungeon.model;
 
 import jp.kentan.minecraft.neko_event.config.provider.DungeonConfigProvider;
 import jp.kentan.minecraft.neko_event.util.Log;
+import jp.kentan.minecraft.neko_event.util.NekoUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -15,6 +16,7 @@ public class Dungeon {
     private String mId, mName;
     private String mJoinPlayerMsg, mJoinBroadcastMsg;
     private String mClearPlayerMsg, mClearBroadcastMsg, mClearTitleText;
+    private String mTimedOutBroadcastMsg;
     private Location mJoinLocation, mClearLocation;
 
     private Boolean mEnableClearSound;
@@ -26,7 +28,7 @@ public class Dungeon {
     private int mLockTimer = 0;
 
     public Dungeon(String id, String name, Location joinLocation, Location clearLocation, String joinPlayerMsg, String joinBroadcastMsg,
-                   String clearPlayerMsg, String clearBroadcastMsg, String clearTitleText, Boolean enableClearSound, int rewardTicketAmount, String rewardGachaId){
+                   String clearPlayerMsg, String clearBroadcastMsg, String clearTitleText, Boolean enableClearSound, String timedOutBroadcastMsg, int rewardTicketAmount, String rewardGachaId){
         mId = id;
         mName = ChatColor.translateAlternateColorCodes('&', name);
 
@@ -40,6 +42,8 @@ public class Dungeon {
         mClearBroadcastMsg = (clearBroadcastMsg != null) ? ChatColor.translateAlternateColorCodes('&', clearBroadcastMsg.replace("{name}", name)) : null;
         mClearTitleText    = (clearTitleText    != null) ? ChatColor.translateAlternateColorCodes('&', clearTitleText.replace("{name}", name)) : null;
 
+        mTimedOutBroadcastMsg = (timedOutBroadcastMsg != null) ? ChatColor.translateAlternateColorCodes('&', timedOutBroadcastMsg.replace("{name}", name)) : null;
+
         mEnableClearSound = enableClearSound;
 
         mRewardTicketAmount = rewardTicketAmount;
@@ -48,10 +52,10 @@ public class Dungeon {
     }
 
     public boolean update(Location joinLocation, Location clearLocation, String joinPlayerMsg, String joinBroadcastMsg, String clearPlayerMsg,
-                           String clearBroadcastMsg, String clearTitleText, Boolean enableClearSound, int rewordTicketAmount, String rewordGachaId){
+                           String clearBroadcastMsg, String clearTitleText, Boolean enableClearSound, String timedOutBroadcastMsg, int rewordTicketAmount, String rewordGachaId){
 
         if(!DungeonConfigProvider.update(mId, joinLocation, clearLocation, joinPlayerMsg, joinBroadcastMsg, clearPlayerMsg,
-                clearBroadcastMsg, clearTitleText, enableClearSound, rewordTicketAmount, rewordGachaId)){
+                clearBroadcastMsg, clearTitleText, enableClearSound, timedOutBroadcastMsg, rewordTicketAmount, rewordGachaId)){
             return false;
         }
 
@@ -83,6 +87,10 @@ public class Dungeon {
             mClearTitleText = ChatColor.translateAlternateColorCodes('&', clearTitleText.replace("{name}", mName));
         }
 
+        if(timedOutBroadcastMsg != null){
+            mTimedOutBroadcastMsg = ChatColor.translateAlternateColorCodes('&', timedOutBroadcastMsg.replace("{name}", mName));
+        }
+
         if(enableClearSound != null){
             mEnableClearSound = enableClearSound;
         }
@@ -109,6 +117,11 @@ public class Dungeon {
             if(--mLockTimer <= 0){
                 mLockTask.cancel();
                 mLockTask = null;
+
+                if(mTimedOutBroadcastMsg != null) {
+                    NekoUtil.broadcastMessage(mTimedOutBroadcastMsg, null);
+                }
+
                 Log.info("ダンジョン({id})のﾛｯｸﾀｲﾏｰがﾀｲﾑｱｳﾄしました.".replace("{id}", mId));
             }
         }, 20L, 20L);

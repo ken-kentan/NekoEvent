@@ -60,7 +60,11 @@ public class GachaManager implements SignListener, ConfigListener<Gacha> {
             }
 
             if(gacha.hasBroadcastMessage()){
-                final String broadcastMsg = gacha.getBroadcastMessage().replace("{player}", player.getName()).replace("{name}", component.getName());
+                final String broadcastMsg = gacha.getBroadcastMessage()
+                        .replace("{player}",   playerName)
+                        .replace("{username}", player.getDisplayName())
+                        .replace("{name}",     component.getName());
+
                 NekoUtil.broadcastMessage(NekoEvent.PREFIX + broadcastMsg, player);
             }
 

@@ -94,7 +94,11 @@ public class ParkourManager implements SignListener, ConfigListener<Parkour> {
         }
 
         if(parkour.hasJoinBroadcastMessage()){
-            NekoUtil.broadcastMessage(NekoEvent.PREFIX + parkour.getJoinBroadcastMessage().replace("{player}", player.getName()), player);
+            NekoUtil.broadcastMessage(
+                    NekoEvent.PREFIX +
+                            parkour.getJoinBroadcastMessage()
+                                    .replace("{player}", player.getName())
+                                    .replace("{username}", player.getDisplayName()), player);
         }
 
         if(location != null) {
@@ -138,7 +142,11 @@ public class ParkourManager implements SignListener, ConfigListener<Parkour> {
         }
 
         if(parkour.hasClearBroadcastMessage()){
-            NekoUtil.broadcastMessage(NekoEvent.PREFIX + parkour.getClearBroadcastMessage().replace("{player}", player.getName()), player);
+            NekoUtil.broadcastMessage(
+                    NekoEvent.PREFIX +
+                            parkour.getClearBroadcastMessage()
+                                    .replace("{player}", player.getName())
+                                    .replace("{username}", player.getDisplayName()), player);
         }
 
         if(ParkourConfigProvider.hasClearedToday(player.getUniqueId(), id)){

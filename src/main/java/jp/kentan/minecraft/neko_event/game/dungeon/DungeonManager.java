@@ -61,7 +61,7 @@ public class DungeonManager implements SignListener, ConfigListener<Dungeon> {
 
         final Dungeon dungeon = DungeonConfigProvider.create(id, name, option.mJoinLocation, option.mClearLocation,
                 option.mJoinPlayerMsg, option.mJoinBroadcastMsg, option.mClearPlayerMsg, option.mClearBroadcastMsg, option.mClearTitleText,
-                option.mEnableClearSound, option.mRewordTicketAmount, option.mRewordGachaId);
+                option.mEnableClearSound, option.mTimedOutBroadcastMsg, option.mRewordTicketAmount, option.mRewordGachaId);
 
         if(dungeon == null){
             player.sendMessage(NekoEvent.PREFIX + ChatColor.YELLOW + "作成に失敗しました.");
@@ -121,7 +121,11 @@ public class DungeonManager implements SignListener, ConfigListener<Dungeon> {
         }
 
         if(dungeon.hasJoinBroadcastMessage()){
-            NekoUtil.broadcastMessage(NekoEvent.PREFIX + dungeon.getJoinBroadcastMessage().replace("{player}", player.getName()), player);
+            NekoUtil.broadcastMessage(
+                    NekoEvent.PREFIX +
+                            dungeon.getJoinBroadcastMessage()
+                                    .replace("{player}", player.getName())
+                                    .replace("{username}", player.getDisplayName()), player);
         }
 
         if(location != null) {
@@ -165,7 +169,11 @@ public class DungeonManager implements SignListener, ConfigListener<Dungeon> {
         }
 
         if(dungeon.hasClearBroadcastMessage()){
-            NekoUtil.broadcastMessage(NekoEvent.PREFIX + dungeon.getClearBroadcastMessage().replace("{player}", player.getName()), player);
+            NekoUtil.broadcastMessage(
+                    NekoEvent.PREFIX +
+                            dungeon.getClearBroadcastMessage()
+                                    .replace("{player}", player.getName())
+                                    .replace("{username}", player.getDisplayName()), player);
         }
 
         if(dungeon.hasRewordTicket()){ //1日1回
@@ -214,7 +222,7 @@ public class DungeonManager implements SignListener, ConfigListener<Dungeon> {
         }
 
         if(dungeon.update(option.mJoinLocation, option.mClearLocation, option.mJoinPlayerMsg, option.mJoinBroadcastMsg,
-                option.mClearPlayerMsg, option.mClearBroadcastMsg, option.mClearTitleText, option.mEnableClearSound, option.mRewordTicketAmount, option.mRewordGachaId)){
+                option.mClearPlayerMsg, option.mClearBroadcastMsg, option.mClearTitleText, option.mEnableClearSound, option.mTimedOutBroadcastMsg, option.mRewordTicketAmount, option.mRewordGachaId)){
             Log.info(player.getName() + "がダンジョン({id})を更新しました.".replace("{id}", id));
         }else{
             player.sendMessage(NekoEvent.PREFIX + ChatColor.YELLOW + "ダンジョン({id})の更新に失敗しました.".replace("{id}", id));
@@ -266,16 +274,17 @@ public class DungeonManager implements SignListener, ConfigListener<Dungeon> {
 
     static void sendOptionHelp(CommandSender sender){
         sender.sendMessage("---------- NekoEvent Dungeonオプションヘルプ ----------");
-        sender.sendMessage("| " + ChatColor.AQUA + "JOIN_LOCATION [HERE/x y z]    (参加時のスポーンを設定)");
-        sender.sendMessage("| " + ChatColor.AQUA + "CLEAR_LOCATION [HERE/x y z]   (クリア時のスポーンを設定)");
-        sender.sendMessage("| " + ChatColor.AQUA + "JOIN_PLAYER_MSG [message]     (参加時にﾌﾟﾚｲﾔｰに表示)");
-        sender.sendMessage("| " + ChatColor.AQUA + "JOIN_BROADCAST_MSG [message]  (参加時にﾌﾟﾚｲﾔｰ以外の全員に表示)");
-        sender.sendMessage("| " + ChatColor.AQUA + "CLEAR_PLAYER_MSG [message]    (クリア時にﾌﾟﾚｲﾔｰ自身に表示)");
-        sender.sendMessage("| " + ChatColor.AQUA + "CLEAR_BROADCAST_MSG [message] (クリア時にﾌﾟﾚｲﾔｰ以外の全員に表示)");
-        sender.sendMessage("| " + ChatColor.AQUA + "CLEAR_TITLE_TEXT [title]      (クリア時にﾌﾟﾚｲﾔｰにタイトルを表示)");
-        sender.sendMessage("| " + ChatColor.AQUA + "CLEAR_SOUND [true/false]      (クリア時にﾌﾟﾚｲﾔｰにSEを再生)");
-        sender.sendMessage("| " + ChatColor.AQUA + "REWARD_TICKET [amount]        (クリア時にｲﾍﾞﾝﾄﾁｹｯﾄを与える)");
-        sender.sendMessage("| " + ChatColor.AQUA + "REWARD_GACHA_ID [gachaId]     (クリア時にガチャを実行)");
+        sender.sendMessage("| " + ChatColor.AQUA + "JOIN_LOCATION [HERE/x y z]        (参加時のスポーンを設定)");
+        sender.sendMessage("| " + ChatColor.AQUA + "CLEAR_LOCATION [HERE/x y z]       (クリア時のスポーンを設定)");
+        sender.sendMessage("| " + ChatColor.AQUA + "JOIN_PLAYER_MSG [message]         (参加時にﾌﾟﾚｲﾔｰに表示)");
+        sender.sendMessage("| " + ChatColor.AQUA + "JOIN_BROADCAST_MSG [message]      (参加時にﾌﾟﾚｲﾔｰ以外の全員に表示)");
+        sender.sendMessage("| " + ChatColor.AQUA + "CLEAR_PLAYER_MSG [message]        (クリア時にﾌﾟﾚｲﾔｰ自身に表示)");
+        sender.sendMessage("| " + ChatColor.AQUA + "CLEAR_BROADCAST_MSG [message]     (クリア時にﾌﾟﾚｲﾔｰ以外の全員に表示)");
+        sender.sendMessage("| " + ChatColor.AQUA + "CLEAR_TITLE_TEXT [title]          (クリア時にﾌﾟﾚｲﾔｰにタイトルを表示)");
+        sender.sendMessage("| " + ChatColor.AQUA + "CLEAR_SOUND [true/false]          (クリア時にﾌﾟﾚｲﾔｰにSEを再生)");
+        sender.sendMessage("| " + ChatColor.AQUA + "TIMED_OUT_BROADCAST_MSG [message] (ﾀｲﾑｱｳﾄ時に全員に表示)");
+        sender.sendMessage("| " + ChatColor.AQUA + "REWARD_TICKET [amount]            (クリア時にｲﾍﾞﾝﾄﾁｹｯﾄを与える)");
+        sender.sendMessage("| " + ChatColor.AQUA + "REWARD_GACHA_ID [gachaId]         (クリア時にガチャを実行)");
         sender.sendMessage("| " + ChatColor.GRAY + "[]は必須,<>は任意,()は説明です.");
         sender.sendMessage("| " + ChatColor.GRAY + "[message]では{name}でﾀﾞﾝｼﾞｮﾝ名,{player}でﾌﾟﾚｲﾔｰ名に置換されます.");
         sender.sendMessage("---------------------------------------");
@@ -390,13 +399,14 @@ public class DungeonManager implements SignListener, ConfigListener<Dungeon> {
         final static String OPTION_CLEAR_PLAYER_MSG_KEY    = "CLEAR_PLAYER_MSG";
         final static String OPTION_CLEAR_TITLE_TEXT_KEY    = "CLEAR_TITLE_TEXT";
         final static String OPTION_CLEAR_BROADCAST_MSG_KEY = "CLEAR_BROADCAST_MSG";
+        final static String OPTION_TIMED_OUT_BROADCAST_MSG_KEY = "TIMED_OUT_BROADCAST_MSG";
         final static String OPTION_REWORD_TICKET_KEY       = "REWARD_TICKET";
         final static String OPTION_REWARD_GACHA_ID_KEY     = "REWARD_GACHA_ID";
         final static String OPTION_JOIN_LOCATION_KEY       = "JOIN_LOCATION";
         final static String OPTION_CLEAR_LOCATION_KEY      = "CLEAR_LOCATION";
         final static String OPTION_CLEAR_SOUND_KEY         = "CLEAR_SOUND";
 
-        String mJoinPlayerMsg, mJoinBroadcastMsg, mClearPlayerMsg, mClearBroadcastMsg, mClearTitleText, mRewordGachaId;
+        String mJoinPlayerMsg, mJoinBroadcastMsg, mClearPlayerMsg, mClearBroadcastMsg, mClearTitleText, mRewordGachaId, mTimedOutBroadcastMsg;
         Location mJoinLocation = null, mClearLocation = null;
         int mRewordTicketAmount;
         Boolean mEnableClearSound;
@@ -422,6 +432,8 @@ public class DungeonManager implements SignListener, ConfigListener<Dungeon> {
             mClearBroadcastMsg = NekoUtil.appendStrings(optionMap.remove(OPTION_CLEAR_BROADCAST_MSG_KEY));
             mClearTitleText    = NekoUtil.appendStrings(optionMap.remove(OPTION_CLEAR_TITLE_TEXT_KEY));
             mEnableClearSound  = optionMap.containsKey(OPTION_CLEAR_SOUND_KEY) ? optionMap.remove(OPTION_CLEAR_SOUND_KEY).get(0).equals("true") : null;
+
+            mTimedOutBroadcastMsg = NekoUtil.appendStrings(optionMap.remove(OPTION_TIMED_OUT_BROADCAST_MSG_KEY));
 
             mRewordGachaId = optionMap.containsKey(OPTION_REWARD_GACHA_ID_KEY) ? optionMap.remove(OPTION_REWARD_GACHA_ID_KEY).get(0) : null;
 
