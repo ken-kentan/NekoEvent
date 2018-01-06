@@ -78,6 +78,17 @@ public class SpawnManager implements SignListener {
         }
     }
 
+    public static void removeSpawn(Player player){
+        Location spawn = player.getBedSpawnLocation();
+
+        if(spawn == null || !spawn.getWorld().getName().equals("EventWorld")){
+            return;
+        }
+
+        player.setBedSpawnLocation(null, true);
+        player.sendMessage(NekoEvent.PREFIX + ChatColor.YELLOW + "セーブポイントが自動的に消去されました.");
+    }
+
     private static boolean hasSpawnMetadata(Sign sign){
         if(!SignConfigProvider.hasMetadata(sign.getLocation(), SPAWN_LOCATION_PLAYER_METADATA_KEY)){
             if (!SignConfigProvider.hasMetadata(sign.getLocation(), SPAWN_LOCATION_X_METADATA_KEY)) {

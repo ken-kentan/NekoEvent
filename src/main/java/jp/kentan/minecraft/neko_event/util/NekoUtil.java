@@ -5,6 +5,8 @@ import org.bukkit.*;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -220,5 +222,12 @@ public class NekoUtil {
 
         sender.sendMessage(NekoEvent.PREFIX + ChatColor.YELLOW + "チャットから実行してください.");
         return false;
+    }
+
+    public static boolean isEmpty(Inventory inventory){
+        for(ItemStack item : inventory.getContents()){
+            if(item != null) return false;
+        }
+        return true;
     }
 }

@@ -1,6 +1,9 @@
 package jp.kentan.minecraft.neko_event.listener;
 
+import jp.kentan.minecraft.neko_event.spawn.SpawnManager;
 import jp.kentan.minecraft.neko_event.util.GameUtil;
+import jp.kentan.minecraft.neko_event.util.NekoUtil;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
@@ -11,6 +14,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
@@ -51,11 +55,40 @@ public class PlayerEventListener implements Listener{
         }
     }
 
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerTeleport(PlayerTeleportEvent event){
+        if(isInEventWorld(event.getFrom().getWorld()) && !isInEventWorld(event.getTo().getWorld())){
+            SpawnManager.removeSpawn(event.getPlayer());
+        }
+
+        // for 2018障害物レース用
+        if(event.getFrom().getWorld() == event.getTo().getWorld()){
+            return;
+        }
+
+        if(isInRaceWorld(event.getFrom().getWorld()) || isInRaceWorld(event.getTo().getWorld())){
+            final Player player = event.getPlayer();
+
+            if (player.getGameMode() == GameMode.CREATIVE){
+                return;
+            }
+
+            if(!NekoUtil.isEmpty(player.getInventory())){
+                event.setCancelled(true);
+                player.sendMessage(ChatColor.RED + "アイテムを持った状態では移動できません.");
+            }
+        }
+    }
+
     private static boolean isInEventWorld(Player player) {
         return player.getGameMode() == GameMode.ADVENTURE && isInEventWorld(player.getWorld());
 
     }
-    private static boolean isInEventWorld(World word){
-        return word.getName().equals("EventWorld");
+    private static boolean isInEventWorld(World world){
+        return world.getName().equals("EventWorld");
+    }
+
+    private static boolean isInRaceWorld(World world){
+        return world.getName().equals("test_world");
     }
 }
