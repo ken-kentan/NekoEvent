@@ -27,7 +27,7 @@ public class GachaCommandExecutor implements CommandExecutor {
                 break;
             case "demo":
                 if(NekoUtil.checkParams(params, 2) && NekoUtil.isPlayer(sender)){
-                    GachaManager.demo((Player)sender, args[1], args[2]);
+                    GachaManager.demo((Player)sender, args[1], args[2], params > 2 && args[3].equals("true"));
                 }
                 break;
             case "list":
@@ -51,7 +51,7 @@ public class GachaCommandExecutor implements CommandExecutor {
     private static void sendHelp(CommandSender sender){
         sender.sendMessage("---------- NekoEvent Gachaコマンドヘルプ ----------");
         sender.sendMessage("| " + ChatColor.LIGHT_PURPLE + "/gacha play [player] [gachaId] <ticketCost>");
-        sender.sendMessage("| " + ChatColor.LIGHT_PURPLE + "/gacha demo [gachaId] [times]");
+        sender.sendMessage("| " + ChatColor.LIGHT_PURPLE + "/gacha demo [gachaId] [times] <secondly>");
         sender.sendMessage("| " + ChatColor.LIGHT_PURPLE + "/gacha list");
         sender.sendMessage("| " + ChatColor.LIGHT_PURPLE + "/gacha info [gachaId]");
         sender.sendMessage("| " + ChatColor.LIGHT_PURPLE + "/gacha reload");

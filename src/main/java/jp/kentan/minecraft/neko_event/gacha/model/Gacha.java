@@ -24,12 +24,13 @@ public class Gacha {
         mRequireVoteTicket = requireVoteTicket;
     }
 
-    public void add(String name, double probability, List<String> command){
-        mGacha.add(new Component(name, probability, command));
+    public void add(String name, double probability, double secondlyProbability, List<String> command){
+        mGacha.add(new Component(name, probability, secondlyProbability, command));
     }
 
     public void normalizeIfNeed(){
         final double sumProbability = mGacha.stream().mapToDouble(Component::getProbability).sum();
+
         final List<Component> emptyProbabilityList = mGacha.stream().filter(c -> c.getProbability() <= 0D).collect(Collectors.toList());
 
         if(sumProbability < 1D){
@@ -44,14 +45,36 @@ public class Gacha {
         }else if(sumProbability > 1D){
             Log.error("ｶﾞﾁｬ(" + mId + ") の合計確率が100%を超えています.");
         }
+
+
+        final double sumSecondlyProbability = mGacha.stream().mapToDouble(Component::getSecondlyProbability).sum();
+
+        final List<Component> emptySecondlyProbabilityList = mGacha.stream().filter(c -> c.getSecondlyProbability() <= 0D).collect(Collectors.toList());
+
+        if(sumSecondlyProbability < 1D){
+            if(emptySecondlyProbabilityList.size() > 0){
+                final double secondlyProbability = (1D - sumSecondlyProbability) / emptySecondlyProbabilityList.size();
+
+                emptySecondlyProbabilityList.forEach(c -> c.mSecondlyProbability = secondlyProbability);
+            }else{
+                double gain = 1D / sumSecondlyProbability;
+                mGacha.forEach(g -> g.mSecondlyProbability *= gain);
+            }
+        }else if(sumSecondlyProbability > 1D){
+            Log.error("ｶﾞﾁｬ(" + mId + ") の合計確率が100%を超えています.");
+        }
     }
 
-    public Component getByRandom(){
+    public Component getByRandom(boolean useSecondly){
         double sumProbability = 0D;
         double random = RANDOM.nextDouble(false, true);
 
         for(Component component : mGacha){
-            sumProbability += component.getProbability();
+            if (useSecondly) {
+                sumProbability += component.getSecondlyProbability();
+            } else {
+                sumProbability += component.getProbability();
+            }
 
             if(sumProbability >= random){
                 return component;
@@ -112,10 +135,12 @@ public class Gacha {
         private final List<String> COMMANDS = new ArrayList<>();
 
         private double mProbability;
+        private double mSecondlyProbability;
 
-        private Component(String name, double probability, List<String> commands){
+        private Component(String name, double probability, double secondlyProbability, List<String> commands){
             NAME = ChatColor.translateAlternateColorCodes('&', name);
             mProbability = probability;
+            mSecondlyProbability = secondlyProbability;
             COMMANDS.addAll(commands);
         }
 
@@ -125,6 +150,10 @@ public class Gacha {
 
         double getProbability() {
             return mProbability;
+        }
+
+        double getSecondlyProbability() {
+            return mSecondlyProbability;
         }
 
         public List<String> getCommands(){

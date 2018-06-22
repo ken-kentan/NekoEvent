@@ -45,7 +45,9 @@ public class GachaManager implements SignListener, ConfigListener<Gacha> {
     }
 
     private static void play(Player player, Gacha gacha){
-        Gacha.Component component = gacha.getByRandom();
+        final boolean useSecondly = player.getScoreboardTags().contains("use_gacha_secondly");
+
+        Gacha.Component component = gacha.getByRandom(useSecondly);
 
         final Location location = player.getLocation();
         final Sound soundEffect;
@@ -68,7 +70,12 @@ public class GachaManager implements SignListener, ConfigListener<Gacha> {
                 NekoUtil.broadcastMessage(NekoEvent.PREFIX + broadcastMsg, player);
             }
 
-            Log.info(player.getName() + "にｶﾞﾁｬ(" + gacha.getId() + ")で" + component.getName() + ChatColor.RESET + "を与えました.");
+            if (useSecondly) {
+                player.removeScoreboardTag("use_gacha_secondly");
+                Log.info(player.getName() + "にｶﾞﾁｬ(" + gacha.getId() + ")(ｾｶﾝﾀﾞﾘ)で" + component.getName() + ChatColor.RESET + "を与えました.");
+            } else {
+                Log.info(player.getName() + "にｶﾞﾁｬ(" + gacha.getId() + ")で" + component.getName() + ChatColor.RESET + "を与えました.");
+            }
 
             soundEffect = Sound.ENTITY_PLAYER_LEVELUP;
         }else{ //はずれ
@@ -140,7 +147,7 @@ public class GachaManager implements SignListener, ConfigListener<Gacha> {
         play(player, gacha);
     }
 
-    static void demo(Player player, String gachaId, String strTimes){
+    static void demo(Player player, String gachaId, String strTimes, boolean useSecondly){
         Gacha gacha = sGachaMap.get(gachaId);
         if(gacha == null){
             Log.error(GACHA_ID_NOT_FOUND.replace("{id}", gachaId));
@@ -157,7 +164,7 @@ public class GachaManager implements SignListener, ConfigListener<Gacha> {
         Map<String, Integer> resultMap = new HashMap<>();
 
         for(int i=0; i<limit; ++i){
-            final String key = gacha.getByRandom().getName();
+            final String key = gacha.getByRandom(useSecondly).getName();
 
             if(resultMap.containsKey(key)){
                 resultMap.replace(key, resultMap.get(key) + 1);
@@ -166,7 +173,11 @@ public class GachaManager implements SignListener, ConfigListener<Gacha> {
             }
         }
 
-        player.sendMessage(NekoEvent.PREFIX + "ｶﾞﾁｬ(" + gachaId + ")を" + limit + "回引いた結果");
+        if (useSecondly) {
+            player.sendMessage(NekoEvent.PREFIX + "ｶﾞﾁｬ(" + gachaId + ")(ｾｶﾝﾀﾞﾘ)を" + limit + "回引いた結果");
+        } else {
+            player.sendMessage(NekoEvent.PREFIX + "ｶﾞﾁｬ(" + gachaId + ")を" + limit + "回引いた結果");
+        }
 
         resultMap.forEach((s, i) -> player.sendMessage(s + ": " + i + "回"));
     }

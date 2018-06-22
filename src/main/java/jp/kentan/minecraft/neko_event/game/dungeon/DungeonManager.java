@@ -132,6 +132,8 @@ public class DungeonManager implements SignListener, ConfigListener<Dungeon> {
             SpawnManager.setSpawn(player, location);
         }
 
+        player.removeScoreboardTag("use_gacha_secondly");
+
         Log.info(player.getName() + "がダンジョン({id})に参加しました.".replace("{id}", id));
     }
 

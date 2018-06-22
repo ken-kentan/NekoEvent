@@ -60,9 +60,12 @@ public class GachaConfigProvider {
                 components.forEach(index -> {
                     final String indexPath = componentsPath + "." + index;
 
+                    double probability = config.getDouble(indexPath + ".probability");
+
                     gacha.add(
                             config.getString(indexPath + ".name"),
-                            config.getDouble(indexPath + ".probability"),
+                            probability,
+                            config.getDouble(indexPath + ".secondlyProbability", probability),
                             config.getStringList(indexPath + ".commands"));
                 });
 
