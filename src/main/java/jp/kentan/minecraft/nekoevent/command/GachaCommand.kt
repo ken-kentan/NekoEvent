@@ -46,9 +46,17 @@ class GachaCommand(
 
         if (args.size == 1) {
             return ARGUMENT_LIST.filter { it.startsWith(args[0], true) }.toMutableList()
-        }
+        } else {
+            val prefix = if ((args[0] == "demo" || args[0] == "info") && args.size == 2) {
+                args[1]
+            } else if (args[0] == "play" && args.size == 3) {
+                args[2]
+            } else {
+                return mutableListOf()
+            }
 
-        return mutableListOf()
+            return manager.getGachaIdList().filter { it.startsWith(prefix, true) }.toMutableList()
+        }
     }
 
     private fun sendHelp(sender: CommandSender) {

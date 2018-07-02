@@ -209,7 +209,7 @@ class KeyManager(
                 " 回収: ${key.enabledTake}",
                 " 期限: ${if (key.enabledExpire) "${key.expireMinutes}分" else "なし" }",
                 " ブロック: ${if (key.block != null) "${key.block.first}, ${key.block.second}" else "なし"}",
-                " 一致: ${key.matchMessage}",
+                " 一致: ${key.formatMatchMessage}",
                 " 不一致: ${key.formatNotMatchMessage}",
                 " 期限切れ: ${key.formatExpiredMessage}",
                 " 枚数不足: ${key.formatShortAmountMessage}"

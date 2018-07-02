@@ -11,7 +11,7 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
 class KeyCommand(
-        private val keyManager: KeyManager
+        private val manager: KeyManager
 ) : BaseCommand() {
 
     companion object {
@@ -26,37 +26,37 @@ class KeyCommand(
 
         when (args[0]) {
             "use" -> sender.doIfArguments(args, 2) {
-                keyManager.use(args[1], args[2])
+                manager.use(args[1], args[2])
             }
             "give" -> sender.doIfArguments(args, 2) {
-                keyManager.give(args[1], args[2], if (args.size >= 4) args[3] else "1")
+                manager.give(args[1], args[2], if (args.size >= 4) args[3] else "1")
             }
             "drop" -> sender.doIfArguments(args, 5) {
-                keyManager.drop(args[1], args.sliceArray(2..5), if (args.size > 5) args[6] else "1")
+                manager.drop(args[1], args.sliceArray(2..5), if (args.size > 5) args[6] else "1")
             }
             "create" -> sender.doIfArguments(args, 1) {
                 if (it is Player) {
-                    keyManager.create(it, args[1])
+                    manager.create(it, args[1])
                 } else {
                     it.sendInGameCommand()
                 }
             }
             "delete" -> sender.doIfArguments(args, 1) {
-                keyManager.delete(it, args[1])
+                manager.delete(it, args[1])
             }
             "flag" -> sender.doIfArguments(args, 2) {
                 if (it is Player) {
-                    keyManager.flag(it, args[1], args[2], args.drop(3))
+                    manager.flag(it, args[1], args[2], args.drop(3))
                 } else {
                     it.sendInGameCommand()
                 }
             }
             "flaglist" -> KeyFlag.sendList(sender)
-            "list" -> keyManager.sendList(sender)
+            "list" -> manager.sendList(sender)
             "info" -> sender.doIfArguments(args, 1) {
-                keyManager.sendInfo(it, args[1])
+                manager.sendInfo(it, args[1])
             }
-            "reload" -> keyManager.reload()
+            "reload" -> manager.reload()
             else -> sender.sendUnknownCommand()
         }
 
@@ -68,25 +68,40 @@ class KeyCommand(
             return mutableListOf()
         }
 
+        var prefix = ""
+        val completeList = mutableListOf<String>()
+
         if (args.size == 1) {
-            return ARGUMENT_LIST.filter { it.startsWith(args[0], true) }.toMutableList()
+            prefix = args[0]
+            completeList.addAll(ARGUMENT_LIST)
+        } else {
+            when (args[0]) {
+                "use", "give" -> {
+                    if (args.size == 3) {
+                        prefix = args[2]
+                        completeList.addAll(manager.getKeyIdList())
+                    }
+                }
+                "drop", "delete", "info" -> {
+                    if (args.size == 2){
+                        prefix = args[1]
+                        completeList.addAll(manager.getKeyIdList())
+                    }
+                }
+                "flag" -> {
+                    if (args.size == 2) {
+                        prefix = args[1]
+                        completeList.addAll(manager.getKeyIdList())
+                    } else if (args.size == 3) {
+                        prefix = args[2]
+                        completeList.addAll(KeyFlag.idList)
+                    }
+                }
+                else -> {}
+            }
         }
 
-        when (args[0]) {
-            "use", "give" -> {
-                if (args.size == 3) return keyManager.getKeyIdList().filter { it.startsWith(args[2], true) }.toMutableList()
-            }
-            "drop", "delete", "info" -> {
-                if (args.size == 2) return keyManager.getKeyIdList().filter { it.startsWith(args[1], true) }.toMutableList()
-            }
-            "flag" -> {
-                if (args.size == 2) return keyManager.getKeyIdList().filter { it.startsWith(args[1], true) }.toMutableList()
-                else if (args.size == 3) return KeyFlag.idList.filter { it.startsWith(args[2], true) }.toMutableList()
-            }
-            else -> {}
-        }
-
-        return mutableListOf()
+        return completeList.filter { it.startsWith(prefix, true) }.toMutableList()
     }
 
     private fun sendHelp(sender: CommandSender) {

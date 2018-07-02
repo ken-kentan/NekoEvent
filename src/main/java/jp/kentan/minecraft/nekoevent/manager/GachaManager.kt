@@ -42,6 +42,8 @@ class GachaManager(
         gachaConfig.listener = this
     }
 
+    fun getGachaIdList() = gachaMap.values.map { it.id }.sorted()
+
     fun play(strPlayer: String, gachaId: String) {
         val player = strPlayer.toPlayerOrError() ?: return
 
