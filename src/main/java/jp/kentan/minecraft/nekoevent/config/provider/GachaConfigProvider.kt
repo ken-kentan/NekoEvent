@@ -1,7 +1,7 @@
 package jp.kentan.minecraft.nekoevent.config.provider
 
 import jp.kentan.minecraft.nekoevent.config.ConfigUpdateListener
-import jp.kentan.minecraft.nekoevent.model.Gacha
+import jp.kentan.minecraft.nekoevent.component.model.Gacha
 import jp.kentan.minecraft.nekoevent.util.Log
 import jp.kentan.minecraft.nekoevent.util.formatColorCode
 import org.bukkit.configuration.file.YamlConfiguration

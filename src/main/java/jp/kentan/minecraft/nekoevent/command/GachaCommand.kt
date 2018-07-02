@@ -1,38 +1,35 @@
 package jp.kentan.minecraft.nekoevent.command
 
 import jp.kentan.minecraft.nekoevent.manager.GachaManager
-import jp.kentan.minecraft.nekoevent.util.doIfParameter
+import jp.kentan.minecraft.nekoevent.util.doIfArguments
 import jp.kentan.minecraft.nekoevent.util.sendUnknownCommand
 import org.bukkit.ChatColor
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
-import org.bukkit.entity.Player
 
 class GachaCommand(
         private val manager: GachaManager
 ) : BaseCommand() {
 
-    private companion object {
-        val ARGUMENT_LIST = mutableListOf("play", "demo", "list", "info", "reload", "help")
+    companion object {
+        private val ARGUMENT_LIST = listOf("play", "demo", "list", "info", "reload", "help")
     }
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
-        val param = args.size-1
-
-        if (param < 0 || label == "help") {
+        if (args.size <= 1 || label == "help") {
             sendHelp(sender)
             return true
         }
 
-        when (args[0]) {
-            "play" -> sender.doIfParameter(param, 2) {
+        when (label) {
+            "play" -> sender.doIfArguments(args, 2) {
                     manager.play(args[1], args[2])
             }
-            "demo" -> sender.doIfParameter(param, 2) {
+            "demo" -> sender.doIfArguments(args, 2) {
                 manager.demo(it, args[1], args[2])
             }
             "list" -> manager.sendList(sender)
-            "info" -> sender.doIfParameter(param, 1) {
+            "info" -> sender.doIfArguments(args, 1) {
                 manager.sendInfo(it, args[1])
             }
             "reload" -> manager.reload()

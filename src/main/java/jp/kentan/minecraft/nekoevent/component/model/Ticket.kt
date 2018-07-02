@@ -1,5 +1,6 @@
-package jp.kentan.minecraft.nekoevent.model
+package jp.kentan.minecraft.nekoevent.component.model
 
+import jp.kentan.minecraft.nekoevent.component.TicketType
 import jp.kentan.minecraft.nekoevent.util.formatColorCode
 import jp.kentan.minecraft.nekoevent.util.isFull
 import org.bukkit.Material

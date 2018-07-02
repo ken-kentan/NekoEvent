@@ -1,8 +1,8 @@
 package jp.kentan.minecraft.nekoevent.manager.factory
 
-import jp.kentan.minecraft.nekoevent.model.Ticket
-import jp.kentan.minecraft.nekoevent.model.TicketType
-import jp.kentan.minecraft.nekoevent.model.TicketType.*
+import jp.kentan.minecraft.nekoevent.component.model.Ticket
+import jp.kentan.minecraft.nekoevent.component.TicketType
+import jp.kentan.minecraft.nekoevent.component.TicketType.*
 import jp.kentan.minecraft.nekoevent.util.formatColorCode
 import jp.kentan.minecraft.nekoevent.util.isFull
 import org.bukkit.entity.Player

@@ -1,4 +1,4 @@
-package jp.kentan.minecraft.nekoevent.model
+package jp.kentan.minecraft.nekoevent.component
 
 enum class GachaCost(
         private val id: String,

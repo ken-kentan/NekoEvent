@@ -2,10 +2,12 @@ package jp.kentan.minecraft.nekoevent
 
 import jp.kentan.minecraft.nekoevent.command.BaseCommand
 import jp.kentan.minecraft.nekoevent.command.GachaCommand
+import jp.kentan.minecraft.nekoevent.command.KeyCommand
 import jp.kentan.minecraft.nekoevent.config.ConfigManager
 import jp.kentan.minecraft.nekoevent.listener.BukkitEventListener
-import jp.kentan.minecraft.nekoevent.listener.GachaSignListener
 import jp.kentan.minecraft.nekoevent.manager.GachaManager
+import jp.kentan.minecraft.nekoevent.manager.KeyManager
+import jp.kentan.minecraft.nekoevent.manager.TicketManager
 import jp.kentan.minecraft.nekoevent.util.Log
 import org.bukkit.ChatColor
 import org.bukkit.command.PluginCommand
@@ -22,17 +24,17 @@ class NekoEvent : JavaPlugin() {
 
         val configManager = ConfigManager(dataFolder)
 
-        val gachaManager = GachaManager(configManager.gachaConfigProvider)
+        val ticketManager = TicketManager()
+        val keyManager = KeyManager(configManager.keyConfigProvider)
+        val gachaManager = GachaManager(
+                ticketManager,
+                keyManager,
+                configManager.gachaConfigProvider,
+                configManager.signConfigProvider)
 
         getCommand("gacha").set(GachaCommand(gachaManager))
+        getCommand("key").set(KeyCommand(keyManager))
 
-
-        // Event
-        val bukkitEventListener = BukkitEventListener()
-
-        val gachaSignListener = GachaSignListener(gachaManager)
-
-        bukkitEventListener.registerSignListener("gacha", gachaSignListener)
 
         Log.info("有効化しました.")
 

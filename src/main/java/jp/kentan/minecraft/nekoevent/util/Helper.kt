@@ -20,8 +20,8 @@ fun CommandSender.sendArgumentShortage() {
     sendMessage("${NekoEvent.PREFIX}${ChatColor.YELLOW}パラメータが不足しています.")
 }
 
-fun CommandSender.doIfParameter(size: Int, requireSize: Int, block: (sender: CommandSender) -> Unit) {
-    if (size < requireSize) {
+fun CommandSender.doIfArguments(args: Array<String>, requireSize: Int, block: (sender: CommandSender) -> Unit) {
+    if (args.size-1 < requireSize) {
         sendArgumentShortage()
     } else {
         block(this)
@@ -30,7 +30,7 @@ fun CommandSender.doIfParameter(size: Int, requireSize: Int, block: (sender: Com
 
 fun String.formatColorCode(): String = ChatColor.translateAlternateColorCodes('&', this)
 
-fun String.toPlayer(): Player? = Bukkit.getServer().getPlayer(this) ?: let {
+fun String.toPlayerOrError(): Player? = Bukkit.getServer().getPlayer(this) ?: let {
     Log.error("プレイヤー($it)が見つかりませんでした.")
     return@let null
 }
@@ -44,3 +44,45 @@ fun Player.broadcastMessageWithoutMe(message: String) {
 fun PlayerInventory.isFull() = firstEmpty() == -1
 
 fun Location.formatString() = "(${world.name}, XYZ:${x.toInt()}/${y.toInt()}/${z.toInt()})"
+
+fun Array<String>.toLocationOrError(): Location? {
+    if (size < 4) { return null }
+
+    val world = Bukkit.getWorld(get(0)) ?: let {
+        Log.error("ワールド(${get(0)})は存在しません.")
+        return null
+    }
+
+    val location = Location(
+            world,
+            get(1).toDoubleOrError() ?: return null,
+            get(2).toDoubleOrError() ?: return null,
+            get(3).toDoubleOrError() ?: return null
+    )
+
+    if (size >= 6) {
+        location.yaw = get(4).toFloatOrError() ?: return null
+        location.pitch = get(5).toFloatOrError() ?: return null
+    }
+
+    return location
+}
+
+fun String.toIntOrError(): Int? {
+    return toIntOrNull() ?: let {
+        Log.error("$this)をInt(数値)に変換できません.")
+        return null
+    }
+}
+private fun String.toFloatOrError(): Float? {
+    return toFloatOrNull() ?: let {
+        Log.error("$this)をFloat(数値)に変換できません.")
+        return null
+    }
+}
+private fun String.toDoubleOrError(): Double? {
+    return toDoubleOrNull() ?: let {
+        Log.error("$this)をDouble(数値)に変換できません.")
+        return null
+    }
+}

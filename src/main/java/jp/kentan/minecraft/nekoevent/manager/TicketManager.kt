@@ -2,8 +2,8 @@ package jp.kentan.minecraft.nekoevent.manager
 
 import jp.kentan.minecraft.nekoevent.NekoEvent
 import jp.kentan.minecraft.nekoevent.manager.factory.TicketFactory
-import jp.kentan.minecraft.nekoevent.model.TicketType
-import jp.kentan.minecraft.nekoevent.model.TicketType.*
+import jp.kentan.minecraft.nekoevent.component.TicketType
+import jp.kentan.minecraft.nekoevent.component.TicketType.*
 import jp.kentan.minecraft.nekoevent.util.Log
 import org.bukkit.entity.Player
 import kotlin.math.max

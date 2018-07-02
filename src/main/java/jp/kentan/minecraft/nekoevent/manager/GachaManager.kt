@@ -5,10 +5,10 @@ import jp.kentan.minecraft.nekoevent.config.ConfigUpdateListener
 import jp.kentan.minecraft.nekoevent.config.provider.GachaConfigProvider
 import jp.kentan.minecraft.nekoevent.config.provider.SignConfigProvider
 import jp.kentan.minecraft.nekoevent.listener.SignListener
-import jp.kentan.minecraft.nekoevent.model.Gacha
-import jp.kentan.minecraft.nekoevent.model.GachaCost
-import jp.kentan.minecraft.nekoevent.model.GachaCost.*
-import jp.kentan.minecraft.nekoevent.model.TicketType
+import jp.kentan.minecraft.nekoevent.component.model.Gacha
+import jp.kentan.minecraft.nekoevent.component.GachaCost
+import jp.kentan.minecraft.nekoevent.component.GachaCost.*
+import jp.kentan.minecraft.nekoevent.component.TicketType
 import jp.kentan.minecraft.nekoevent.util.*
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -43,7 +43,7 @@ class GachaManager(
     }
 
     fun play(strPlayer: String, gachaId: String) {
-        val player = strPlayer.toPlayer() ?: return
+        val player = strPlayer.toPlayerOrError() ?: return
 
         play(player, gachaId)
     }
@@ -63,8 +63,10 @@ class GachaManager(
         }
     }
 
-    private  fun playWithKey(player: Player, gachaId: String, keyId: String) {
-
+    private fun playWithKey(player: Player, gachaId: String, keyId: String) {
+        if (keyManager.use(player, keyId)) {
+            play(player, gachaId)
+        }
     }
 
     private fun play(player: Player, gacha: Gacha) {
@@ -212,10 +214,7 @@ class GachaManager(
 
         when (cost) {
             EVENT_TICKET, VOTE_TICKET -> {
-                val amount = strCostDetail.toIntOrNull() ?: let {
-                    Log.error("チケット枚数($strCost)は1以上の整数を入力してください.")
-                    return
-                }
+                val amount = strCostDetail.toIntOrError() ?: return
 
                 costDetailText = "&9&n1プレイ&r &a&n${amount}枚".formatColorCode()
 

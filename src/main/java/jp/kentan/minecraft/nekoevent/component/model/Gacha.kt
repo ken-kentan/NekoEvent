@@ -1,4 +1,4 @@
-package jp.kentan.minecraft.nekoevent.model
+package jp.kentan.minecraft.nekoevent.component.model
 
 import jp.kentan.minecraft.nekoevent.util.Log
 import jp.kentan.minecraft.nekoevent.util.MersenneTwisterFast
