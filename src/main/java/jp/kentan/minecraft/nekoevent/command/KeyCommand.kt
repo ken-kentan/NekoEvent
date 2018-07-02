@@ -19,12 +19,12 @@ class KeyCommand(
     }
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
-        if (args.size <= 1 || label == "help") {
+        if (args.isEmpty() || args[0] == "help") {
             sendHelp(sender)
             return true
         }
 
-        when (label) {
+        when (args[0]) {
             "use" -> sender.doIfArguments(args, 2) {
                 keyManager.use(args[1], args[2])
             }
@@ -72,16 +72,16 @@ class KeyCommand(
             return ARGUMENT_LIST.filter { it.startsWith(args[0], true) }.toMutableList()
         }
 
-        when (args[1]) {
+        when (args[0]) {
             "use", "give" -> {
-                if (args.size == 3) return keyManager.getKeyIdList().toMutableList()
+                if (args.size == 3) return keyManager.getKeyIdList().filter { it.startsWith(args[2], true) }.toMutableList()
             }
             "drop", "delete", "info" -> {
-                if (args.size == 2) return keyManager.getKeyIdList().toMutableList()
+                if (args.size == 2) return keyManager.getKeyIdList().filter { it.startsWith(args[1], true) }.toMutableList()
             }
             "flag" -> {
-                if (args.size == 2) return keyManager.getKeyIdList().toMutableList()
-                else if (args.size == 3) return KeyFlag.idList.toMutableList()
+                if (args.size == 2) return keyManager.getKeyIdList().filter { it.startsWith(args[1], true) }.toMutableList()
+                else if (args.size == 3) return KeyFlag.idList.filter { it.startsWith(args[2], true) }.toMutableList()
             }
             else -> {}
         }

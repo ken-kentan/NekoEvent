@@ -28,9 +28,9 @@ class KeyConfigProvider(dataFolder: File) : BaseConfigProvider(dataFolder, "key.
             val keyMap = keyIdSet.associate { id ->
                 val path = "Key.$id"
 
-                val key  = Key(
+                val key = Key(
                         id,
-                        ItemStack.deserialize(config.getConfigurationSection("$path.ItemStack").getValues(true)),
+                        config.getItemStack("$path.ItemStack"),
                         config.getBoolean("$path.enabledTake"),
                         config.getInt("$path.expireMinutes"),
                         if (config.isString("$path.Block.material"))
@@ -46,10 +46,10 @@ class KeyConfigProvider(dataFolder: File) : BaseConfigProvider(dataFolder, "key.
                             )
                         else
                             null,
-                        config.getString("$path.matchMessage").formatColorCode(),
-                        config.getString("$path.notMatchMessage").formatColorCode(),
-                        config.getString("$path.expiredMessage").formatColorCode(),
-                        config.getString("$path.shortAmountMessage").formatColorCode()
+                        config.getString("$path.matchMessage", null),
+                        config.getString("$path.notMatchMessage", null),
+                        config.getString("$path.expiredMessage", null),
+                        config.getString("$path.shortAmountMessage", null)
                 )
 
                 return@associate id to key
@@ -64,24 +64,28 @@ class KeyConfigProvider(dataFolder: File) : BaseConfigProvider(dataFolder, "key.
 
     fun update(key: Key): Boolean {
         val path = "Key.${key.id}"
-        val dataMap = LinkedHashMap<String, Any>().apply {
+        val dataMap = LinkedHashMap<String, Any?>().apply {
             put("$path.enabledTake", key.enabledTake)
             put("$path.expireMinutes", key.expireMinutes)
 
-            key.block?.let { (material, location) ->
-                put("$path.Block.material", material.toString())
-                put("$path.Block.Location.world", location.world.name)
-                put("$path.Block.Location.x", location.blockX)
-                put("$path.Block.Location.y", location.blockY)
-                put("$path.Block.Location.z", location.blockZ)
+            put("$path.Block.material", key.blockMaterial?.name)
+
+            if (key.blockLocation != null) {
+                val loc = key.blockLocation
+                put("$path.Block.Location.world", loc.world.name)
+                put("$path.Block.Location.x", loc.blockX)
+                put("$path.Block.Location.y", loc.blockY)
+                put("$path.Block.Location.z", loc.blockZ)
+            } else {
+                put("$path.Block.Location", null)
             }
 
-            key.matchMessage?.let { put("$path.matchMessage", it) }
-            key.notMatchMessage?.let { put("$path.notMatchMessage", it) }
-            key.expiredMessage?.let { put("$path.expiredMessage", it) }
-            key.shortAmountMessage?.let { put("$path.shortAmountMessage", it) }
+            put("$path.matchMessage", key.matchMessage)
+            put("$path.notMatchMessage", key.notMatchMessage)
+            put("$path.expiredMessage", key.expiredMessage)
+            put("$path.shortAmountMessage", key.shortAmountMessage)
 
-            put("$path.ItemStack.", key.getItemStack())
+            put("$path.ItemStack", key.getItemStack())
         }
 
         return super.save(dataMap)

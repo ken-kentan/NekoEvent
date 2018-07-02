@@ -15,8 +15,8 @@ data class Key(
         private val itemStack: ItemStack,
         val enabledTake: Boolean = true,
         val expireMinutes: Int = 0,
-        private val blockMaterial: Material? = null,
-        private val blockLocation: Location? = null,
+        val blockMaterial: Material? = null,
+        val blockLocation: Location? = null,
         val matchMessage: String?       = "&b一致",
         val notMatchMessage: String?    = "&c不一致",
         val expiredMessage: String?     = "&e期限切れです.",
@@ -27,7 +27,7 @@ data class Key(
         private val DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(ZoneId.systemDefault())
     }
 
-    val name: String = itemStack.itemMeta.displayName
+    val name: String = itemStack.itemMeta?.displayName ?: itemStack.type.name
     val amount = itemStack.amount
 
     val block: Pair<Material, Location>? = if (blockMaterial != null && blockLocation != null) Pair(blockMaterial, blockLocation) else null

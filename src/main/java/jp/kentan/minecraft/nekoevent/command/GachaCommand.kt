@@ -16,12 +16,12 @@ class GachaCommand(
     }
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
-        if (args.size <= 1 || label == "help") {
+        if (args.isEmpty() || args[0] == "help") {
             sendHelp(sender)
             return true
         }
 
-        when (label) {
+        when (args[0]) {
             "play" -> sender.doIfArguments(args, 2) {
                     manager.play(args[1], args[2])
             }

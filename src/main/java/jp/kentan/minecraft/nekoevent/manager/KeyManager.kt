@@ -24,6 +24,10 @@ class KeyManager(
 
     private val keyMap = mutableMapOf<String, Key>()
 
+    init {
+        keyConfig.listener = this
+    }
+
     fun getKey(keyId: String): Key? = keyMap[keyId]
 
     fun getKeyIdList() = keyMap.values.map { it.id }.sorted()
@@ -114,6 +118,7 @@ class KeyManager(
 
         if (keyMap.containsKey(keyId)) {
             player.sendMessage(NekoEvent.PREFIX + ChatColor.YELLOW + "ID: ${keyId}はすでに使用しています.")
+            return
         }
 
         val key = Key(keyId, itemStack)
@@ -169,7 +174,7 @@ class KeyManager(
 
         if (keyConfig.update(key)) {
             keyMap[keyId] = key
-            player.sendMessage(NekoEvent.PREFIX + key.name + ChatColor.GREEN + "を更新しました.")
+            player.sendMessage(NekoEvent.PREFIX + ChatColor.GREEN + "$keyId を更新しました.")
         } else {
             player.sendMessage(NekoEvent.PREFIX + ChatColor.YELLOW + "更新に失敗しました.")
         }
@@ -204,7 +209,7 @@ class KeyManager(
                 " 回収: ${key.enabledTake}",
                 " 期限: ${if (key.enabledExpire) "${key.expireMinutes}分" else "なし" }",
                 " ブロック: ${if (key.block != null) "${key.block.first}, ${key.block.second}" else "なし"}",
-                " 一致: ${key.formatMatchMessage}",
+                " 一致: ${key.matchMessage}",
                 " 不一致: ${key.formatNotMatchMessage}",
                 " 期限切れ: ${key.formatExpiredMessage}",
                 " 枚数不足: ${key.formatShortAmountMessage}"
