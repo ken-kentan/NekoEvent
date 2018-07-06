@@ -117,7 +117,7 @@ class KeyManager(
         }
 
         if (keyMap.containsKey(keyId)) {
-            player.sendMessage(NekoEvent.PREFIX + ChatColor.YELLOW + "ID: ${keyId}はすでに使用しています.")
+            player.sendMessage(NekoEvent.PREFIX + ChatColor.YELLOW + "ID: ${keyId}は既に使用されています.")
             return
         }
 

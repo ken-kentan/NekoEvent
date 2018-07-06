@@ -3,10 +3,12 @@ package jp.kentan.minecraft.nekoevent
 import jp.kentan.minecraft.nekoevent.command.BaseCommand
 import jp.kentan.minecraft.nekoevent.command.GachaCommand
 import jp.kentan.minecraft.nekoevent.command.KeyCommand
+import jp.kentan.minecraft.nekoevent.command.PasswordCommand
 import jp.kentan.minecraft.nekoevent.config.ConfigManager
 import jp.kentan.minecraft.nekoevent.listener.BukkitEventListener
 import jp.kentan.minecraft.nekoevent.manager.GachaManager
 import jp.kentan.minecraft.nekoevent.manager.KeyManager
+import jp.kentan.minecraft.nekoevent.manager.PasswordManager
 import jp.kentan.minecraft.nekoevent.manager.TicketManager
 import jp.kentan.minecraft.nekoevent.util.Log
 import org.bukkit.ChatColor
@@ -31,9 +33,11 @@ class NekoEvent : JavaPlugin() {
                 keyManager,
                 configManager.gachaConfigProvider,
                 configManager.signConfigProvider)
+        val passwordManager = PasswordManager(configManager.passwordConfigProvider)
 
         getCommand("gacha").set(GachaCommand(gachaManager))
         getCommand("key").set(KeyCommand(keyManager))
+        getCommand("password").set(PasswordCommand(passwordManager))
 
 
         Log.info("有効化しました.")
