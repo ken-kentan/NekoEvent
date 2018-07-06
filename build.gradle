@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.2.50'
+    ext.kotlin_version = '1.2.51'
 
     repositories {
         mavenCentral()
@@ -9,7 +9,7 @@ buildscript {
     }
 }
 
-group 'jp.kentan.minecraft.neko_event'
+group 'jp.kentan.minecraft.nekoevent'
 version '3.0.0-SNAPSHOT'
 
 apply plugin: 'kotlin'
@@ -26,8 +26,8 @@ repositories {
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
-    compileOnly 'org.spigotmc:spigot-api:1.12-R0.1-SNAPSHOT'
-    compileOnly 'org.bukkit:bukkit:1.12-R0.1-SNAPSHOT'
+    compileOnly 'org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT'
+    compileOnly 'org.bukkit:bukkit:1.12.2-R0.1-SNAPSHOT'
 }
 
 compileKotlin {
