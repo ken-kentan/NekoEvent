@@ -1,7 +1,9 @@
 package jp.kentan.minecraft.nekoevent.command
 
+import jp.kentan.minecraft.nekoevent.component.model.CommandArgument
 import jp.kentan.minecraft.nekoevent.manager.GachaManager
 import jp.kentan.minecraft.nekoevent.util.doIfArguments
+import jp.kentan.minecraft.nekoevent.util.getPlayerNames
 import jp.kentan.minecraft.nekoevent.util.sendUnknownCommand
 import org.bukkit.ChatColor
 import org.bukkit.command.Command
@@ -12,7 +14,14 @@ class GachaCommand(
 ) : BaseCommand() {
 
     companion object {
-        private val ARGUMENT_LIST = listOf("play", "demo", "list", "info", "reload", "help")
+        private val ARGUMENT_LIST = listOf(
+                CommandArgument("play", CommandArgument.PLAYER, "[gachaId]"),
+                CommandArgument("demo", "[gachaId]", "[times]"),
+                CommandArgument("list"),
+                CommandArgument("info", "[gachaId]"),
+                CommandArgument("reload"),
+                CommandArgument("help")
+        )
     }
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
@@ -39,23 +48,26 @@ class GachaCommand(
         return true
     }
 
-    override fun onTabComplete(sender: CommandSender, command: Command, alias: String, args: Array<out String>): MutableList<String> {
-        if (!sender.hasPermission("neko.event.gacha")) {
+    override fun onTabComplete(sender: CommandSender, command: Command, alias: String, args: Array<String>): MutableList<String> {
+        if (!sender.hasPermission("neko.event.gacha") || args.isEmpty()) {
             return mutableListOf()
         }
 
         if (args.size == 1) {
-            return ARGUMENT_LIST.filter { it.startsWith(args[0], true) }.toMutableList()
-        } else {
-            val prefix = if ((args[0] == "demo" || args[0] == "info") && args.size == 2) {
-                args[1]
-            } else if (args[0] == "play" && args.size == 3) {
-                args[2]
-            } else {
-                return mutableListOf()
-            }
+            return ARGUMENT_LIST.filter { it.matchFirst(args[0]) }.mapNotNull { it.get(args) }.toMutableList()
+        }
 
-            return manager.getGachaIdList().filter { it.startsWith(prefix, true) }.toMutableList()
+        val commandArg = ARGUMENT_LIST.find { it.matchFirst(args[0]) } ?: return mutableListOf()
+        val prefix = args.last()
+
+        return when (commandArg.get(args)) {
+            CommandArgument.PLAYER -> {
+                getPlayerNames(prefix).toMutableList()
+            }
+            "[gachaId]" -> {
+                manager.getGachaIdList().filter { it.startsWith(prefix, true) }.toMutableList()
+            }
+            else -> mutableListOf()
         }
     }
 

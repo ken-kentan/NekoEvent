@@ -1,8 +1,10 @@
 package jp.kentan.minecraft.nekoevent.command
 
 import jp.kentan.minecraft.nekoevent.component.KeyFlag
+import jp.kentan.minecraft.nekoevent.component.model.CommandArgument
 import jp.kentan.minecraft.nekoevent.manager.KeyManager
 import jp.kentan.minecraft.nekoevent.util.doIfArguments
+import jp.kentan.minecraft.nekoevent.util.getPlayerNames
 import jp.kentan.minecraft.nekoevent.util.sendInGameCommand
 import jp.kentan.minecraft.nekoevent.util.sendUnknownCommand
 import org.bukkit.ChatColor
@@ -15,7 +17,18 @@ class KeyCommand(
 ) : BaseCommand() {
 
     companion object {
-        private val ARGUMENT_LIST = listOf("use", "give", "drop", "create", "delete", "flag", "flaglist", "list", "info", "help")
+        private val ARGUMENT_LIST = listOf(
+                CommandArgument("use", CommandArgument.PLAYER, "[keyId]"),
+                CommandArgument("give", CommandArgument.PLAYER, "[keyId]", "<amount>"),
+                CommandArgument("drop", "[keyId]", "[world]", "[x y z]", "<amount>"),
+                CommandArgument("create", "[keyId]"),
+                CommandArgument("delete", "[keyId]"),
+                CommandArgument("flag", "[keyId]", "[flagId]", "<flagArgs..>"),
+                CommandArgument("flaglist"),
+                CommandArgument("list"),
+                CommandArgument("info", "[keyId]"),
+                CommandArgument("help")
+        )
     }
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
@@ -63,45 +76,24 @@ class KeyCommand(
         return true
     }
 
-    override fun onTabComplete(sender: CommandSender, command: Command, alias: String, args: Array<out String>): MutableList<String> {
+    override fun onTabComplete(sender: CommandSender, command: Command, alias: String, args: Array<String>): MutableList<String> {
         if (!sender.hasPermission("neko.event.key") || args.isEmpty()) {
             return mutableListOf()
         }
 
-        var prefix = ""
-        val completeList = mutableListOf<String>()
-
         if (args.size == 1) {
-            prefix = args[0]
-            completeList.addAll(ARGUMENT_LIST)
-        } else {
-            when (args[0]) {
-                "use", "give" -> {
-                    if (args.size == 3) {
-                        prefix = args[2]
-                        completeList.addAll(manager.getKeyIdList())
-                    }
-                }
-                "drop", "delete", "info" -> {
-                    if (args.size == 2){
-                        prefix = args[1]
-                        completeList.addAll(manager.getKeyIdList())
-                    }
-                }
-                "flag" -> {
-                    if (args.size == 2) {
-                        prefix = args[1]
-                        completeList.addAll(manager.getKeyIdList())
-                    } else if (args.size == 3) {
-                        prefix = args[2]
-                        completeList.addAll(KeyFlag.idList)
-                    }
-                }
-                else -> {}
-            }
+            return ARGUMENT_LIST.filter { it.matchFirst(args[0]) }.mapNotNull { it.get(args) }.toMutableList()
         }
 
-        return completeList.filter { it.startsWith(prefix, true) }.toMutableList()
+        val commandArg = ARGUMENT_LIST.find { it.matchFirst(args[0]) } ?: return mutableListOf()
+        val prefix = args.last()
+
+        return when (commandArg.get(args)) {
+            CommandArgument.PLAYER -> getPlayerNames(prefix).toMutableList()
+            "[keyId]"              -> manager.getKeyIdList().filter { it.startsWith(prefix, true) }.toMutableList()
+            "[flagId]"             -> KeyFlag.idList.filter { it.startsWith(prefix, true) }.toMutableList()
+            else -> mutableListOf()
+        }
     }
 
     private fun sendHelp(sender: CommandSender) {
