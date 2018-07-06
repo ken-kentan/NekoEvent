@@ -140,6 +140,5 @@ class SignConfigProvider(dataFolder: File) : BaseConfigProvider(dataFolder, "sig
             val metadataMap: Map<String, Any>)
     {
         fun get(key: String) = metadataMap[key]
-        fun containsKey(key: String) = metadataMap.containsKey(key)
     }
 }

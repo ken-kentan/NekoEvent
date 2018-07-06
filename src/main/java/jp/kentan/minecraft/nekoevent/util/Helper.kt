@@ -84,7 +84,7 @@ private fun String.toFloatOrError(): Float? {
         return null
     }
 }
-private fun String.toDoubleOrError(): Double? {
+fun String.toDoubleOrError(): Double? {
     return toDoubleOrNull() ?: let {
         Log.error("$this)をDouble(数値)に変換できません.")
         return null
