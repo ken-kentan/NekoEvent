@@ -208,7 +208,7 @@ class KeyManager(
                 " 名前: ${key.name}",
                 " 回収: ${key.enabledTake}",
                 " 期限: ${if (key.enabledExpire) "${key.expireMinutes}分" else "なし" }",
-                " ブロック: ${if (key.block != null) "${key.block.first}, ${key.block.second}" else "なし"}",
+                " ブロック: ${if (key.block != null) "${key.block.first}, ${key.block.second.formatString()}" else "なし"}",
                 " 一致: ${key.formatMatchMessage}",
                 " 不一致: ${key.formatNotMatchMessage}",
                 " 期限切れ: ${key.formatExpiredMessage}",

@@ -180,7 +180,7 @@ class PasswordManager(
                 " 初期値: ${password.default}",
                 " パスワード: ${password.passwordText}",
                 " バッファ: ${password.bufferText}",
-                " ブロック: ${if (password.block != null) "${password.block.first}, ${password.block.second}" else "なし"}",
+                " ブロック: ${if (password.block != null) "${password.block.first}, ${password.block.second.formatString()}" else "なし"}",
                 " 一致: ${password.formatMatchMessage}",
                 " 不一致: ${password.formatNotMatchMessage}",
                 " 入力: ${password.formatInputMessage}",

@@ -86,7 +86,7 @@ class PasswordCommand(
 
         return when (commandArg.get(args)) {
             CommandArgument.PLAYER -> getPlayerNames(prefix).toMutableList()
-            "[passId]"              -> manager.getKeyIdList().filter { it.startsWith(prefix, true) }.toMutableList()
+            "[passId]"             -> manager.getKeyIdList().filter { it.startsWith(prefix, true) }.toMutableList()
             "[flagId]"             -> PasswordFlag.idList.filter { it.startsWith(prefix, true) }.toMutableList()
             else -> mutableListOf()
         }
