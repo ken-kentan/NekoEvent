@@ -175,7 +175,7 @@ class PasswordManager(
         }
 
         val messages = arrayOf(
-                "&7--------- &6鍵情報 &7---------".formatColorCode(),
+                "&7--------- &6パスワード情報 &7---------".formatColorCode(),
                 " ID: ${password.id}",
                 " 初期値: ${password.default}",
                 " パスワード: ${password.passwordText}",
