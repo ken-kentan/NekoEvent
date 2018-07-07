@@ -21,3 +21,8 @@ commands:
         usage: /<command>
         permission: neko.event.password
         permission-message: You don't have <permission>
+    dungeon:
+        description: NekoEvent
+        usage: /<command>
+        permission: neko.event.dungeon
+        permission-message: You don't have <permission>

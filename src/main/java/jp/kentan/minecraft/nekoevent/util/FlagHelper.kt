@@ -68,6 +68,11 @@ fun List<String>.flagLocation(player: Player, def: Location?): Location? {
         x = get(0).toDoubleOrNull() ?: throw InvalidFlagException("数値に変換できません.")
         y = get(1).toDoubleOrNull() ?: throw InvalidFlagException("数値に変換できません.")
         z = get(2).toDoubleOrNull() ?: throw InvalidFlagException("数値に変換できません.")
+
+        if (size >= 5) {
+            yaw   = get(3).toFloatOrNull() ?: throw InvalidFlagException("数値に変換できません.")
+            pitch = get(4).toFloatOrNull() ?: throw InvalidFlagException("数値に変換できません.")
+        }
     }
 }
 

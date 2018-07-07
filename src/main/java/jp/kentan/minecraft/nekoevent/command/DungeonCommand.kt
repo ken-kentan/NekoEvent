@@ -1,8 +1,8 @@
 package jp.kentan.minecraft.nekoevent.command
 
-import jp.kentan.minecraft.nekoevent.component.KeyFlag
+import jp.kentan.minecraft.nekoevent.component.DungeonFlag
 import jp.kentan.minecraft.nekoevent.component.model.CommandArgument
-import jp.kentan.minecraft.nekoevent.manager.KeyManager
+import jp.kentan.minecraft.nekoevent.manager.DungeonManager
 import jp.kentan.minecraft.nekoevent.util.doIfArguments
 import jp.kentan.minecraft.nekoevent.util.getPlayerNames
 import jp.kentan.minecraft.nekoevent.util.sendInGameCommand
@@ -12,21 +12,22 @@ import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
-class KeyCommand(
-        private val manager: KeyManager
+class DungeonCommand(
+        private val manager: DungeonManager
 ) : BaseCommand() {
 
     companion object {
         private val ARGUMENT_LIST = listOf(
-                CommandArgument("use", CommandArgument.PLAYER, "[keyId]"),
-                CommandArgument("give", CommandArgument.PLAYER, "[keyId]", "<amount>"),
-                CommandArgument("drop", "[keyId]", "[world]", "[x y z]", "<amount>"),
-                CommandArgument("create", "[keyId]"),
-                CommandArgument("delete", "[keyId]"),
-                CommandArgument("flag", "[keyId]", "[flagId]", "<flagArgs..>"),
+                CommandArgument("join", CommandArgument.PLAYER, "[dungeonId]"),
+                CommandArgument("clear", CommandArgument.PLAYER, "[dungeonId]"),
+                CommandArgument("lock", "[dungeonId]", "[seconds]"),
+                CommandArgument("unlock", "[dungeonId]"),
+                CommandArgument("create", "[dungeonId]"),
+                CommandArgument("delete", "[dungeonId]"),
+                CommandArgument("flag", "[dungeonId]", "[flagId]", "<flagArgs..>"),
                 CommandArgument("flaglist"),
                 CommandArgument("list"),
-                CommandArgument("info", "[keyId]"),
+                CommandArgument("info", "[dungeonId]"),
                 CommandArgument("reload"),
                 CommandArgument("help")
         )
@@ -39,21 +40,20 @@ class KeyCommand(
         }
 
         when (args[0]) {
-            "use" -> sender.doIfArguments(args, 2) {
-                manager.use(args[1], args[2])
+            "join" -> sender.doIfArguments(args, 2) {
+                manager.join(args[1], args[2])
             }
-            "give" -> sender.doIfArguments(args, 2) {
-                manager.give(args[1], args[2], if (args.size >= 4) args[3] else "1")
+            "clear" -> sender.doIfArguments(args, 2) {
+                manager.clear(args[1], args[2])
             }
-            "drop" -> sender.doIfArguments(args, 5) {
-                manager.drop(args[1], args.sliceArray(2..5), if (args.size > 5) args[6] else "1")
+            "lock" -> sender.doIfArguments(args, 2) {
+                manager.lock(args[1], args[2])
+            }
+            "unlock" -> sender.doIfArguments(args, 1) {
+                manager.unlock(args[1])
             }
             "create" -> sender.doIfArguments(args, 1) {
-                if (it is Player) {
-                    manager.create(it, args[1])
-                } else {
-                    it.sendInGameCommand()
-                }
+                manager.create(it, args[1])
             }
             "delete" -> sender.doIfArguments(args, 1) {
                 manager.delete(it, args[1])
@@ -65,7 +65,7 @@ class KeyCommand(
                     it.sendInGameCommand()
                 }
             }
-            "flaglist" -> KeyFlag.sendList(sender)
+            "flaglist" -> DungeonFlag.sendList(sender)
             "list" -> manager.sendList(sender)
             "info" -> sender.doIfArguments(args, 1) {
                 manager.sendInfo(it, args[1])
@@ -78,7 +78,7 @@ class KeyCommand(
     }
 
     override fun onTabComplete(sender: CommandSender, command: Command, alias: String, args: Array<String>): MutableList<String> {
-        if (!sender.hasPermission("neko.event.key") || args.isEmpty()) {
+        if (!sender.hasPermission("neko.event.dungeon") || args.isEmpty()) {
             return mutableListOf()
         }
 
@@ -91,25 +91,26 @@ class KeyCommand(
 
         return when (commandArg.get(args)) {
             CommandArgument.PLAYER -> getPlayerNames(prefix).toMutableList()
-            "[keyId]"              -> manager.getKeyIdList().filter { it.startsWith(prefix, true) }.toMutableList()
-            "[flagId]"             -> KeyFlag.idList.filter { it.startsWith(prefix, true) }.toMutableList()
+            "[dungeonId]"          -> manager.getDungeonIdList().filter { it.startsWith(prefix, true) }.toMutableList()
+            "[flagId]"             -> DungeonFlag.idList.filter { it.startsWith(prefix, true) }.toMutableList()
             else -> mutableListOf()
         }
     }
 
     private fun sendHelp(sender: CommandSender) {
-        sender.sendMessage("---------- NekoEvent Keyコマンドヘルプ ----------")
-        sender.sendMessage("| " + ChatColor.GOLD + "/key use [player] [keyId]")
-        sender.sendMessage("| " + ChatColor.GOLD + "/key give [player] [keyId] <amount>")
-        sender.sendMessage("| " + ChatColor.GOLD + "/key drop [keyId] [world] [x y z] <amount>")
-        sender.sendMessage("| " + ChatColor.GOLD + "/key create [keyId]")
-        sender.sendMessage("| " + ChatColor.GOLD + "/key delete [keyId]")
-        sender.sendMessage("| " + ChatColor.GOLD + "/key flag [keyId] [flagId] <flagArgs..>")
-        sender.sendMessage("| " + ChatColor.GOLD + "/key flaglist")
-        sender.sendMessage("| " + ChatColor.GOLD + "/key list")
-        sender.sendMessage("| " + ChatColor.GOLD + "/key info [keyId]")
-        sender.sendMessage("| " + ChatColor.GOLD + "/key reload")
-        sender.sendMessage("| " + ChatColor.GOLD + "/key help")
+        sender.sendMessage("---------- NekoEvent Dungeonコマンドヘルプ ----------")
+        sender.sendMessage("| " + ChatColor.RED + "/dungeon join [player] [dungeonId]")
+        sender.sendMessage("| " + ChatColor.RED + "/dungeon clear [player] [dungeonId]")
+        sender.sendMessage("| " + ChatColor.RED + "/dungeon lock [dungeonId] [seconds]")
+        sender.sendMessage("| " + ChatColor.RED + "/dungeon unlock [dungeonId]")
+        sender.sendMessage("| " + ChatColor.RED + "/dungeon create [dungeonId]")
+        sender.sendMessage("| " + ChatColor.RED + "/dungeon delete [dungeonId]")
+        sender.sendMessage("| " + ChatColor.RED + "/dungeon flag [dungeonId] [flagId] <flagArgs..>")
+        sender.sendMessage("| " + ChatColor.RED + "/dungeon flaglist")
+        sender.sendMessage("| " + ChatColor.RED + "/dungeon list")
+        sender.sendMessage("| " + ChatColor.RED + "/dungeon info [dungeonId]")
+        sender.sendMessage("| " + ChatColor.RED + "/dungeon reload")
+        sender.sendMessage("| " + ChatColor.RED + "/dungeon help")
         sender.sendMessage("| " + ChatColor.GRAY + "[]は必須,<>は任意,()は説明です.")
         sender.sendMessage("| " + ChatColor.GRAY + "'-o'は複数指定が可能です.")
         sender.sendMessage("---------------------------------------")

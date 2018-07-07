@@ -26,10 +26,14 @@ class BukkitEventListener(
 
     private val scheduler = Bukkit.getScheduler()
 
-    private val signListenerMap = mutableMapOf<String, SignListener>()
+    private val signChangedListenerMap = mutableMapOf<String, SignListener>()
+    private val signInteractListenerMap = mutableMapOf<String, SignListener>()
 
-    fun registerSignListener(key: String, listener: SignListener) {
-        signListenerMap["[$key]"] = listener
+    fun registerSignListener(key: Pair<String, String>, listener: SignListener) {
+        val (changed, interact) = key
+
+        signChangedListenerMap[changed] = listener
+        signInteractListenerMap[interact] = listener
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -38,7 +42,7 @@ class BukkitEventListener(
             return
         }
 
-        signListenerMap[event.getLine(0)]?.onSignChanged(event)
+        signChangedListenerMap[event.getLine(0)]?.onSignChanged(event)
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -46,7 +50,7 @@ class BukkitEventListener(
         val blockState = event.clickedBlock.state
 
         if (blockState is Sign) {
-            signListenerMap[blockState.getLine(0)]?.onPlayerInteract(event, blockState)
+            signInteractListenerMap[blockState.getLine(0)]?.onPlayerInteract(event, blockState)
         }
     }
 

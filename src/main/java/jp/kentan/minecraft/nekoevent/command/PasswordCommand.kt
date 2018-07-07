@@ -27,6 +27,7 @@ class PasswordCommand(
                 CommandArgument("flaglist"),
                 CommandArgument("list"),
                 CommandArgument("info", "[passId]"),
+                CommandArgument("reload"),
                 CommandArgument("help")
         )
     }

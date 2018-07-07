@@ -4,25 +4,64 @@ import jp.kentan.minecraft.nekoevent.NekoEvent
 import jp.kentan.minecraft.nekoevent.manager.factory.TicketFactory
 import jp.kentan.minecraft.nekoevent.component.TicketType
 import jp.kentan.minecraft.nekoevent.component.TicketType.*
+import jp.kentan.minecraft.nekoevent.config.ConfigManager
+import jp.kentan.minecraft.nekoevent.config.ConfigUpdateListener
+import jp.kentan.minecraft.nekoevent.config.provider.TicketConfigProvider
 import jp.kentan.minecraft.nekoevent.util.Log
+import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import kotlin.math.max
 
-class TicketManager {
+class TicketManager(
+        private val config: TicketConfigProvider
+) : ConfigUpdateListener<Any> {
+
+    companion object {
+        private val REACH_TODAY_LIMIT = "&e"
+    }
 
     private val eventTicket = TicketFactory.create(EVENT)
     private val voteTicket  = TicketFactory.create(VOTE)
 
-    fun give(player: Player, type: TicketType, amount: Int) {
+    private val dayLimitAmountMap = mutableMapOf(EVENT to 5, VOTE to 2)
+
+    init {
+        config.listener = this
+    }
+
+    fun give(player: Player, type: TicketType, amount: Int, ignoreDayLimit: Boolean = true) {
         if (amount < 1) {
             Log.warn("1以上の枚数を指定して下さい.")
             return
         }
 
-        when (type) {
-            EVENT -> eventTicket.give(player, amount)
-            VOTE -> voteTicket.give(player, amount)
+        var giveAmount = amount
+
+        if (!ignoreDayLimit) {
+            val limitAmount = dayLimitAmountMap[type]
+
+            if (limitAmount != null) {
+                val todayAmount = config.getTodayTicketAmount(player, type)
+
+                if (todayAmount >= limitAmount) {
+                    player.sendMessage(NekoEvent.PREFIX + type.getReachDayLimitMessage(limitAmount))
+                    return
+                }
+
+                if ((todayAmount + amount) > limitAmount) {
+                    giveAmount = limitAmount - todayAmount
+                }
+            } else {
+                Log.warn("チケット(${type.name})の1日上限が無視されました.")
+            }
         }
+
+        when (type) {
+            EVENT -> eventTicket.give(player, giveAmount)
+            VOTE -> voteTicket.give(player, giveAmount)
+        }
+
+        config.addTodayTicketAmount(player, type, giveAmount)
 
         Log.info("${player.name}に${type.displayName}を${amount}枚与えました.")
     }
@@ -69,5 +108,21 @@ class TicketManager {
         }
 
         return true
+    }
+
+    override fun onConfigUpdate(dataMap: Map<String, Any>) {
+        TicketType.values().forEach { type ->
+            val key = "Ticket.${type.path}.dayLimitAmount"
+            val amount = dataMap[key] as Int?
+
+            if (amount == null || amount < 1) {
+                Log.warn("${key}を正しく読み込めませんでした.")
+                return@forEach
+            }
+
+            dayLimitAmountMap[type] = amount
+
+            Log.info("${key}を${amount}で設定しました.")
+        }
     }
 }

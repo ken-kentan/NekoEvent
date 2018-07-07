@@ -1,13 +1,19 @@
 package jp.kentan.minecraft.nekoevent.component.model
 
+import jp.kentan.minecraft.nekoevent.util.Log
 import jp.kentan.minecraft.nekoevent.util.formatColorCode
-import javax.xml.stream.Location
+import org.bukkit.Bukkit
+import org.bukkit.Location
+import org.bukkit.plugin.Plugin
+import org.bukkit.scheduler.BukkitScheduler
+import org.bukkit.scheduler.BukkitTask
+import java.util.concurrent.ConcurrentHashMap
 
 data class Dungeon(
         val id: String,
-        val name: String = "",
-        val eventTicketAmount: Int = 0,
-        val gachaId: String? = null,
+        val name: String = "ダンジョン",
+        val rewardTicketAmount: Int = 0,
+        val rewardGachaId: String? = null,
         val joinLocation: Location? = null,
         val joinMessage: String? = "{name}&rに&c参加&rしました！",
         val joinBroadcastMessage: String? = null,
@@ -15,15 +21,84 @@ data class Dungeon(
         val clearMessage: String? = "&dクリアおめでとう！&rまた&c挑戦&rしてね！",
         val clearBroadcastMessage: String? = null,
         val enabledClearSound: Boolean = true,
-        val timerMinutes: Int = 0,
-        val timeoutBroadcastMessage: String? = null
+        val lockMessage: String? = "{name}&rは&cロック中&rです！ &b{time}&rお待ちください...",
+        val lockBroadcastMessage: String? = null,
+        val unlockBroadcastMessage: String? = null,
+        private var lockTimerSeconds: Int = 0
 ) {
 
+    companion object {
+        private val asyncLockTimerTaskMap = ConcurrentHashMap<String, BukkitTask>()
+    }
+
+    val hasRewardTicket = rewardTicketAmount > 0
+
+    val formatName = name.formatColorCode()
     val formatJoinMessage = joinMessage.format()
     val formatJoinBroadcastMessage = joinBroadcastMessage.format()
     val formatClearMessage = clearMessage.format()
     val formatClearBroadcastMessage = clearBroadcastMessage.format()
-    val formatTimeoutBroadcastMessage = timeoutBroadcastMessage.format()
+    private val _formatLockTimerMessage = lockMessage.format()
+    val formatLockMessage: String?
+        get() {
+            val timer = if (lockTimerSeconds >= 60) { "${lockTimerSeconds / 60}分" } else { "${lockTimerSeconds}秒" }
+            return _formatLockTimerMessage?.replace("{time}", timer)
+        }
+    val formatLockBroadcastMessage = lockBroadcastMessage.format()
+    val formatUnlockBroadcastMessage = unlockBroadcastMessage.format()
 
-    private fun String?.format() = this?.replace("{name}", name)?.formatColorCode()
+    val isLock: Boolean
+        get() = lockTimerSeconds > 0
+
+
+    fun startLockTimer(scheduler: BukkitScheduler, plugin: Plugin, seconds: Int) {
+        asyncLockTimerTaskMap[id]?.cancel()
+
+        lockTimerSeconds = seconds
+
+        scheduler.scheduleAsyncLockTimerTask(plugin)
+
+        formatLockBroadcastMessage?.let {
+            Bukkit.broadcastMessage(it)
+        }
+
+        Log.info("ダンジョン($id)にﾛｯｸﾀｲﾏｰ(${seconds}s)を設定しました.")
+    }
+
+    fun stopLockTimer() {
+        asyncLockTimerTaskMap.remove(id)?.let {
+            it.cancel()
+            formatUnlockBroadcastMessage?.let {
+                Bukkit.broadcastMessage(it)
+            }
+        }
+
+        lockTimerSeconds = 0
+    }
+
+    fun restoreLockTimerIfNeed(scheduler: BukkitScheduler, plugin: Plugin) {
+        if (lockTimerSeconds < 1) {
+            return
+        }
+
+        scheduler.scheduleAsyncLockTimerTask(plugin)
+    }
+
+    private fun BukkitScheduler.scheduleAsyncLockTimerTask(plugin: Plugin) {
+        val asyncTask = runTaskTimerAsynchronously(plugin, {
+            if (--lockTimerSeconds < 1){
+                asyncLockTimerTaskMap.remove(id)?.cancel()
+
+                formatUnlockBroadcastMessage?.let {
+                    Bukkit.broadcastMessage(it)
+                }
+
+                Log.info("ダンジョン($id)のﾛｯｸﾀｲﾏｰが終了しました.")
+            }
+        }, 20L, 20L)
+
+        asyncLockTimerTaskMap[id] = asyncTask
+    }
+
+    private fun String?.format() = this?.replace("{name}", formatName)?.formatColorCode()
 }

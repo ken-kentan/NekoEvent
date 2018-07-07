@@ -30,7 +30,9 @@ class GachaManager(
     companion object {
         private const val ID_NOT_FOUND = "ガチャ({id})は存在しません."
 
-        val SIGN_INDEX = "&8&l[&d&lガチャ&8&l]".formatColorCode()
+        private val SIGN_INDEX = "&8&l[&d&lガチャ&8&l]".formatColorCode()
+        val SIGN_KEY = Pair("[gacha]", SIGN_INDEX)
+
         private const val ID_METADATA_KEY = "gachaId"
         private const val COST_METADATA_KEY = "gachaCost"
         private const val COST_DETAIL_METADATA_KEY = "gachaCostDetail"
@@ -190,7 +192,7 @@ class GachaManager(
 
     /**
      * 看板フォーマット
-     * 0: [gacha ]
+     * 0: [gacha]
      * 1: gachaId
      * 2: [jp.kentan.minecraft.nekoevent.model.GachaCost].id
      * 3: cost detail (ex. ticket num)

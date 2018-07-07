@@ -22,13 +22,14 @@ class SpawnManager(
 
     companion object {
         private val SIGN_INDEX = "&8&l[&3&lセーブ&8&l]".formatColorCode()
+        val SIGN_KEY = Pair("[setspawn]", SIGN_INDEX)
 
         private const val LOCATION_X_METADATA_KEY = "setspawnX"
         private const val LOCATION_Y_METADATA_KEY = "setspawnY"
         private const val LOCATION_Z_METADATA_KEY = "setspawnZ"
     }
 
-    private fun setSpawn(player: Player, location: Location, isSendMessage: Boolean = true) {
+    fun setSpawn(player: Player, location: Location, isSendMessage: Boolean = true) {
         location.y = ceil(location.y)
 
         player.setBedSpawnLocation(location, true)

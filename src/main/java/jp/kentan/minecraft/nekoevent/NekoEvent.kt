@@ -1,9 +1,6 @@
 package jp.kentan.minecraft.nekoevent
 
-import jp.kentan.minecraft.nekoevent.command.BaseCommand
-import jp.kentan.minecraft.nekoevent.command.GachaCommand
-import jp.kentan.minecraft.nekoevent.command.KeyCommand
-import jp.kentan.minecraft.nekoevent.command.PasswordCommand
+import jp.kentan.minecraft.nekoevent.command.*
 import jp.kentan.minecraft.nekoevent.config.ConfigManager
 import jp.kentan.minecraft.nekoevent.listener.BukkitEventListener
 import jp.kentan.minecraft.nekoevent.manager.*
@@ -24,7 +21,7 @@ class NekoEvent : JavaPlugin() {
 
         val configManager = ConfigManager(dataFolder)
 
-        val ticketManager = TicketManager()
+        val ticketManager = TicketManager(configManager.ticketConfigProvider)
         val spawnManager = SpawnManager(configManager.signConfigProvider)
 
         val keyManager = KeyManager(configManager.keyConfigProvider)
@@ -34,10 +31,19 @@ class NekoEvent : JavaPlugin() {
                 configManager.gachaConfigProvider,
                 configManager.signConfigProvider)
         val passwordManager = PasswordManager(configManager.passwordConfigProvider)
+        val dungeonManager = DungeonManager(
+                this,
+                configManager.dungeonConfigProvider,
+                configManager.signConfigProvider,
+                spawnManager,
+                gachaManager,
+                ticketManager
+        )
 
         getCommand("gacha").set(GachaCommand(gachaManager))
         getCommand("key").set(KeyCommand(keyManager))
         getCommand("password").set(PasswordCommand(passwordManager))
+        getCommand("dungeon").set(DungeonCommand(dungeonManager))
 
 
         Log.info("有効化しました.")
@@ -45,8 +51,9 @@ class NekoEvent : JavaPlugin() {
         configManager.load()
 
         val bukkitEventListener = BukkitEventListener(this, spawnManager)
-        bukkitEventListener.registerSignListener("gacha", gachaManager)
-        bukkitEventListener.registerSignListener("setspawn", spawnManager)
+        bukkitEventListener.registerSignListener(GachaManager.SIGN_KEY, gachaManager)
+        bukkitEventListener.registerSignListener(SpawnManager.SIGN_KEY, spawnManager)
+        bukkitEventListener.registerSignListener(DungeonManager.SIGN_KEY, dungeonManager)
 
         server.pluginManager.registerEvents(bukkitEventListener, this)
     }
