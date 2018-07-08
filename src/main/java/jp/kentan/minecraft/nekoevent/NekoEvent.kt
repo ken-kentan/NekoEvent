@@ -46,6 +46,7 @@ class NekoEvent : JavaPlugin() {
                 ticketManager
         )
 
+        getCommand("event").set(EventCommand(this, configManager, ticketManager, spawnManager))
         getCommand("gacha").set(GachaCommand(gachaManager))
         getCommand("key").set(KeyCommand(keyManager))
         getCommand("password").set(PasswordCommand(passwordManager))

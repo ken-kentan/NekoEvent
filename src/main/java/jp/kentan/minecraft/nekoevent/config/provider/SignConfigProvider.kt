@@ -17,7 +17,7 @@ class SignConfigProvider(dataFolder: File) : BaseConfigProvider(dataFolder, "sig
         load()
     }
 
-    private fun load() {
+    fun load() {
         try {
             val config = YamlConfiguration.loadConfiguration(configFile)
 

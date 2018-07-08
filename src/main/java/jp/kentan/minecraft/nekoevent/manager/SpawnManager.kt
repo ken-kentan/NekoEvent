@@ -3,9 +3,7 @@ package jp.kentan.minecraft.nekoevent.manager
 import jp.kentan.minecraft.nekoevent.NekoEvent
 import jp.kentan.minecraft.nekoevent.config.provider.SignConfigProvider
 import jp.kentan.minecraft.nekoevent.listener.SignListener
-import jp.kentan.minecraft.nekoevent.util.Log
-import jp.kentan.minecraft.nekoevent.util.formatColorCode
-import jp.kentan.minecraft.nekoevent.util.toDoubleOrError
+import jp.kentan.minecraft.nekoevent.util.*
 import org.bukkit.ChatColor
 import org.bukkit.Location
 import org.bukkit.Sound
@@ -27,6 +25,13 @@ class SpawnManager(
         private const val LOCATION_X_METADATA_KEY = "setspawnX"
         private const val LOCATION_Y_METADATA_KEY = "setspawnY"
         private const val LOCATION_Z_METADATA_KEY = "setspawnZ"
+    }
+
+    fun setSpawn(strPlayer: String, strLocation: List<String>) {
+        val player = strPlayer.toPlayerOrError() ?: return
+        val location = strLocation.toLocationOrError() ?: return
+
+        setSpawn(player, location)
     }
 
     fun setSpawn(player: Player, location: Location, isSendMessage: Boolean = true) {

@@ -28,4 +28,9 @@ class ConfigManager(dataFolder: File) {
         dungeonConfigProvider.load()
         ticketConfigProvider.load()
     }
+
+    fun reload() {
+        signConfigProvider.load()
+        load()
+    }
 }

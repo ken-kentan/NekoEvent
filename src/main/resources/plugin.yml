@@ -6,6 +6,11 @@ website: http://ken.kentan.jp
 softdepend: [Multiverse-Core]
 
 commands:
+    event:
+        description: NekoEvent
+        usage: /<command>
+        permission: neko.event
+        permission-message: You don't have <permission>
     gacha:
         description: NekoEvent
         usage: /<command>

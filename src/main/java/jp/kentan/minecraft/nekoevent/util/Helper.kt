@@ -4,6 +4,7 @@ import jp.kentan.minecraft.nekoevent.NekoEvent
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Location
+import org.bukkit.attribute.Attribute
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.inventory.PlayerInventory
@@ -14,6 +15,10 @@ fun CommandSender.sendUnknownCommand() {
 
 fun CommandSender.sendInGameCommand() {
     sendMessage("${NekoEvent.PREFIX}${ChatColor.YELLOW}ゲーム内専用コマンドです.")
+}
+
+fun CommandSender.sendCommandBlockCommand() {
+    sendMessage("${NekoEvent.PREFIX}${ChatColor.YELLOW}コマンドブロック専用コマンドです.")
 }
 
 fun CommandSender.sendArgumentShortage() {
@@ -45,11 +50,22 @@ fun Player.broadcastMessageWithoutMe(message: String) {
             .forEach { it.sendMessage(message) }
 }
 
+fun Player.resetStatus() {
+    activePotionEffects.forEach { e -> player.removePotionEffect(e.type) }
+    fireTicks = 0
+
+    val maxHealth = getAttribute(Attribute.GENERIC_MAX_HEALTH).value
+
+    if (maxHealth >= 1.0) {
+        health = maxHealth
+    }
+}
+
 fun PlayerInventory.isFull() = firstEmpty() == -1
 
-fun Location.formatString() = "(${world.name}, XYZ:${x.toInt()}/${y.toInt()}/${z.toInt()})"
+fun Location.formatString() = "(${world.name}, XYZ:$blockX/$blockY/$blockZ)"
 
-fun Array<String>.toLocationOrError(): Location? {
+fun List<String>.toLocationOrError(): Location? {
     if (size < 4) { return null }
 
     val world = Bukkit.getWorld(get(0)) ?: let {
@@ -70,6 +86,35 @@ fun Array<String>.toLocationOrError(): Location? {
     }
 
     return location
+}
+
+/**
+ * 相対座標対応版
+ * [x y z] or [x y z yaw pitch]
+ */
+fun List<String>.toLocationOrError(base: Location): Location? {
+    if (size !in 3..5) {
+        Log.error("座標パラメータ数が不正です.")
+        return null
+    }
+
+    val vector5 = doubleArrayOf(
+            base.x,
+            base.y,
+            base.z,
+            base.yaw.toDouble(),
+            base.pitch.toDouble()
+    )
+
+    forEachIndexed { index, str ->
+        if (str.startsWith("~")) {
+            vector5[index] += str.substring(1).toDoubleOrError() ?: return null
+        } else {
+            vector5[index] = str.toDoubleOrError() ?: return null
+        }
+    }
+
+    return Location(base.world, vector5[0], vector5[1], vector5[2], vector5[3].toFloat(), vector5[4].toFloat())
 }
 
 fun String.toIntOrError(): Int? {

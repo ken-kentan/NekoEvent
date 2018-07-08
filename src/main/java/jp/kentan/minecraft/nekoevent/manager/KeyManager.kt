@@ -45,7 +45,7 @@ class KeyManager(
         player.inventory.addItem(key.getItemStack(amount))
     }
 
-    fun drop(keyId: String, strLocation: Array<String>, strAmount: String) {
+    fun drop(keyId: String, strLocation: List<String>, strAmount: String) {
         val key = keyMap.getOrError(keyId) ?: return
 
         val location = strLocation.toLocationOrError() ?: return

@@ -4,21 +4,17 @@ import jp.kentan.minecraft.nekoevent.NekoEvent
 import jp.kentan.minecraft.nekoevent.manager.factory.TicketFactory
 import jp.kentan.minecraft.nekoevent.component.TicketType
 import jp.kentan.minecraft.nekoevent.component.TicketType.*
-import jp.kentan.minecraft.nekoevent.config.ConfigManager
 import jp.kentan.minecraft.nekoevent.config.ConfigUpdateListener
 import jp.kentan.minecraft.nekoevent.config.provider.TicketConfigProvider
 import jp.kentan.minecraft.nekoevent.util.Log
-import org.bukkit.ChatColor
+import jp.kentan.minecraft.nekoevent.util.toIntOrError
+import jp.kentan.minecraft.nekoevent.util.toPlayerOrError
 import org.bukkit.entity.Player
 import kotlin.math.max
 
 class TicketManager(
         private val config: TicketConfigProvider
 ) : ConfigUpdateListener<Any> {
-
-    companion object {
-        private val REACH_TODAY_LIMIT = "&e"
-    }
 
     private val eventTicket = TicketFactory.create(EVENT)
     private val voteTicket  = TicketFactory.create(VOTE)
@@ -27,6 +23,20 @@ class TicketManager(
 
     init {
         config.listener = this
+    }
+
+    fun give(strPlayer: String, strType: String, strAmount: String) {
+        val player = strPlayer.toPlayerOrError() ?: return
+        val type: TicketType
+        try {
+            type = TicketType.valueOf(strType.toUpperCase())
+        } catch (e: Exception) {
+            Log.error(e)
+            return
+        }
+        val amount = strAmount.toIntOrError() ?: return
+
+        give(player, type, amount)
     }
 
     fun give(player: Player, type: TicketType, amount: Int, ignoreDayLimit: Boolean = true) {
