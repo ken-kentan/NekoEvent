@@ -9,6 +9,7 @@ import jp.kentan.minecraft.nekoevent.config.ConfigUpdateListener
 import jp.kentan.minecraft.nekoevent.config.provider.DungeonConfigProvider
 import jp.kentan.minecraft.nekoevent.config.provider.SignConfigProvider
 import jp.kentan.minecraft.nekoevent.listener.SignListener
+import jp.kentan.minecraft.nekoevent.manager.DungeonManager.SignAction.*
 import jp.kentan.minecraft.nekoevent.util.*
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -39,6 +40,8 @@ class DungeonManager(
         private const val ID_METADATA_KEY = "dungeonId"
         private const val ACTION_METADATA_KEY = "dungeonAction"
     }
+
+    private enum class SignAction { JOIN, CLEAR }
 
     private val scheduler =  Bukkit.getScheduler()
 
@@ -297,21 +300,24 @@ class DungeonManager(
      * 看板フォーマット
      * 0: [dungeon]
      * 1: dungeonId
-     * 2: join / clear
+     * 2: [SignAction]
      * 3:
      */
     override fun onSignChanged(event: SignChangeEvent) {
         val player = event.player
         val dungeonId = event.getLine(1)
-        val action = event.getLine(2)
+        val strAction = event.getLine(2).toUpperCase()
 
         val dungeon = dungeonMap[dungeonId] ?: let {
             player.sendMessage(NekoEvent.PREFIX + ChatColor.YELLOW + "ダンジョン($dungeonId)は存在しません.")
             return
         }
 
-        if (action != "join" && action != "clear") {
-            player.sendMessage(NekoEvent.PREFIX + ChatColor.YELLOW + "アクションは[join/clear]で指定してください.")
+        val action: SignAction
+        try {
+            action = SignAction.valueOf(strAction)
+        } catch (e: Exception) {
+            player.sendMessage(NekoEvent.PREFIX + ChatColor.YELLOW + "正しいSignActionを指定してください.")
             return
         }
 
@@ -330,7 +336,11 @@ class DungeonManager(
         event.setLine(0, SIGN_INDEX)
         event.setLine(1, dungeon.formatName)
         event.setLine(2, "")
-        event.setLine(3, (if (action == "join") "&c&n参加" else "&b&nクリア").formatColorCode())
+
+        when (action) {
+            JOIN  -> event.setLine(3, "&c&n参加".formatColorCode())
+            CLEAR -> event.setLine(3, "&b&nクリア".formatColorCode())
+        }
     }
 
     override fun onPlayerInteract(event: PlayerInteractEvent, sign: Sign) {
@@ -344,12 +354,11 @@ class DungeonManager(
             return
         }
 
-        val action = signConfig.getMetadata(sign.location, ACTION_METADATA_KEY) as String? ?: return
+        val action = signConfig.getMetadata(sign.location, ACTION_METADATA_KEY) as SignAction? ?: return
 
         when (action) {
-            "join"  -> join(event.player, dungeon)
-            "clear" -> clear(event.player, dungeon)
-            else -> {}
+            JOIN  -> join(event.player, dungeon)
+            CLEAR -> clear(event.player, dungeon)
         }
     }
 }
