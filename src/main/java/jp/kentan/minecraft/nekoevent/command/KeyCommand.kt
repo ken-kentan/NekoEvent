@@ -111,7 +111,6 @@ class KeyCommand(
         sender.sendMessage("| " + ChatColor.GOLD + "/key reload")
         sender.sendMessage("| " + ChatColor.GOLD + "/key help")
         sender.sendMessage("| " + ChatColor.GRAY + "[]は必須,<>は任意,()は説明です.")
-        sender.sendMessage("| " + ChatColor.GRAY + "'-o'は複数指定が可能です.")
         sender.sendMessage("---------------------------------------")
     }
 }

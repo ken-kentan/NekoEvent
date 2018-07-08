@@ -107,7 +107,6 @@ class PasswordCommand(
         sender.sendMessage("| " + ChatColor.BLUE + "/password reload")
         sender.sendMessage("| " + ChatColor.BLUE + "/password help")
         sender.sendMessage("| " + ChatColor.GRAY + "[]は必須,<>は任意,()は説明です.")
-        sender.sendMessage("| " + ChatColor.GRAY + "'-o'は複数指定が可能です.")
         sender.sendMessage("---------------------------------------")
     }
 }

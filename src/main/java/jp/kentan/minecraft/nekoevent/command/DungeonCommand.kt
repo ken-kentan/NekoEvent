@@ -112,7 +112,6 @@ class DungeonCommand(
         sender.sendMessage("| " + ChatColor.RED + "/dungeon reload")
         sender.sendMessage("| " + ChatColor.RED + "/dungeon help")
         sender.sendMessage("| " + ChatColor.GRAY + "[]は必須,<>は任意,()は説明です.")
-        sender.sendMessage("| " + ChatColor.GRAY + "'-o'は複数指定が可能です.")
         sender.sendMessage("---------------------------------------")
     }
 }
