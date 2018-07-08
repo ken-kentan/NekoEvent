@@ -2,6 +2,7 @@ package jp.kentan.minecraft.nekoevent.component.model
 
 import jp.kentan.minecraft.nekoevent.util.Log
 import jp.kentan.minecraft.nekoevent.util.MersenneTwisterFast
+import jp.kentan.minecraft.nekoevent.util.formatColorCode
 
 
 data class Gacha(
@@ -18,8 +19,10 @@ data class Gacha(
         private val RANDOM = MersenneTwisterFast()
     }
 
+    val formatName = name.formatColorCode()
+
     init {
-        if (componentList.sumByDouble { it.probability }.compareTo(1) != 0) {
+        if (componentList.sumByDouble { it.probability } !in 0.99..1.01) {
             throw IllegalArgumentException("ｶﾞﾁｬ($id)の合計確率が100%ではありません.")
         }
     }

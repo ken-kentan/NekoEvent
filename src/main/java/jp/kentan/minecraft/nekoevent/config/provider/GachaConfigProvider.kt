@@ -51,7 +51,7 @@ class GachaConfigProvider(dataFolder: File) : BaseConfigProvider(dataFolder, "ga
                         componentList,
                         config.getString("$path.winMessage")?.formatColorCode(),
                         config.getString("$path.loseMessage")?.formatColorCode(),
-                        config.getString("$path.broadcastMsg")?.formatColorCode(),
+                        config.getString("$path.broadcastMessage")?.formatColorCode(),
                         config.getBoolean("$path.enabledEffect", true)
                     )
             }.toMap()

@@ -108,7 +108,10 @@ fun List<String>.toLocationOrError(base: Location): Location? {
 
     forEachIndexed { index, str ->
         if (str.startsWith("~")) {
-            vector5[index] += str.substring(1).toDoubleOrError() ?: return null
+            val strVal = str.substring(1)
+            if (strVal.isNotEmpty()) {
+                vector5[index] += strVal.toDoubleOrError() ?: return null
+            }
         } else {
             vector5[index] = str.toDoubleOrError() ?: return null
         }

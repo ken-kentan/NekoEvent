@@ -24,7 +24,7 @@ class EventCommand(
 
     companion object {
         private val ARGUMENT_LIST = listOf(
-                CommandArgument("ticket", PLAYER, "[type]", "[amount]"),
+                CommandArgument("ticket", PLAYER, "[ticketType]", "[amount]"),
                 CommandArgument("tp", PLAYER, "[x y z <yaw pitch>]"),
                 CommandArgument("msg", PLAYER, "[sender]", "[message]"),
                 CommandArgument("setspawn", PLAYER, "[x y z]"),
@@ -59,7 +59,11 @@ class EventCommand(
                 eventMessage(args[1], args[2], args.drop(3))
             }
             "setspawn" -> sender.doIfArguments(args, 4) {
-                spawnManager.setSpawn(args[1], args.drop(2))
+                if (it is BlockCommandSender) {
+                    spawnManager.setSpawn(args[1], listOf(it.block.world.name, args[2], args[3], args[4]))
+                } else {
+                    it.sendCommandBlockCommand()
+                }
             }
             "jump" -> sender.doIfArguments(args, 3) {
                 eventJump(args[1], args[2], args[3])
@@ -69,7 +73,7 @@ class EventCommand(
             }
             "random" -> sender.doIfArguments(args, 6) {
                 if (it is BlockCommandSender) {
-                    eventRandom(it, args.drop(2))
+                    eventRandom(it, args.drop(1))
                 } else {
                     it.sendCommandBlockCommand()
                 }

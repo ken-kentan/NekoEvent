@@ -18,6 +18,10 @@ class PasswordManager(
 
     private val passwordMap = mutableMapOf<String, Password>()
 
+    init {
+        config.listener = this
+    }
+
     fun getKeyIdList() = passwordMap.values.map { it.id }.sorted()
 
     fun input(strPlayer: String, passwordId: String, text: String) {
@@ -182,7 +186,7 @@ class PasswordManager(
         passwordMap.clear()
         passwordMap.putAll(dataMap)
 
-        Log.info("${passwordMap.size}個の鍵を読み込みました.")
+        Log.info("${passwordMap.size}個のパスワードを読み込みました.")
     }
 
     private fun MutableMap<String, Password>.getOrError(id: String): Password? {

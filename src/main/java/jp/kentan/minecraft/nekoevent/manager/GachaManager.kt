@@ -144,7 +144,7 @@ class GachaManager(
             sb.append(' ')
             sb.append(id)
             sb.append(": ")
-            sb.append(gacha.name)
+            sb.append(gacha.formatName)
             sb.append('\n')
             sb.append(ChatColor.RESET)
         }
@@ -158,7 +158,7 @@ class GachaManager(
         val messages = arrayOf(
                 "&7--------- &dガチャ情報 &7---------".formatColorCode(),
                 " ID: $gachaId",
-                " 名前: ${gacha.name}",
+                " 名前: ${gacha.formatName}",
                 " コンポ数: ${gacha.componentList.size}",
                 " あたり: ${gacha.winMessage}",
                 " はずれ: ${gacha.loseMessage}",
@@ -238,7 +238,7 @@ class GachaManager(
 
 
         event.setLine(0, SIGN_INDEX)
-        event.setLine(1, gacha.name)
+        event.setLine(1, gacha.formatName)
         event.setLine(2, cost.signText)
         event.setLine(3, costDetailText)
     }
@@ -250,8 +250,9 @@ class GachaManager(
 
         val gachaId = signConfig.getMetadata(sign.location, ID_METADATA_KEY) as String? ?: return
 
-        val cost = GachaCost.find(signConfig.getMetadata(sign.location, COST_METADATA_KEY) as String?) ?: return
-        val costDetail = signConfig.getMetadata(sign.location, COST_DETAIL_METADATA_KEY) as String? ?: return
+        val strCost = signConfig.getMetadata(sign.location, COST_METADATA_KEY) as String? ?: return
+        val cost = GachaCost.valueOf(strCost)
+        val costDetail = signConfig.getMetadata(sign.location, COST_DETAIL_METADATA_KEY)?.toString() ?: return
 
         when (cost) {
             FREE -> play(event.player, gachaId)

@@ -70,7 +70,7 @@ data class Key(
             val compare = target.clone()
 
             val strPeriod = compare.itemMeta.run {
-                if (this == null) {
+                if (this == null || !hasLore()) {
                     return KeyResult.NOT_MATCH
                 }
 
