@@ -58,7 +58,7 @@ class SpawnManager(
 
     /**
      * 看板フォーマット
-     * 0: [setspawn ]
+     * 0: [setspawn]
      * 1: [x y z]
      * 2: <message>
      * 3:
