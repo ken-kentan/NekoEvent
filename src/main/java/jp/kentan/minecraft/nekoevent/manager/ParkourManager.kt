@@ -270,7 +270,7 @@ class ParkourManager(
 
         val signMetadataMap = LinkedHashMap<String, Any>().apply {
             put(ID_METADATA_KEY, parkourId)
-            put(ACTION_METADATA_KEY, action)
+            put(ACTION_METADATA_KEY, action.name)
         }
 
         val sign = event.block.state as Sign
@@ -299,9 +299,9 @@ class ParkourManager(
         val parkourId = signConfig.getMetadata(sign.location, ID_METADATA_KEY) as String? ?: return
         val parkour = parkourMap.getOrError(parkourId) ?: return
 
-        val action = signConfig.getMetadata(sign.location, ACTION_METADATA_KEY) as SignAction? ?: return
+        val strAction = signConfig.getMetadata(sign.location, ACTION_METADATA_KEY) as String? ?: return
 
-        when (action) {
+        when (SignAction.valueOf(strAction)) {
             JOIN  -> join(event.player, parkour)
             CLEAR -> clear(event.player, parkour)
             BACK  -> back(event.player, parkour)

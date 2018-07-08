@@ -305,7 +305,7 @@ class DungeonManager(
 
         val signMetadataMap = LinkedHashMap<String, Any>().apply {
             put(ID_METADATA_KEY, dungeonId)
-            put(ACTION_METADATA_KEY, action)
+            put(ACTION_METADATA_KEY, action.name)
         }
 
         val sign = event.block.state as Sign
@@ -333,9 +333,9 @@ class DungeonManager(
         val dungeonId = signConfig.getMetadata(sign.location, ID_METADATA_KEY) as String? ?: return
         val dungeon = dungeonMap.getOrError(dungeonId) ?: return
 
-        val action = signConfig.getMetadata(sign.location, ACTION_METADATA_KEY) as SignAction? ?: return
+        val strAction = signConfig.getMetadata(sign.location, ACTION_METADATA_KEY) as String? ?: return
 
-        when (action) {
+        when (SignAction.valueOf(strAction)) {
             JOIN  -> join(event.player, dungeon)
             CLEAR -> clear(event.player, dungeon)
         }
