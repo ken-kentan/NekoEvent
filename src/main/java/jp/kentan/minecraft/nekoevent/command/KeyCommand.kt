@@ -2,6 +2,7 @@ package jp.kentan.minecraft.nekoevent.command
 
 import jp.kentan.minecraft.nekoevent.component.KeyFlag
 import jp.kentan.minecraft.nekoevent.component.model.CommandArgument
+import jp.kentan.minecraft.nekoevent.component.model.CommandArgument.Companion.PLAYER
 import jp.kentan.minecraft.nekoevent.manager.KeyManager
 import jp.kentan.minecraft.nekoevent.util.doIfArguments
 import jp.kentan.minecraft.nekoevent.util.getPlayerNames
@@ -18,8 +19,8 @@ class KeyCommand(
 
     companion object {
         private val ARGUMENT_LIST = listOf(
-                CommandArgument("use", CommandArgument.PLAYER, "[keyId]"),
-                CommandArgument("give", CommandArgument.PLAYER, "[keyId]", "<amount>"),
+                CommandArgument("use", PLAYER, "[keyId]"),
+                CommandArgument("give", PLAYER, "[keyId]", "<amount>"),
                 CommandArgument("drop", "[keyId]", "[world]", "[x y z]", "<amount>"),
                 CommandArgument("create", "[keyId]"),
                 CommandArgument("delete", "[keyId]"),
@@ -90,10 +91,10 @@ class KeyCommand(
         val prefix = args.last()
 
         return when (commandArg.get(args)) {
-            CommandArgument.PLAYER -> getPlayerNames(prefix).toMutableList()
-            "[keyId]"              -> manager.getKeyIdList().filter { it.startsWith(prefix, true) }.toMutableList()
-            "[flagId]"             -> KeyFlag.idList.filter { it.startsWith(prefix, true) }.toMutableList()
-            else -> mutableListOf()
+            PLAYER     -> getPlayerNames(prefix).toMutableList()
+            "[keyId]"  -> manager.getKeyIdList().filter { it.startsWith(prefix, true) }.toMutableList()
+            "[flagId]" -> KeyFlag.idList.filter { it.startsWith(prefix, true) }.toMutableList()
+            else       -> mutableListOf()
         }
     }
 

@@ -2,6 +2,7 @@ package jp.kentan.minecraft.nekoevent.command
 
 import jp.kentan.minecraft.nekoevent.component.ParkourFlag
 import jp.kentan.minecraft.nekoevent.component.model.CommandArgument
+import jp.kentan.minecraft.nekoevent.component.model.CommandArgument.Companion.PLAYER
 import jp.kentan.minecraft.nekoevent.manager.ParkourManager
 import jp.kentan.minecraft.nekoevent.util.doIfArguments
 import jp.kentan.minecraft.nekoevent.util.getPlayerNames
@@ -18,9 +19,9 @@ class ParkourCommand(
 
     companion object {
         private val ARGUMENT_LIST = listOf(
-                CommandArgument("join", CommandArgument.PLAYER, "[parkourId]"),
-                CommandArgument("clear", CommandArgument.PLAYER, "[parkourId]"),
-                CommandArgument("back", CommandArgument.PLAYER, "[parkourId]"),
+                CommandArgument("join", PLAYER, "[parkourId]"),
+                CommandArgument("clear", PLAYER, "[parkourId]"),
+                CommandArgument("back", PLAYER, "[parkourId]"),
                 CommandArgument("create", "[parkourId]"),
                 CommandArgument("delete", "[parkourId]"),
                 CommandArgument("flag", "[parkourId]", "[flagId]", "<flagArgs..>"),
@@ -86,10 +87,10 @@ class ParkourCommand(
         val prefix = args.last()
 
         return when (commandArg.get(args)) {
-            CommandArgument.PLAYER -> getPlayerNames(prefix).toMutableList()
-            "[parkourId]"          -> manager.getParkourIdList().filter { it.startsWith(prefix, true) }.toMutableList()
-            "[flagId]"             -> ParkourFlag.idList.filter { it.startsWith(prefix, true) }.toMutableList()
-            else -> mutableListOf()
+            PLAYER        -> getPlayerNames(prefix).toMutableList()
+            "[parkourId]" -> manager.getParkourIdList().filter { it.startsWith(prefix, true) }.toMutableList()
+            "[flagId]"    -> ParkourFlag.idList.filter { it.startsWith(prefix, true) }.toMutableList()
+            else          -> mutableListOf()
         }
     }
 

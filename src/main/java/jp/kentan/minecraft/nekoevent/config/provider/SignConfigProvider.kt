@@ -7,7 +7,7 @@ import org.bukkit.Location
 import org.bukkit.block.Sign
 import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
-import java.util.LinkedHashMap
+import java.util.*
 
 class SignConfigProvider(dataFolder: File) : BaseConfigProvider(dataFolder, "sign.yml") {
 

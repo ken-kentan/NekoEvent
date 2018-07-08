@@ -9,7 +9,8 @@ import jp.kentan.minecraft.nekoevent.config.ConfigUpdateListener
 import jp.kentan.minecraft.nekoevent.config.provider.DungeonConfigProvider
 import jp.kentan.minecraft.nekoevent.config.provider.SignConfigProvider
 import jp.kentan.minecraft.nekoevent.listener.SignListener
-import jp.kentan.minecraft.nekoevent.manager.DungeonManager.SignAction.*
+import jp.kentan.minecraft.nekoevent.manager.DungeonManager.SignAction.CLEAR
+import jp.kentan.minecraft.nekoevent.manager.DungeonManager.SignAction.JOIN
 import jp.kentan.minecraft.nekoevent.util.*
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor

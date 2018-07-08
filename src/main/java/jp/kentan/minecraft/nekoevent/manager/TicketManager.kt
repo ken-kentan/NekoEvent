@@ -1,11 +1,12 @@
 package jp.kentan.minecraft.nekoevent.manager
 
 import jp.kentan.minecraft.nekoevent.NekoEvent
-import jp.kentan.minecraft.nekoevent.manager.factory.TicketFactory
 import jp.kentan.minecraft.nekoevent.component.TicketType
-import jp.kentan.minecraft.nekoevent.component.TicketType.*
+import jp.kentan.minecraft.nekoevent.component.TicketType.EVENT
+import jp.kentan.minecraft.nekoevent.component.TicketType.VOTE
 import jp.kentan.minecraft.nekoevent.config.ConfigUpdateListener
 import jp.kentan.minecraft.nekoevent.config.provider.TicketConfigProvider
+import jp.kentan.minecraft.nekoevent.manager.factory.TicketFactory
 import jp.kentan.minecraft.nekoevent.util.Log
 import jp.kentan.minecraft.nekoevent.util.toIntOrError
 import jp.kentan.minecraft.nekoevent.util.toPlayerOrError

@@ -1,13 +1,14 @@
 package jp.kentan.minecraft.nekoevent.manager.factory
 
-import jp.kentan.minecraft.nekoevent.component.model.Ticket
 import jp.kentan.minecraft.nekoevent.component.TicketType
-import jp.kentan.minecraft.nekoevent.component.TicketType.*
+import jp.kentan.minecraft.nekoevent.component.TicketType.EVENT
+import jp.kentan.minecraft.nekoevent.component.TicketType.VOTE
+import jp.kentan.minecraft.nekoevent.component.model.Ticket
 import jp.kentan.minecraft.nekoevent.util.formatColorCode
 import jp.kentan.minecraft.nekoevent.util.isFull
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import java.util.ArrayList
+import java.util.*
 import java.util.regex.Pattern
 
 class TicketFactory {

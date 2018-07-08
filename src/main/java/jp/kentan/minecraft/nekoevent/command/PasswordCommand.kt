@@ -2,6 +2,7 @@ package jp.kentan.minecraft.nekoevent.command
 
 import jp.kentan.minecraft.nekoevent.component.PasswordFlag
 import jp.kentan.minecraft.nekoevent.component.model.CommandArgument
+import jp.kentan.minecraft.nekoevent.component.model.CommandArgument.Companion.PLAYER
 import jp.kentan.minecraft.nekoevent.manager.PasswordManager
 import jp.kentan.minecraft.nekoevent.util.doIfArguments
 import jp.kentan.minecraft.nekoevent.util.getPlayerNames
@@ -18,9 +19,9 @@ class PasswordCommand(
 
     companion object {
         private val ARGUMENT_LIST = listOf(
-                CommandArgument("input", CommandArgument.PLAYER, "[passId]", "[text]"),
+                CommandArgument("input", PLAYER, "[passId]", "[text]"),
                 CommandArgument("set", "[passId]", "[text]"),
-                CommandArgument("reset", CommandArgument.PLAYER, "[passId]"),
+                CommandArgument("reset", PLAYER, "[passId]"),
                 CommandArgument("create", "[passId]"),
                 CommandArgument("delete", "[passId]"),
                 CommandArgument("flag", "[passId]", "[flagId]", "<flagArgs..>"),
@@ -86,10 +87,10 @@ class PasswordCommand(
         val prefix = args.last()
 
         return when (commandArg.get(args)) {
-            CommandArgument.PLAYER -> getPlayerNames(prefix).toMutableList()
-            "[passId]"             -> manager.getKeyIdList().filter { it.startsWith(prefix, true) }.toMutableList()
-            "[flagId]"             -> PasswordFlag.idList.filter { it.startsWith(prefix, true) }.toMutableList()
-            else -> mutableListOf()
+            PLAYER     -> getPlayerNames(prefix).toMutableList()
+            "[passId]" -> manager.getKeyIdList().filter { it.startsWith(prefix, true) }.toMutableList()
+            "[flagId]" -> PasswordFlag.idList.filter { it.startsWith(prefix, true) }.toMutableList()
+            else       -> mutableListOf()
         }
     }
 

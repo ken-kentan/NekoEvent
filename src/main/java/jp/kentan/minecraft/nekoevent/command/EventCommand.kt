@@ -104,15 +104,15 @@ class EventCommand(
         val prefix = args.last()
 
         return when (commandArg.get(args)) {
-            PLAYER   -> getPlayerNames(prefix).toMutableList()
-            "[type]" -> TicketType.idList.filter { it.startsWith(prefix, true) }.toMutableList()
+            PLAYER         -> getPlayerNames(prefix).toMutableList()
+            "[ticketType]" -> TicketType.idList.filter { it.startsWith(prefix, true) }.toMutableList()
             else -> mutableListOf()
         }
     }
 
     private fun sendHelp(sender: CommandSender) {
         sender.sendMessage("---------- NekoEvent コマンドヘルプ ----------")
-        sender.sendMessage("| " + ChatColor.YELLOW + "/event ticket [player] [type] [amount]")
+        sender.sendMessage("| " + ChatColor.YELLOW + "/event ticket [player] [ticketType] [amount]")
         sender.sendMessage("| " + ChatColor.YELLOW + "/event tp [player] [x y z <yaw pitch>] (相対指定時の基準はプレイヤー座標)")
         sender.sendMessage("| " + ChatColor.YELLOW + "/event msg [player] [sender] [message] ([sender]にnullを指定で[message]のみ表示)")
         sender.sendMessage("| " + ChatColor.YELLOW + "/event setspawn [player] <x y z> (相対指定時の基準はｺﾏﾝﾄﾞﾌﾞﾛｯｸ座標)")

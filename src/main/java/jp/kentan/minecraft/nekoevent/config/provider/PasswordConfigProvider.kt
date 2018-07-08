@@ -8,7 +8,6 @@ import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
-import java.util.HashMap
 
 class PasswordConfigProvider(dataFolder: File) : BaseConfigProvider(dataFolder, "password.yml") {
 

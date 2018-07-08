@@ -1,6 +1,7 @@
 package jp.kentan.minecraft.nekoevent.command
 
 import jp.kentan.minecraft.nekoevent.component.model.CommandArgument
+import jp.kentan.minecraft.nekoevent.component.model.CommandArgument.Companion.PLAYER
 import jp.kentan.minecraft.nekoevent.manager.GachaManager
 import jp.kentan.minecraft.nekoevent.util.doIfArguments
 import jp.kentan.minecraft.nekoevent.util.getPlayerNames
@@ -15,7 +16,7 @@ class GachaCommand(
 
     companion object {
         private val ARGUMENT_LIST = listOf(
-                CommandArgument("play", CommandArgument.PLAYER, "[gachaId]"),
+                CommandArgument("play", PLAYER, "[gachaId]"),
                 CommandArgument("demo", "[gachaId]", "[times]"),
                 CommandArgument("list"),
                 CommandArgument("info", "[gachaId]"),
@@ -61,13 +62,9 @@ class GachaCommand(
         val prefix = args.last()
 
         return when (commandArg.get(args)) {
-            CommandArgument.PLAYER -> {
-                getPlayerNames(prefix).toMutableList()
-            }
-            "[gachaId]" -> {
-                manager.getGachaIdList().filter { it.startsWith(prefix, true) }.toMutableList()
-            }
-            else -> mutableListOf()
+            PLAYER      -> getPlayerNames(prefix).toMutableList()
+            "[gachaId]" -> manager.getGachaIdList().filter { it.startsWith(prefix, true) }.toMutableList()
+            else        -> mutableListOf()
         }
     }
 

@@ -3,12 +3,10 @@ package jp.kentan.minecraft.nekoevent.config.provider
 import jp.kentan.minecraft.nekoevent.component.model.Key
 import jp.kentan.minecraft.nekoevent.config.ConfigUpdateListener
 import jp.kentan.minecraft.nekoevent.util.Log
-import jp.kentan.minecraft.nekoevent.util.formatColorCode
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.configuration.file.YamlConfiguration
-import org.bukkit.inventory.ItemStack
 import java.io.File
 
 class KeyConfigProvider(dataFolder: File) : BaseConfigProvider(dataFolder, "key.yml") {

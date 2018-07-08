@@ -2,6 +2,7 @@ package jp.kentan.minecraft.nekoevent.command
 
 import jp.kentan.minecraft.nekoevent.component.DungeonFlag
 import jp.kentan.minecraft.nekoevent.component.model.CommandArgument
+import jp.kentan.minecraft.nekoevent.component.model.CommandArgument.Companion.PLAYER
 import jp.kentan.minecraft.nekoevent.manager.DungeonManager
 import jp.kentan.minecraft.nekoevent.util.doIfArguments
 import jp.kentan.minecraft.nekoevent.util.getPlayerNames
@@ -18,8 +19,8 @@ class DungeonCommand(
 
     companion object {
         private val ARGUMENT_LIST = listOf(
-                CommandArgument("join", CommandArgument.PLAYER, "[dungeonId]"),
-                CommandArgument("clear", CommandArgument.PLAYER, "[dungeonId]"),
+                CommandArgument("join", PLAYER, "[dungeonId]"),
+                CommandArgument("clear", PLAYER, "[dungeonId]"),
                 CommandArgument("lock", "[dungeonId]", "[seconds]"),
                 CommandArgument("unlock", "[dungeonId]"),
                 CommandArgument("create", "[dungeonId]"),
@@ -90,9 +91,9 @@ class DungeonCommand(
         val prefix = args.last()
 
         return when (commandArg.get(args)) {
-            CommandArgument.PLAYER -> getPlayerNames(prefix).toMutableList()
-            "[dungeonId]"          -> manager.getDungeonIdList().filter { it.startsWith(prefix, true) }.toMutableList()
-            "[flagId]"             -> DungeonFlag.idList.filter { it.startsWith(prefix, true) }.toMutableList()
+            PLAYER        -> getPlayerNames(prefix).toMutableList()
+            "[dungeonId]" -> manager.getDungeonIdList().filter { it.startsWith(prefix, true) }.toMutableList()
+            "[flagId]"    -> DungeonFlag.idList.filter { it.startsWith(prefix, true) }.toMutableList()
             else -> mutableListOf()
         }
     }
