@@ -18,10 +18,6 @@ class KeyManager(
         private val keyConfig: KeyConfigProvider
 ) : ConfigUpdateListener<Key> {
 
-    companion object {
-        private const val ID_NOT_FOUND = "鍵({id})は存在しません."
-    }
-
     private val keyMap = mutableMapOf<String, Key>()
 
     init {
@@ -40,10 +36,7 @@ class KeyManager(
     }
 
     fun give(player: Player, keyId: String, amount: Int) {
-        val key = keyMap[keyId] ?: let {
-            Log.error(ID_NOT_FOUND.replace("{id}", keyId))
-            return
-        }
+        val key = keyMap.getOrError(keyId) ?: return
 
         give(player, key, amount)
     }
@@ -53,10 +46,7 @@ class KeyManager(
     }
 
     fun drop(keyId: String, strLocation: Array<String>, strAmount: String) {
-        val key = keyMap[keyId] ?: let {
-            Log.error(ID_NOT_FOUND.replace("{id}", keyId))
-            return
-        }
+        val key = keyMap.getOrError(keyId) ?: return
 
         val location = strLocation.toLocationOrError() ?: return
         val amount = strAmount.toIntOrError() ?: return
@@ -75,10 +65,7 @@ class KeyManager(
     }
 
     fun use(player: Player, keyId: String): Boolean {
-        val key = keyMap[keyId] ?: let {
-            Log.error(ID_NOT_FOUND.replace("{id}", keyId))
-            return false
-        }
+        val key = keyMap.getOrError(keyId) ?: return false
 
         return use(player, key)
     }
@@ -197,10 +184,7 @@ class KeyManager(
     }
 
     fun sendInfo(sender: CommandSender, keyId: String) {
-        val key = keyMap[keyId] ?: let {
-            sender.sendMessage(NekoEvent.PREFIX + ChatColor.YELLOW + ID_NOT_FOUND.replace("{id}", keyId))
-            return
-        }
+        val key = keyMap.getOrError(keyId) ?: return
 
         val messages = arrayOf(
                 "&7--------- &6鍵情報 &7---------".formatColorCode(),
@@ -227,5 +211,12 @@ class KeyManager(
         keyMap.putAll(dataMap)
 
         Log.info("${keyMap.size}個の鍵を読み込みました.")
+    }
+
+    private fun MutableMap<String, Key>.getOrError(id: String): Key? {
+        return keyMap[id] ?: let {
+            Log.error("鍵($id)は存在しません.")
+            return@let null
+        }
     }
 }

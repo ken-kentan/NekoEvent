@@ -16,20 +16,13 @@ class PasswordManager(
         private val config: PasswordConfigProvider
 ) : ConfigUpdateListener<Password> {
 
-    companion object {
-        private const val ID_NOT_FOUND = "パスワード({id})は存在しません."
-    }
-
     private val passwordMap = mutableMapOf<String, Password>()
 
     fun getKeyIdList() = passwordMap.values.map { it.id }.sorted()
 
     fun input(strPlayer: String, passwordId: String, text: String) {
         val player = strPlayer.toPlayerOrError() ?: return
-        val password = passwordMap[passwordId] ?: let {
-            Log.error(ID_NOT_FOUND.replace("{id}", passwordId))
-            return
-        }
+        val password = passwordMap.getOrError(passwordId) ?: return
 
         input(player, password, text)
     }
@@ -61,10 +54,7 @@ class PasswordManager(
     }
 
     fun set(passwordId: String, text: String) {
-        val password = passwordMap[passwordId] ?: let {
-            Log.error(ID_NOT_FOUND.replace("{id}", passwordId))
-            return
-        }
+        val password = passwordMap.getOrError(passwordId) ?: return
 
         password.passwordText = text
         Log.info("パスワード($passwordId)を'$text'に設定しました.")
@@ -72,10 +62,7 @@ class PasswordManager(
 
     fun reset(strPlayer: String, passwordId: String) {
         val player = strPlayer.toPlayerOrError() ?: return
-        val password = passwordMap[passwordId] ?: let {
-            Log.error(ID_NOT_FOUND.replace("{id}", passwordId))
-            return
-        }
+        val password = passwordMap.getOrError(passwordId) ?: return
 
         reset(player, password)
     }
@@ -168,11 +155,8 @@ class PasswordManager(
         sender.sendMessage(sb.toString())
     }
 
-    fun sendInfo(sender: CommandSender, keyId: String) {
-        val password = passwordMap[keyId] ?: let {
-            sender.sendMessage(NekoEvent.PREFIX + ChatColor.YELLOW + ID_NOT_FOUND.replace("{id}", keyId))
-            return
-        }
+    fun sendInfo(sender: CommandSender, passwordId: String) {
+        val password = passwordMap.getOrError(passwordId) ?: return
 
         val messages = arrayOf(
                 "&7--------- &6パスワード情報 &7---------".formatColorCode(),
@@ -199,5 +183,12 @@ class PasswordManager(
         passwordMap.putAll(dataMap)
 
         Log.info("${passwordMap.size}個の鍵を読み込みました.")
+    }
+
+    private fun MutableMap<String, Password>.getOrError(id: String): Password? {
+        return passwordMap[id] ?: let {
+            Log.error("パスワード($id)は存在しません.")
+            return@let null
+        }
     }
 }

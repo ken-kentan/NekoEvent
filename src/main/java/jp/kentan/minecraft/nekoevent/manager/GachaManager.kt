@@ -28,8 +28,6 @@ class GachaManager(
 ) : ConfigUpdateListener<Gacha>, SignListener {
 
     companion object {
-        private const val ID_NOT_FOUND = "ガチャ({id})は存在しません."
-
         private val SIGN_INDEX = "&8&l[&d&lガチャ&8&l]".formatColorCode()
         val SIGN_KEY = Pair("[gacha]", SIGN_INDEX)
 
@@ -53,10 +51,7 @@ class GachaManager(
     }
 
     fun play(player: Player, gachaId: String) {
-        val gacha = gachaMap[gachaId] ?: let {
-            Log.error(ID_NOT_FOUND.replace("{id}", gachaId))
-            return
-        }
+        val gacha = gachaMap.getOrError(gachaId) ?: return
 
         play(player, gacha)
     }
@@ -111,10 +106,7 @@ class GachaManager(
     }
 
     fun demo(sender: CommandSender, gachaId: String, strTimes: String) {
-        val gacha = gachaMap[gachaId] ?: let {
-            Log.error(ID_NOT_FOUND.replace("{id}", gachaId))
-            return
-        }
+        val gacha = gachaMap.getOrError(gachaId) ?: return
 
         val time = strTimes.toIntOrNull() ?: let {
             Log.error("$strTimes は0以上の整数にしてください.")
@@ -161,10 +153,7 @@ class GachaManager(
     }
 
     fun sendInfo(sender: CommandSender, gachaId: String) {
-        val gacha = gachaMap[gachaId] ?: let {
-            sender.sendMessage(NekoEvent.PREFIX + ChatColor.YELLOW + ID_NOT_FOUND.replace("{id}", gachaId))
-            return
-        }
+        val gacha = gachaMap.getOrError(gachaId) ?: return
 
         val messages = arrayOf(
                 "&7--------- &dガチャ情報 &7---------".formatColorCode(),
@@ -240,10 +229,7 @@ class GachaManager(
         }
 
 
-        val gacha = gachaMap[gachaId] ?: let {
-            player.sendMessage(NekoEvent.PREFIX + ChatColor.YELLOW + ID_NOT_FOUND.replace("{id}", gachaId))
-            return
-        }
+        val gacha = gachaMap.getOrError(gachaId) ?: return
 
         val sign = event.block.state as Sign
         if (!signConfig.save(sign.location, signMetadataMap)) {
@@ -273,6 +259,13 @@ class GachaManager(
             EVENT_TICKET -> playWithTicket(event.player, gachaId, TicketType.EVENT, costDetail.toIntOrNull() ?: 0)
             VOTE_TICKET  -> playWithTicket(event.player, gachaId, TicketType.VOTE, costDetail.toIntOrNull() ?: 0)
             KEY -> playWithKey(event.player, gachaId, costDetail)
+        }
+    }
+
+    private fun MutableMap<String, Gacha>.getOrError(id: String): Gacha? {
+        return gachaMap[id] ?: let {
+            Log.error("ガチャ($id)は存在しません.")
+            return@let null
         }
     }
 }

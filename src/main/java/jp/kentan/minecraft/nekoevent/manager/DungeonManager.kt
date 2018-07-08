@@ -55,10 +55,7 @@ class DungeonManager(
 
     fun join(strPlayer: String, dungeonId: String) {
         val player = strPlayer.toPlayerOrError() ?: return
-        val dungeon = dungeonMap[dungeonId] ?: let {
-            Log.error("ダンジョン($dungeonId)は存在しません.")
-            return
-        }
+        val dungeon = dungeonMap.getOrError(dungeonId) ?: return
 
         join(player, dungeon)
     }
@@ -95,10 +92,7 @@ class DungeonManager(
 
     fun clear(strPlayer: String, dungeonId: String) {
         val player = strPlayer.toPlayerOrError() ?: return
-        val dungeon = dungeonMap[dungeonId] ?: let {
-            Log.error("ダンジョン($dungeonId)は存在しません.")
-            return
-        }
+        val dungeon = dungeonMap.getOrError(dungeonId) ?: return
 
         clear(player, dungeon)
     }
@@ -142,10 +136,7 @@ class DungeonManager(
     }
 
     fun lock(dungeonId: String, strSeconds: String) {
-        val dungeon = dungeonMap[dungeonId] ?: let {
-            Log.error("ダンジョン($dungeonId)は存在しません.")
-            return
-        }
+        val dungeon = dungeonMap.getOrError(dungeonId) ?: return
         val seconds = strSeconds.toIntOrError() ?: return
 
         lock(dungeon, seconds)
@@ -161,10 +152,7 @@ class DungeonManager(
     }
 
     fun unlock(dungeonId: String) {
-        val dungeon = dungeonMap[dungeonId] ?: let {
-            Log.error("ダンジョン($dungeonId)は存在しません.")
-            return
-        }
+        val dungeon = dungeonMap.getOrError(dungeonId) ?: return
 
         dungeon.stopLockTimer()
     }
@@ -200,10 +188,7 @@ class DungeonManager(
     }
 
     fun flag(player: Player, dungeonId: String, flagId: String, flagArgs: List<String>) {
-        var dungeon = dungeonMap[dungeonId] ?: let {
-            player.sendMessage(NekoEvent.PREFIX + ChatColor.YELLOW + "${dungeonId}は存在しません.")
-            return
-        }
+        var dungeon = dungeonMap.getOrError(dungeonId) ?: return
 
         val flagType = DungeonFlag.find(flagId) ?: let {
             player.sendMessage(NekoEvent.PREFIX + ChatColor.YELLOW + "${flagId}は正しいフラグIDではありません.")
@@ -259,10 +244,7 @@ class DungeonManager(
     }
 
     fun sendInfo(sender: CommandSender, dungeonId: String) {
-        val dungeon = dungeonMap[dungeonId] ?: let {
-            sender.sendMessage(NekoEvent.PREFIX + ChatColor.YELLOW + "ダンジョン($dungeonId)は存在しません.")
-            return
-        }
+        val dungeon = dungeonMap.getOrError(dungeonId) ?: return
 
         val messages = arrayOf(
                 "&7--------- &4ダンジョン情報 &7---------".formatColorCode(),
@@ -349,16 +331,20 @@ class DungeonManager(
         }
 
         val dungeonId = signConfig.getMetadata(sign.location, ID_METADATA_KEY) as String? ?: return
-        val dungeon = dungeonMap[dungeonId] ?: let {
-            Log.error("ダンジョン($dungeonId)は存在しません.")
-            return
-        }
+        val dungeon = dungeonMap.getOrError(dungeonId) ?: return
 
         val action = signConfig.getMetadata(sign.location, ACTION_METADATA_KEY) as SignAction? ?: return
 
         when (action) {
             JOIN  -> join(event.player, dungeon)
             CLEAR -> clear(event.player, dungeon)
+        }
+    }
+
+    private fun MutableMap<String, Dungeon>.getOrError(id: String): Dungeon? {
+        return dungeonMap[id] ?: let {
+            Log.error("ダンジョン($id)は存在しません.")
+            return@let null
         }
     }
 }
