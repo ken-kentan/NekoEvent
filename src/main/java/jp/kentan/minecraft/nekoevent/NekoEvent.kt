@@ -31,6 +31,12 @@ class NekoEvent : JavaPlugin() {
                 configManager.gachaConfigProvider,
                 configManager.signConfigProvider)
         val passwordManager = PasswordManager(configManager.passwordConfigProvider)
+        val parkourManager = ParkourManager(
+                configManager.parkourConfigProvider,
+                configManager.signConfigProvider,
+                spawnManager,
+                ticketManager
+        )
         val dungeonManager = DungeonManager(
                 this,
                 configManager.dungeonConfigProvider,
@@ -43,6 +49,7 @@ class NekoEvent : JavaPlugin() {
         getCommand("gacha").set(GachaCommand(gachaManager))
         getCommand("key").set(KeyCommand(keyManager))
         getCommand("password").set(PasswordCommand(passwordManager))
+        getCommand("parkour").set(ParkourCommand(parkourManager))
         getCommand("dungeon").set(DungeonCommand(dungeonManager))
 
 
@@ -53,6 +60,7 @@ class NekoEvent : JavaPlugin() {
         val bukkitEventListener = BukkitEventListener(this, spawnManager)
         bukkitEventListener.registerSignListener(GachaManager.SIGN_KEY, gachaManager)
         bukkitEventListener.registerSignListener(SpawnManager.SIGN_KEY, spawnManager)
+        bukkitEventListener.registerSignListener(ParkourManager.SIGN_KEY, parkourManager)
         bukkitEventListener.registerSignListener(DungeonManager.SIGN_KEY, dungeonManager)
 
         server.pluginManager.registerEvents(bukkitEventListener, this)

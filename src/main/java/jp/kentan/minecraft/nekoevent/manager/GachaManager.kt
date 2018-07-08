@@ -187,7 +187,6 @@ class GachaManager(
      * 3: cost detail (ex. ticket num)
      */
     override fun onSignChanged(event: SignChangeEvent) {
-        val player = event.player
         val gachaId = event.getLine(1)
         val strCost = event.getLine(2)
         val strCostDetail = event.getLine(3)

@@ -16,6 +16,7 @@ class ConfigManager(dataFolder: File) {
     val gachaConfigProvider = GachaConfigProvider(dataFolder)
     val keyConfigProvider = KeyConfigProvider(dataFolder)
     val passwordConfigProvider = PasswordConfigProvider(dataFolder)
+    val parkourConfigProvider = ParkourConfigProvider(dataFolder, playerConfigProvider)
     val dungeonConfigProvider = DungeonConfigProvider(dataFolder, playerConfigProvider)
     val ticketConfigProvider = TicketConfigProvider(dataFolder, playerConfigProvider)
 
@@ -23,6 +24,7 @@ class ConfigManager(dataFolder: File) {
         gachaConfigProvider.load()
         keyConfigProvider.load()
         passwordConfigProvider.load()
+        parkourConfigProvider.load()
         dungeonConfigProvider.load()
         ticketConfigProvider.load()
     }
