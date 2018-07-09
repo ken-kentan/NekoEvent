@@ -24,15 +24,27 @@ class TicketFactory {
 
     private class EventTicket : Ticket(EVENT,
             listOf("&3&oイベントワールドで使用する特別なチケット&r".formatColorCode()),
-            "イベントワールドで使用する特別なチケット")
-
-    private class VoteTicket : Ticket(VOTE,
-            listOf("&6&o投票&3&oでもらえる不思議なチケット&r #".formatColorCode(), LORE_CONTENT),
-            "&6&o投票&3&oでもらえる不思議なチケット&r #") {
+            "イベントワールドで使用する特別なチケット") {
 
         companion object {
-            private val EVENT_TICKET = EventTicket()
+            private val VOTE_TICKET = VoteTicket()
+        }
 
+        override fun isSimilar(playerName: String, similarItem: ItemStack?): Boolean {
+
+            if (VOTE_TICKET.isSimilar(playerName, similarItem)) {
+                return true
+            }
+
+            return super.isSimilar(playerName, similarItem)
+        }
+
+    }
+
+    private class VoteTicket : Ticket(VOTE,
+            listOf(LORE_CONTENT, "&8本人しか使用できないよ(｡･ω･｡)".formatColorCode()), LORE_CONTENT) {
+
+        companion object {
             private val LORE_PATTERN = Pattern.compile(".*#(\\w*)")
             private val LORE_CONTENT = "&6&o投票&3&oでもらえる不思議なチケット&r #".formatColorCode()
         }
@@ -46,6 +58,7 @@ class TicketFactory {
                 val lore = ArrayList<String>()
                 lore.addAll(getLore())
                 lore[0] = LORE_CONTENT + player.name
+                setLore(lore)
             }
             itemStack.itemMeta = meta
 
@@ -60,10 +73,6 @@ class TicketFactory {
         override fun isSimilar(playerName: String, similarItem: ItemStack?): Boolean {
             if (!super.isSimilar("", similarItem)) {
                 return false
-            }
-
-            if (EVENT_TICKET.isSimilar(playerName, similarItem)) {
-                return true
             }
 
             val matcher = LORE_PATTERN.matcher(similarItem?.itemMeta?.lore?.get(0))
