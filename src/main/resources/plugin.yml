@@ -1,6 +1,6 @@
 name: NekoEvent
-main: jp.kentan.minecraft.neko_event.NekoEvent
-version: 2.0.0
+main: jp.kentan.minecraft.nekoevent.NekoEvent
+version: 3.0.0
 author: ken_kentan
 website: http://ken.kentan.jp
 softdepend: [Multiverse-Core]
@@ -16,16 +16,6 @@ commands:
         usage: /<command>
         permission: neko.event.gacha
         permission-message: You don't have <permission>
-    dungeon:
-        description: NekoEvent
-        usage: /<command>
-        permission: neko.event.dungeon
-        permission-message: You don't have <permission>
-    parkour:
-        description: NekoEvent
-        usage: /<command>
-        permission: neko.event.parkour
-        permission-message: You don't have <permission>
     key:
         description: NekoEvent
         usage: /<command>
@@ -35,4 +25,14 @@ commands:
         description: NekoEvent
         usage: /<command>
         permission: neko.event.password
+        permission-message: You don't have <permission>
+    parkour:
+        description: NekoEvent
+        usage: /<command>
+        permission: neko.event.parkour
+        permission-message: You don't have <permission>
+    dungeon:
+        description: NekoEvent
+        usage: /<command>
+        permission: neko.event.dungeon
         permission-message: You don't have <permission>

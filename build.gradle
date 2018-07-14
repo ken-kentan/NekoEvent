@@ -1,9 +1,18 @@
-group 'jp.kentan.minecraft.neko_event'
-version '2.0.0'
+buildscript {
+    ext.kotlin_version = '1.2.51'
 
-apply plugin: 'java'
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
 
-sourceCompatibility = 1.8
+group 'jp.kentan.minecraft.nekoevent'
+version '3.0.0-SNAPSHOT'
+
+apply plugin: 'kotlin'
 
 repositories {
     mavenCentral()
@@ -15,9 +24,19 @@ repositories {
 }
 
 dependencies {
-//    testCompile group: 'junit', name: 'junit', version: '4.12'
-    compileOnly 'org.spigotmc:spigot-api:1.12-R0.1-SNAPSHOT'
-    compileOnly 'org.bukkit:bukkit:1.12-R0.1-SNAPSHOT'
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+
+    compileOnly 'org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT'
+    compileOnly 'org.bukkit:bukkit:1.12.2-R0.1-SNAPSHOT'
 }
 
-compileJava.options.encoding = 'UTF-8'
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+jar {
+    from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+}
