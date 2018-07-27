@@ -31,6 +31,7 @@ class EventCommand(
                 CommandArgument("jump", PLAYER, "[height]", "[length]"),
                 CommandArgument("exp", PLAYER, "[value]"),
                 CommandArgument("random", "[x y z]", "[x y z]", "<x y z>"),
+                CommandArgument("randomtp", PLAYER, "[x y z]", "[x y z]", "<x y z>"),
                 CommandArgument("delay", "[seconds]", "[x y z]"),
                 CommandArgument("reset_status", PLAYER),
                 CommandArgument("reload"),
@@ -74,6 +75,13 @@ class EventCommand(
             "random" -> sender.doIfArguments(args, 6) {
                 if (it is BlockCommandSender) {
                     eventRandom(it, args.drop(1))
+                } else {
+                    it.sendCommandBlockCommand()
+                }
+            }
+            "randomtp" -> sender.doIfArguments(args, 6) {
+                if (it is BlockCommandSender) {
+                    eventRandomTp(args[1], it, args.drop(2))
                 } else {
                     it.sendCommandBlockCommand()
                 }
@@ -123,6 +131,7 @@ class EventCommand(
         sender.sendMessage("| " + ChatColor.YELLOW + "/event jump [player] [height] [length] (各値は小数点係数)")
         sender.sendMessage("| " + ChatColor.YELLOW + "/event exp [player] [value] (経験値ｵｰﾌﾞをドロップ)")
         sender.sendMessage("| " + ChatColor.YELLOW + "/event random [x y z] [x y z] <x y z> (座標は複数指定可能. 0.5s後に消滅)")
+        sender.sendMessage("| " + ChatColor.YELLOW + "/event randomtp [x y z] [x y z] <x y z> (座標は複数指定可能)")
         sender.sendMessage("| " + ChatColor.YELLOW + "/event delay [seconds] [x y z]")
         sender.sendMessage("| " + ChatColor.YELLOW + "/event reset_status [player] (プレイヤーのステータスをリセットして体力20)")
         sender.sendMessage("| " + ChatColor.YELLOW + "/event reload")
@@ -188,6 +197,17 @@ class EventCommand(
         location.block.type = Material.REDSTONE_BLOCK
 
         scheduler.scheduleSyncDelayedTask(plugin, { location.block.type = Material.AIR }, 10L)
+    }
+
+    private fun eventRandomTp(strPlayer: String, sender: BlockCommandSender, strLocationList: List<String>) {
+        val pivot = random.nextInt(strLocationList.size / 3) * 3
+        val location = strLocationList.slice(pivot..pivot+2).toLocationOrError(sender.block.location) ?: return
+
+        val player = strPlayer.toPlayerOrError() ?: return
+        location.yaw = player.location.yaw
+        location.pitch = player.location.pitch
+
+        player.teleport(location)
     }
 
     private fun eventDelay(sender: BlockCommandSender, strSeconds: String, strLocationList: List<String>) {
