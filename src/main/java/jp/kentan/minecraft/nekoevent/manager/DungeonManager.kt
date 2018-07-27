@@ -123,7 +123,7 @@ class DungeonManager(
             if (dungeonConfig.hasClearedToday(player, dungeon)) {
                 player.sendMessage(EVENT_TICKET_ONCE_A_DAY)
             } else {
-                ticketManager.give(player, TicketType.EVENT, dungeon.rewardTicketAmount, false)
+                ticketManager.give(player, TicketType.EVENT, dungeon.rewardTicketAmount, isSendMessage = true, ignoreDayLimit = false)
             }
         }
 

@@ -16,7 +16,7 @@ abstract class Ticket(
 ) {
     protected val itemStack: ItemStack = ItemStack(Material.PAPER)
 
-    protected val dropMessage = "インベントリに空きがないため${type.displayName}&r{amount}枚を&cドロップ&rしました.".formatColorCode()
+    protected val dropMessage = "インベントリに空きがないため ${type.displayName}&r を&cドロップ&rしました.".formatColorCode()
     private val shortageMessage = "${type.displayName}&eが{amount}枚&c不足&eしています.".formatColorCode()
 
     init {

@@ -10,7 +10,7 @@ buildscript {
 }
 
 group 'jp.kentan.minecraft.nekoevent'
-version '3.0.0-SNAPSHOT'
+version '3.0.1'
 
 apply plugin: 'kotlin'
 

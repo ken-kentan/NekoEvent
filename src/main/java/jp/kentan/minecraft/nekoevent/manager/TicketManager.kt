@@ -10,6 +10,7 @@ import jp.kentan.minecraft.nekoevent.manager.factory.TicketFactory
 import jp.kentan.minecraft.nekoevent.util.Log
 import jp.kentan.minecraft.nekoevent.util.toIntOrError
 import jp.kentan.minecraft.nekoevent.util.toPlayerOrError
+import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import kotlin.math.max
 
@@ -37,10 +38,10 @@ class TicketManager(
         }
         val amount = strAmount.toIntOrError() ?: return
 
-        give(player, type, amount)
+        give(player, type, amount, false, true)
     }
 
-    fun give(player: Player, type: TicketType, amount: Int, ignoreDayLimit: Boolean = true) {
+    fun give(player: Player, type: TicketType, amount: Int, isSendMessage: Boolean, ignoreDayLimit: Boolean) {
         if (amount < 1) {
             Log.warn("1以上の枚数を指定して下さい.")
             return
@@ -74,7 +75,11 @@ class TicketManager(
 
         config.addTodayTicketAmount(player, type, giveAmount)
 
-        Log.info("${player.name}に${type.displayName}を${amount}枚与えました.")
+        if (isSendMessage) {
+            player.sendMessage("${NekoEvent.PREFIX}${type.displayName}${ChatColor.RESET} を ${ChatColor.AQUA}${giveAmount}枚 ${ChatColor.RESET}手に入れました！")
+        }
+
+        Log.info("${player.name}に${type.displayName}を${giveAmount}枚与えました.")
     }
 
     fun take(player: Player, type: TicketType, amount: Int): Boolean {

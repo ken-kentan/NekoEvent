@@ -104,7 +104,7 @@ class ParkourManager(
             if (parkourConfig.hasClearedToday(player, parkour)) {
                 player.sendMessage(EVENT_TICKET_ONCE_A_DAY)
             } else {
-                ticketManager.give(player, TicketType.EVENT, parkour.rewardTicketAmount, false)
+                ticketManager.give(player, TicketType.EVENT, parkour.rewardTicketAmount, isSendMessage = true, ignoreDayLimit = false)
             }
         }
 
