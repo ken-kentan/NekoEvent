@@ -41,7 +41,7 @@ fun String.toPlayerOrError(): Player? = Bukkit.getServer().getPlayer(this) ?: le
 }
 
 fun getPlayerNames(filter: String) = Bukkit.getOnlinePlayers()
-        .map { it.displayName }
+        .map { it.name }
         .filter { it.startsWith(filter) }
 
 fun Player.broadcastMessageWithoutMe(message: String) {
