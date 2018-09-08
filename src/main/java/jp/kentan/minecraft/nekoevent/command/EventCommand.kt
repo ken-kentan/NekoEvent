@@ -159,7 +159,7 @@ class EventCommand(
         val player = strPlayer.toPlayerOrError() ?: return
         val message = messages.joinToString(separator = " ")
 
-        player.sendMessage(" ${if (sender != "null") sender else ""}${ChatColor.GREEN}: ${ChatColor.RESET}$message".formatColorCode())
+        player.sendMessage(" ${if (sender != "null") "$sender${ChatColor.GREEN}: "  else ""}${ChatColor.RESET}$message".formatColorCode())
     }
 
     private fun eventJump(strPlayer: String, strHeight: String, strLength: String) {
