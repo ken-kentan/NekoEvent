@@ -56,8 +56,8 @@ class DungeonConfigProvider(
                                     config.getDouble("$path.Clear.Location.x"),
                                     config.getDouble("$path.Clear.Location.y"),
                                     config.getDouble("$path.Clear.Location.z"),
-                                    config.getDouble("$path.Join.Location.pitch").toFloat(),
-                                    config.getDouble("$path.Join.Location.yaw").toFloat()
+                                    config.getDouble("$path.Clear.Location.pitch").toFloat(),
+                                    config.getDouble("$path.Clear.Location.yaw").toFloat()
                             )
                         else
                             null,
