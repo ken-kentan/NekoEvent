@@ -42,8 +42,8 @@ class ParkourConfigProvider(
                                     config.getDouble("$path.Join.Location.x"),
                                     config.getDouble("$path.Join.Location.y"),
                                     config.getDouble("$path.Join.Location.z"),
-                                    config.getDouble("$path.Join.Location.pitch").toFloat(),
-                                    config.getDouble("$path.Join.Location.yaw").toFloat()
+                                    config.getDouble("$path.Join.Location.yaw").toFloat(),
+                                    config.getDouble("$path.Join.Location.pitch").toFloat()
                             )
                         else
                             null,
@@ -55,8 +55,8 @@ class ParkourConfigProvider(
                                     config.getDouble("$path.Clear.Location.x"),
                                     config.getDouble("$path.Clear.Location.y"),
                                     config.getDouble("$path.Clear.Location.z"),
-                                    config.getDouble("$path.Clear.Location.pitch").toFloat(),
-                                    config.getDouble("$path.Clear.Location.yaw").toFloat()
+                                    config.getDouble("$path.Clear.Location.yaw").toFloat(),
+                                    config.getDouble("$path.Clear.Location.pitch").toFloat()
                             )
                         else
                             null,
