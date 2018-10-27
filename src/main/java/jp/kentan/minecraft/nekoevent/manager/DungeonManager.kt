@@ -69,6 +69,8 @@ class DungeonManager(
             return
         }
 
+        player.resetHealthStatus()
+
         dungeon.joinLocation?.let {
             player.teleport(it)
         }

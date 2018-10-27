@@ -54,6 +54,8 @@ class ParkourManager(
     }
 
     private fun join(player: Player, parkour: Parkour) {
+        player.resetHealthStatus()
+
         parkour.joinLocation?.let {
             player.teleport(it)
         }

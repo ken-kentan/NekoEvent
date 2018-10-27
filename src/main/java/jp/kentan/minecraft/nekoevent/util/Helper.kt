@@ -61,6 +61,11 @@ fun Player.resetStatus() {
     }
 }
 
+fun Player.resetHealthStatus() {
+    val maxHealth = getAttribute(Attribute.GENERIC_MAX_HEALTH)
+    maxHealth.baseValue = maxHealth.defaultValue
+}
+
 fun PlayerInventory.isFull() = firstEmpty() == -1
 
 fun Location.formatString() = "(${world.name}, XYZ:$blockX/$blockY/$blockZ)"
