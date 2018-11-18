@@ -2,10 +2,10 @@ package jp.kentan.minecraft.nekoevent.listener
 
 import jp.kentan.minecraft.nekoevent.NekoEvent
 import jp.kentan.minecraft.nekoevent.manager.SpawnManager
+import jp.kentan.minecraft.nekoevent.util.resetHealthStatus
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.World
-import org.bukkit.attribute.Attribute
 import org.bukkit.block.Sign
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
@@ -76,8 +76,7 @@ class BukkitEventListener(
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onPlayerChangeWorld(event: PlayerChangedWorldEvent) {
         if (event.from.isEventWorld()) {
-            val maxHealth = event.player.getAttribute(Attribute.GENERIC_MAX_HEALTH)
-            maxHealth.baseValue = maxHealth.defaultValue
+            event.player.resetHealthStatus()
         }
     }
 
