@@ -14,6 +14,7 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.ExperienceOrb
 import org.bukkit.plugin.Plugin
+import java.util.concurrent.ConcurrentHashMap
 
 class EventCommand(
         private val plugin: Plugin,
@@ -33,15 +34,18 @@ class EventCommand(
                 CommandArgument("random", "[x y z]", "[x y z]", "<x y z>"),
                 CommandArgument("randomtp", PLAYER, "[x y z]", "[x y z]", "<x y z>"),
                 CommandArgument("delay", "[seconds]", "[x y z]"),
+                CommandArgument("checkdelay", "[x y z]"),
+                CommandArgument("notdelay", "[x y z]", "[x y z]"),
                 CommandArgument("reset_status", PLAYER),
                 CommandArgument("reload"),
                 CommandArgument("help")
         )
 
-        private val random = MersenneTwisterFast()
+        private val RANDOM = MersenneTwisterFast()
     }
 
     private val scheduler = Bukkit.getScheduler()
+    private val delayTaskIdMap = ConcurrentHashMap<Location, Int>()
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
         if (args.isEmpty() || args[0] == "help") {
@@ -93,6 +97,20 @@ class EventCommand(
                     it.sendCommandBlockCommand()
                 }
             }
+            "canceldelay" -> sender.doIfArguments(args, 3) {
+                if (it is BlockCommandSender) {
+                    cancelEventDelay(it, args.drop(1))
+                } else {
+                    it.sendCommandBlockCommand()
+                }
+            }
+            "notdelay" -> sender.doIfArguments(args, 6) {
+                if (it is BlockCommandSender) {
+                    checkEventDelay(it, args.slice(1..3), args.slice(4..6))
+                } else {
+                    it.sendCommandBlockCommand()
+                }
+            }
             "reset_status" -> sender.doIfArguments(args, 1) {
                 resetPlayerStatus(args[1])
             }
@@ -133,6 +151,8 @@ class EventCommand(
         sender.sendMessage("| " + ChatColor.YELLOW + "/event random [x y z] [x y z] <x y z> (座標は複数指定可能. 0.5s後に消滅)")
         sender.sendMessage("| " + ChatColor.YELLOW + "/event randomtp [x y z] [x y z] <x y z> (座標は複数指定可能)")
         sender.sendMessage("| " + ChatColor.YELLOW + "/event delay [seconds] [x y z]")
+        sender.sendMessage("| " + ChatColor.YELLOW + "/event canceldelay [x y z]")
+        sender.sendMessage("| " + ChatColor.YELLOW + "/event notdelay [x y z] [x y z] (delay位置, RED_STONE位置)")
         sender.sendMessage("| " + ChatColor.YELLOW + "/event reset_status [player] (プレイヤーのステータスをリセットして体力20)")
         sender.sendMessage("| " + ChatColor.YELLOW + "/event reload")
         sender.sendMessage("| " + ChatColor.YELLOW + "/event help")
@@ -191,7 +211,7 @@ class EventCommand(
     }
 
     private fun eventRandom(sender: BlockCommandSender, strLocationList: List<String>) {
-        val pivot = random.nextInt(strLocationList.size / 3) * 3
+        val pivot = RANDOM.nextInt(strLocationList.size / 3) * 3
         val location = strLocationList.slice(pivot..pivot+2).toLocationOrError(sender.block.location) ?: return
 
         location.block.type = Material.REDSTONE_BLOCK
@@ -200,7 +220,7 @@ class EventCommand(
     }
 
     private fun eventRandomTp(strPlayer: String, sender: BlockCommandSender, strLocationList: List<String>) {
-        val pivot = random.nextInt(strLocationList.size / 3) * 3
+        val pivot = RANDOM.nextInt(strLocationList.size / 3) * 3
         val location = strLocationList.slice(pivot..pivot+2).toLocationOrError(sender.block.location) ?: return
 
         val player = strPlayer.toPlayerOrError() ?: return
@@ -214,7 +234,28 @@ class EventCommand(
         val seconds = strSeconds.toIntOrError() ?: return
         val location = strLocationList.toLocationOrError(sender.block.location) ?: return
 
-        scheduler.scheduleSyncDelayedTask(plugin, { location.block.type = Material.REDSTONE_BLOCK }, 20L * seconds)
+        val oldTaskId = delayTaskIdMap[location]
+        if (oldTaskId != null) {
+            scheduler.cancelTask(oldTaskId)
+        }
+
+        delayTaskIdMap[location] = scheduler.scheduleSyncDelayedTask(plugin, {
+            delayTaskIdMap.remove(location)
+            location.block.type = Material.REDSTONE_BLOCK
+        }, 20L * seconds)
+    }
+
+    private fun cancelEventDelay(sender: BlockCommandSender, strLocationList: List<String>) {
+        val location = strLocationList.toLocationOrError(sender.block.location) ?: return
+
+        scheduler.cancelTask(delayTaskIdMap.remove(location) ?: return)
+    }
+
+    private fun checkEventDelay(sender: BlockCommandSender, strDelayLocationList: List<String>, strLocationList: List<String>) {
+        val delayLocation = strDelayLocationList.toLocationOrError(sender.block.location) ?: return
+        val location = strLocationList.toLocationOrError(sender.block.location) ?: return
+
+        location.block.type = if (delayTaskIdMap.containsKey(delayLocation)) Material.AIR else Material.REDSTONE_BLOCK
     }
 
     private fun resetPlayerStatus(strPlayer: String) {
