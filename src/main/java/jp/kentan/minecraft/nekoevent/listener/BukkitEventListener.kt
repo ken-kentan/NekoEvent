@@ -5,6 +5,7 @@ import jp.kentan.minecraft.nekoevent.manager.SpawnManager
 import jp.kentan.minecraft.nekoevent.util.resetHealthStatus
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
+import org.bukkit.Material
 import org.bukkit.World
 import org.bukkit.block.Sign
 import org.bukkit.enchantments.Enchantment
@@ -51,6 +52,10 @@ class BukkitEventListener(
 
         if (blockState is Sign) {
             signInteractListenerMap[blockState.getLine(0)]?.onPlayerInteract(event, blockState)
+        }
+
+        if (event.player.isInEventWorld() && (blockState.type == Material.ANVIL || blockState.type == Material.ENCHANTMENT_TABLE)) {
+            event.isCancelled = true
         }
     }
 
