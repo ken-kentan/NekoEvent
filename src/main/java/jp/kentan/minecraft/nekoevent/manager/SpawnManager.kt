@@ -40,7 +40,7 @@ class SpawnManager(
         player.setBedSpawnLocation(location, true)
 
         if (isSendMessage) {
-            player.playSound(location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 0.1f)
+            player.playSound(player.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 0.1f)
             player.sendMessage(NekoEvent.PREFIX + ChatColor.AQUA + "セーブしました！")
         }
     }
