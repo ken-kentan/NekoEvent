@@ -23,6 +23,7 @@ class NekoEvent : JavaPlugin() {
 
         val ticketManager = TicketManager(configManager.ticketConfigProvider)
         val spawnManager = SpawnManager(configManager.signConfigProvider)
+        val reviveManager = ReviveManager(configManager.signConfigProvider)
 
         val keyManager = KeyManager(configManager.keyConfigProvider)
         val gachaManager = GachaManager(
@@ -61,6 +62,7 @@ class NekoEvent : JavaPlugin() {
         val bukkitEventListener = BukkitEventListener(this, spawnManager)
         bukkitEventListener.registerSignListener(GachaManager.SIGN_KEY, gachaManager)
         bukkitEventListener.registerSignListener(SpawnManager.SIGN_KEY, spawnManager)
+        bukkitEventListener.registerSignListener(ReviveManager.SIGN_KEY, reviveManager)
         bukkitEventListener.registerSignListener(ParkourManager.SIGN_KEY, parkourManager)
         bukkitEventListener.registerSignListener(DungeonManager.SIGN_KEY, dungeonManager)
 
