@@ -259,7 +259,6 @@ class EventCommand(
     }
 
     private fun resetPlayerStatus(strPlayer: String) {
-        val player = strPlayer.toPlayerOrError() ?: return
-        player.resetStatus()
+        strPlayer.toPlayerOrError()?.resetStatus()
     }
 }

@@ -35,7 +35,7 @@ fun CommandSender.doIfArguments(args: Array<String>, requireSize: Int, block: (s
 
 fun String.formatColorCode(): String = ChatColor.translateAlternateColorCodes('&', this)
 
-fun String.toPlayerOrError(): Player? = Bukkit.getServer().getPlayer(this) ?: let {
+fun String.toPlayerOrError(): Player? = Bukkit.getPlayerExact(this) ?: let {
     Log.error("プレイヤー($it)が見つかりませんでした.")
     return@let null
 }
@@ -68,7 +68,7 @@ fun Player.resetHealthStatus() {
 
 fun PlayerInventory.isFull() = firstEmpty() == -1
 
-fun Location.formatString() = "(${world.name}, XYZ:$blockX/$blockY/$blockZ)"
+fun Location.formatString() = "(${world.name}, $blockX, $blockY, $blockZ)"
 
 fun List<String>.toLocationOrError(): Location? {
     if (size < 4) { return null }
