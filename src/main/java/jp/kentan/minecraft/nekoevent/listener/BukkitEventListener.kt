@@ -97,12 +97,12 @@ class BukkitEventListener(
     private fun World.isEventWorld() = name == NekoEvent.WORLD_NAME
 
     private fun Player.removeVanishingItems() {
-        val inventory = player.inventory
+        val inventory = this.inventory
 
         for (i in 0 until inventory.size) {
             val item = inventory.getItem(i) ?: continue
 
-            if (item.getEnchantmentLevel(Enchantment.VANISHING_CURSE) > 0) {
+            if (item.containsEnchantment(Enchantment.VANISHING_CURSE)) {
                 inventory.setItem(i, null)
             }
         }
