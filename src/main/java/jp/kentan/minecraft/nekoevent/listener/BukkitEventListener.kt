@@ -39,7 +39,7 @@ class BukkitEventListener(
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onSignChanged(event: SignChangeEvent) {
-        if (!event.player.isOp) {
+        if (!event.player.hasPermission("neko.event")) {
             return
         }
 
