@@ -34,7 +34,8 @@ class GachaConfigProvider(dataFolder: File) : BaseConfigProvider(dataFolder, "ga
                     return@map Gacha.Component(
                             config.getString("$indexPath.name").formatColorCode(),
                             config.getDouble("$indexPath.probability"),
-                            config.getStringList("$indexPath.commands")
+                            config.getStringList("$indexPath.commands"),
+                            config.getBoolean("$indexPath.disabledBroadcast")
                     )
                 }.toMutableList()
 

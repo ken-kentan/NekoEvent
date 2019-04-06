@@ -81,6 +81,10 @@ class GachaManager(
             }
 
             gacha.broadcastMessage?.let {
+                if (component.isDisabledBroadcast) {
+                    return@let
+                }
+
                 val message = it
                         .replace("{player}", player.name)
                         .replace("{username}", player.displayName)

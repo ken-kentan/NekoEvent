@@ -47,7 +47,8 @@ data class Gacha(
     data class Component(
             val name: String,
             val probability: Double,
-            val commandList: List<String>
+            val commandList: List<String>,
+            val isDisabledBroadcast: Boolean
     ) {
         companion object {
             fun normalize(list: MutableList<Component>): Boolean {
