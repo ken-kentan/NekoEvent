@@ -48,7 +48,8 @@ data class Gacha(
             val name: String,
             val probability: Double,
             val commandList: List<String>,
-            val isDisabledBroadcast: Boolean
+            val isDisabledBroadcast: Boolean,
+            val isEnabledOnlyOnce: Boolean
     ) {
         companion object {
             fun normalize(list: MutableList<Component>): Boolean {
@@ -77,6 +78,16 @@ data class Gacha(
             }
         }
 
-        fun isWin() = commandList.isNotEmpty()
+        private var isUsed = false
+
+        fun isWin(): Boolean {
+            if (commandList.isEmpty() || (isEnabledOnlyOnce && isUsed)) {
+                return false
+            }
+
+            isUsed = true
+
+            return true
+        }
     }
 }

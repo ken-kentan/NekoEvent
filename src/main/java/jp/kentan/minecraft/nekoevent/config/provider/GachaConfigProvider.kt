@@ -35,7 +35,8 @@ class GachaConfigProvider(dataFolder: File) : BaseConfigProvider(dataFolder, "ga
                             config.getString("$indexPath.name").formatColorCode(),
                             config.getDouble("$indexPath.probability"),
                             config.getStringList("$indexPath.commands"),
-                            config.getBoolean("$indexPath.disabledBroadcast")
+                            config.getBoolean("$indexPath.disabledBroadcast"),
+                            config.getBoolean("$indexPath.enabledOnlyOnce")
                     )
                 }.toMutableList()
 
