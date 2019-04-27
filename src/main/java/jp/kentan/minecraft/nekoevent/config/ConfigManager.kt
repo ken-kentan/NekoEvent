@@ -19,6 +19,7 @@ class ConfigManager(dataFolder: File) {
     val parkourConfigProvider = ParkourConfigProvider(dataFolder, playerConfigProvider)
     val dungeonConfigProvider = DungeonConfigProvider(dataFolder, playerConfigProvider)
     val ticketConfigProvider = TicketConfigProvider(dataFolder, playerConfigProvider)
+    val bonusConfigProvider = BonusConfigProvider(dataFolder, playerConfigProvider)
 
     fun load() {
         gachaConfigProvider.load()
@@ -27,6 +28,7 @@ class ConfigManager(dataFolder: File) {
         parkourConfigProvider.load()
         dungeonConfigProvider.load()
         ticketConfigProvider.load()
+        bonusConfigProvider.load()
     }
 
     fun reload() {

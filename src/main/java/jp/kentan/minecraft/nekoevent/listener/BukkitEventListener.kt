@@ -17,6 +17,7 @@ import org.bukkit.event.block.SignChangeEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerChangedWorldEvent
 import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.plugin.Plugin
 
@@ -30,11 +31,17 @@ class BukkitEventListener(
     private val signChangedListenerMap = mutableMapOf<String, SignListener>()
     private val signInteractListenerMap = mutableMapOf<String, SignListener>()
 
+    private var playerJoinListener: PlayerJoinListener? = null
+
     fun registerSignListener(key: Pair<String, String>, listener: SignListener) {
         val (changed, interact) = key
 
         signChangedListenerMap[changed] = listener
         signInteractListenerMap[interact] = listener
+    }
+
+    fun registerPlayerJoinListener(listener: PlayerJoinListener) {
+        playerJoinListener = listener
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -90,6 +97,11 @@ class BukkitEventListener(
         if (event.from.world.isEventWorld() && !event.to.world.isEventWorld()) {
             spawn.removeBedSpawnIfNeed(event.player)
         }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    fun onPlayerJoin(event: PlayerJoinEvent) {
+        playerJoinListener?.onPlayerJoin(event.player)
     }
 
     private fun Player.isInEventWorld() = (player.gameMode == GameMode.ADVENTURE) && world.isEventWorld()

@@ -46,6 +46,7 @@ class NekoEvent : JavaPlugin() {
                 gachaManager,
                 ticketManager
         )
+        val bonusManager = BonusManager(this, configManager.bonusConfigProvider)
 
         getCommand("event").set(EventCommand(this, configManager, ticketManager, spawnManager))
         getCommand("gacha").set(GachaCommand(gachaManager))
@@ -59,12 +60,15 @@ class NekoEvent : JavaPlugin() {
 
         configManager.load()
 
-        val bukkitEventListener = BukkitEventListener(this, spawnManager)
-        bukkitEventListener.registerSignListener(GachaManager.SIGN_KEY, gachaManager)
-        bukkitEventListener.registerSignListener(SpawnManager.SIGN_KEY, spawnManager)
-        bukkitEventListener.registerSignListener(ReviveManager.SIGN_KEY, reviveManager)
-        bukkitEventListener.registerSignListener(ParkourManager.SIGN_KEY, parkourManager)
-        bukkitEventListener.registerSignListener(DungeonManager.SIGN_KEY, dungeonManager)
+        val bukkitEventListener = BukkitEventListener(this, spawnManager).apply {
+            registerSignListener(GachaManager.SIGN_KEY, gachaManager)
+            registerSignListener(SpawnManager.SIGN_KEY, spawnManager)
+            registerSignListener(ReviveManager.SIGN_KEY, reviveManager)
+            registerSignListener(ParkourManager.SIGN_KEY, parkourManager)
+            registerSignListener(DungeonManager.SIGN_KEY, dungeonManager)
+
+            registerPlayerJoinListener(bonusManager)
+        }
 
         server.pluginManager.registerEvents(bukkitEventListener, this)
     }
