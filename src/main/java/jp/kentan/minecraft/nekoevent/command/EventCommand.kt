@@ -13,6 +13,8 @@ import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.ExperienceOrb
+import org.bukkit.entity.Player
+import org.bukkit.entity.SmallFireball
 import org.bukkit.plugin.Plugin
 import java.util.concurrent.ConcurrentHashMap
 
@@ -115,6 +117,18 @@ class EventCommand(
                 resetPlayerStatus(args[1])
             }
             "reload" -> config.reload()
+            "debug" -> {
+                if (sender.isOp) {
+                    val p = sender as Player
+                    val loc = Location(p.world, 0.0, 0.0, 0.0)
+
+                    val list = loc.chunk.entities.filter { it is SmallFireball }
+                    Log.info("Find: ${list.size}")
+                    Log.info("Removing...")
+                    list.forEach { it.remove() }
+                    Log.info("Done.")
+                }
+            }
             else -> sender.sendUnknownCommand()
         }
 
