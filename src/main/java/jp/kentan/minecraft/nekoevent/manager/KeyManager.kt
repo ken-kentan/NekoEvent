@@ -55,7 +55,7 @@ class KeyManager(
     }
 
     private fun drop(key: Key, location: Location, amount: Int) {
-        location.world.dropItemNaturally(location, key.getItemStack(amount))
+        location.world?.dropItemNaturally(location, key.getItemStack(amount))
     }
 
     fun use(strPlayer: String, keyId: String) {
@@ -98,7 +98,7 @@ class KeyManager(
 
     fun create(player: Player, keyId: String) {
         val itemStack = player.inventory.itemInMainHand
-        if (itemStack == null || itemStack.type == Material.AIR) {
+        if (itemStack.type == Material.AIR) {
             player.sendMessage(NekoEvent.PREFIX + ChatColor.YELLOW + "登録するアイテムを持って下さい.")
             return
         }
@@ -171,7 +171,7 @@ class KeyManager(
         val sb = StringBuilder("&7--------- &6鍵一覧 &7---------&r".formatColorCode())
         sb.append('\n')
 
-        keyMap.toSortedMap().forEach { id, key ->
+        keyMap.toSortedMap().forEach { (id, key) ->
             sb.append(' ')
             sb.append(id)
             sb.append(": ")

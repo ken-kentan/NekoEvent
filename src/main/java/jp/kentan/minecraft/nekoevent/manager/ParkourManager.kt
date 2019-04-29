@@ -202,7 +202,7 @@ class ParkourManager(
         val sb = StringBuilder("&7--------- &4パルクール一覧 &7---------&r".formatColorCode())
         sb.append('\n')
 
-        parkourMap.toSortedMap().forEach { id, password ->
+        parkourMap.toSortedMap().forEach { (id, password) ->
             sb.append(' ')
             sb.append(id)
             sb.append(": ")
@@ -254,8 +254,8 @@ class ParkourManager(
      */
     override fun onSignChanged(event: SignChangeEvent) {
         val player = event.player
-        val parkourId = event.getLine(1)
-        val strAction = event.getLine(2).toUpperCase()
+        val parkourId = event.getLine(1).orEmpty()
+        val strAction = event.getLine(2).orEmpty().toUpperCase()
 
         val parkour = parkourMap[parkourId] ?: let {
             player.sendMessage(NekoEvent.PREFIX + ChatColor.YELLOW + "パルクール($parkourId)は存在しません.")

@@ -20,19 +20,19 @@ class GachaConfigProvider(dataFolder: File) : BaseConfigProvider(dataFolder, "ga
                 return
             }
 
-            val gachaIdSet = config.getConfigurationSection("Gacha").getKeys(false)
+            val gachaIdSet = config.getConfigurationSection("Gacha")?.getKeys(false).orEmpty()
 
             val gachaMap: Map<String, Gacha> = gachaIdSet.mapNotNull { id ->
                 val path = "Gacha.$id"
 
                 // Gacha Component
                 val componentsPath = "Gacha.$id.components"
-                val componentIdSet = config.getConfigurationSection(componentsPath).getKeys(false)
+                val componentIdSet = config.getConfigurationSection(componentsPath)?.getKeys(false).orEmpty()
                 val componentList = componentIdSet.map { index ->
                     val indexPath = "$componentsPath.$index"
 
                     return@map Gacha.Component(
-                            config.getString("$indexPath.name").formatColorCode(),
+                            config.getString("$indexPath.name")?.formatColorCode().orEmpty(),
                             config.getDouble("$indexPath.probability"),
                             config.getStringList("$indexPath.commands"),
                             config.getBoolean("$indexPath.disabledBroadcast"),
@@ -49,7 +49,7 @@ class GachaConfigProvider(dataFolder: File) : BaseConfigProvider(dataFolder, "ga
                 return@mapNotNull id to
                     Gacha(
                         id,
-                        config.getString("$path.name", "ガチャ"),
+                        config.getString("$path.name") ?: "ガチャ",
                         componentList,
                         config.getString("$path.winMessage")?.formatColorCode(),
                         config.getString("$path.loseMessage")?.formatColorCode(),

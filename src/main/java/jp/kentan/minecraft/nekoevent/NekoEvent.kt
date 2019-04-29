@@ -79,8 +79,13 @@ class NekoEvent : JavaPlugin() {
         Log.info("無効化しました.")
     }
 
-    private fun PluginCommand.set(command: BaseCommand) {
-        executor = command
+    private fun PluginCommand?.set(command: BaseCommand) {
+        if (this == null) {
+            Log.error("Unknown command.")
+            return
+        }
+
+        setExecutor(command)
         tabCompleter = command
     }
 }

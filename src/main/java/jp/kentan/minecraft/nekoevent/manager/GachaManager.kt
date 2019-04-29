@@ -137,14 +137,14 @@ class GachaManager(
 
         sender.sendMessage(NekoEvent.PREFIX + "ｶﾞﾁｬ(" + gachaId + ")を" + time + "回引いた結果")
 
-        resultMap.forEach { name, count -> sender.sendMessage(name + ChatColor.RESET + ": " + count + "回") }
+        resultMap.forEach { (name, count) -> sender.sendMessage(name + ChatColor.RESET + ": " + count + "回") }
     }
 
     fun sendList(sender: CommandSender) {
         val sb = StringBuilder("&7--------- &dガチャ一覧 &7---------&r".formatColorCode())
         sb.append('\n')
 
-        gachaMap.toSortedMap().forEach { id, gacha ->
+        gachaMap.toSortedMap().forEach { (id, gacha) ->
             sb.append(' ')
             sb.append(id)
             sb.append(": ")
@@ -191,9 +191,9 @@ class GachaManager(
      * 3: cost detail (ex. ticket num)
      */
     override fun onSignChanged(event: SignChangeEvent) {
-        val gachaId = event.getLine(1)
-        val strCost = event.getLine(2)
-        val strCostDetail = event.getLine(3)
+        val gachaId = event.getLine(1).orEmpty()
+        val strCost = event.getLine(2).orEmpty()
+        val strCostDetail = event.getLine(3).orEmpty()
 
         // コスト判定
         val cost = GachaCost.find(strCost) ?: let {
@@ -255,7 +255,7 @@ class GachaManager(
         val gachaId = signConfig.getMetadata(sign.location, ID_METADATA_KEY) as String? ?: return
 
         val strCost = signConfig.getMetadata(sign.location, COST_METADATA_KEY) as String? ?: return
-        val cost = GachaCost.valueOf(strCost)
+        val cost = valueOf(strCost)
         val costDetail = signConfig.getMetadata(sign.location, COST_DETAIL_METADATA_KEY)?.toString() ?: return
 
         when (cost) {

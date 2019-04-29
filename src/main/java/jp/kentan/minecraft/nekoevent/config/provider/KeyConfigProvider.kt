@@ -22,22 +22,22 @@ class KeyConfigProvider(dataFolder: File) : BaseConfigProvider(dataFolder, "key.
                 return
             }
 
-            val keyIdSet = config.getConfigurationSection("Key").getKeys(false)
+            val keyIdSet = config.getConfigurationSection("Key")?.getKeys(false).orEmpty()
             val keyMap = keyIdSet.associate { id ->
                 val path = "Key.$id"
 
                 val key = Key(
                         id,
-                        config.getItemStack("$path.ItemStack"),
+                        config.getItemStack("$path.ItemStack") ?: throw IllegalArgumentException(),
                         config.getBoolean("$path.enabledTake"),
                         config.getInt("$path.expireMinutes"),
                         if (config.isString("$path.Block.material"))
-                            Material.matchMaterial(config.getString("$path.Block.material"))
+                            Material.matchMaterial(config.getString("$path.Block.material").orEmpty())
                         else
                             null,
                         if (config.isConfigurationSection("$path.Block.Location"))
                             Location(
-                                    Bukkit.getWorld(config.getString("$path.Block.Location.world")),
+                                    Bukkit.getWorld(config.getString("$path.Block.Location.world").orEmpty()),
                                     config.getDouble("$path.Block.Location.x"),
                                     config.getDouble("$path.Block.Location.y"),
                                     config.getDouble("$path.Block.Location.z")
@@ -70,7 +70,7 @@ class KeyConfigProvider(dataFolder: File) : BaseConfigProvider(dataFolder, "key.
 
             if (key.blockLocation != null) {
                 val loc = key.blockLocation
-                put("$path.Block.Location.world", loc.world.name)
+                put("$path.Block.Location.world", loc.world?.name)
                 put("$path.Block.Location.x", loc.blockX)
                 put("$path.Block.Location.y", loc.blockY)
                 put("$path.Block.Location.z", loc.blockZ)

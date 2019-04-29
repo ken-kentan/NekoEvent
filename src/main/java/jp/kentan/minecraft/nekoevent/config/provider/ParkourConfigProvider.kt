@@ -28,17 +28,17 @@ class ParkourConfigProvider(
                 return
             }
 
-            val parkourIdSet = config.getConfigurationSection("Parkour").getKeys(false)
+            val parkourIdSet = config.getConfigurationSection("Parkour")?.getKeys(false).orEmpty()
             val parkourMap = parkourIdSet.associate { id ->
                 val path = "Parkour.$id"
 
                 val parkour = Parkour(
                         id,
-                        config.getString("$path.name", "パルクール"),
+                        config.getString("$path.name") ?: "パルクール",
                         config.getInt("$path.Reward.ticketAmount"),
                         if (config.isConfigurationSection("$path.Join.Location"))
                             Location(
-                                    Bukkit.getWorld(config.getString("$path.Join.Location.world")),
+                                    Bukkit.getWorld(config.getString("$path.Join.Location.world").orEmpty()),
                                     config.getDouble("$path.Join.Location.x"),
                                     config.getDouble("$path.Join.Location.y"),
                                     config.getDouble("$path.Join.Location.z"),
@@ -51,7 +51,7 @@ class ParkourConfigProvider(
                         config.getString("$path.Join.broadcastMessage"),
                         if (config.isConfigurationSection("$path.Clear.Location"))
                             Location(
-                                    Bukkit.getWorld(config.getString("$path.Clear.Location.world")),
+                                    Bukkit.getWorld(config.getString("$path.Clear.Location.world").orEmpty()),
                                     config.getDouble("$path.Clear.Location.x"),
                                     config.getDouble("$path.Clear.Location.y"),
                                     config.getDouble("$path.Clear.Location.z"),
@@ -64,7 +64,7 @@ class ParkourConfigProvider(
                         config.getString("$path.Clear.broadcastMessage"),
                         if (config.isConfigurationSection("$path.Back.Location"))
                             Location(
-                                    Bukkit.getWorld(config.getString("$path.Back.Location.world")),
+                                    Bukkit.getWorld(config.getString("$path.Back.Location.world").orEmpty()),
                                     config.getDouble("$path.Back.Location.x"),
                                     config.getDouble("$path.Back.Location.y"),
                                     config.getDouble("$path.Back.Location.z"),
@@ -95,7 +95,7 @@ class ParkourConfigProvider(
 
             if (parkour.joinLocation != null) {
                 val loc = parkour.joinLocation
-                put("$path.Join.Location.world", loc.world.name)
+                put("$path.Join.Location.world", loc.world?.name)
                 put("$path.Join.Location.x", loc.x)
                 put("$path.Join.Location.y", loc.y)
                 put("$path.Join.Location.z", loc.z)
@@ -109,7 +109,7 @@ class ParkourConfigProvider(
 
             if (parkour.clearLocation != null) {
                 val loc = parkour.clearLocation
-                put("$path.Clear.Location.world", loc.world.name)
+                put("$path.Clear.Location.world", loc.world?.name)
                 put("$path.Clear.Location.x", loc.x)
                 put("$path.Clear.Location.y", loc.y)
                 put("$path.Clear.Location.z", loc.z)
@@ -123,7 +123,7 @@ class ParkourConfigProvider(
 
             if (parkour.backLocation != null) {
                 val loc = parkour.backLocation
-                put("$path.Back.Location.world", loc.world.name)
+                put("$path.Back.Location.world", loc.world?.name)
                 put("$path.Back.Location.x", loc.x)
                 put("$path.Back.Location.y", loc.y)
                 put("$path.Back.Location.z", loc.z)

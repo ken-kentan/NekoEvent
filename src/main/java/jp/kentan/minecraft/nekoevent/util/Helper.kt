@@ -51,10 +51,10 @@ fun Player.broadcastMessageWithoutMe(message: String) {
 }
 
 fun Player.resetStatus() {
-    activePotionEffects.forEach { e -> player.removePotionEffect(e.type) }
+    activePotionEffects.forEach { e -> removePotionEffect(e.type) }
     fireTicks = 0
 
-    val maxHealth = getAttribute(Attribute.GENERIC_MAX_HEALTH).value
+    val maxHealth = getAttribute(Attribute.GENERIC_MAX_HEALTH)?.value ?: return
 
     if (maxHealth >= 1.0) {
         health = maxHealth
@@ -62,13 +62,13 @@ fun Player.resetStatus() {
 }
 
 fun Player.resetHealthStatus() {
-    val maxHealth = getAttribute(Attribute.GENERIC_MAX_HEALTH)
+    val maxHealth = getAttribute(Attribute.GENERIC_MAX_HEALTH) ?: return
     maxHealth.baseValue = maxHealth.defaultValue
 }
 
 fun PlayerInventory.isFull() = firstEmpty() == -1
 
-fun Location.formatString() = "(${world.name}, $blockX, $blockY, $blockZ)"
+fun Location.formatString() = "(${world?.name}, $blockX, $blockY, $blockZ)"
 
 fun List<String>.toLocationOrError(): Location? {
     if (size < 4) { return null }

@@ -26,13 +26,13 @@ class SignConfigProvider(dataFolder: File) : BaseConfigProvider(dataFolder, "sig
                 return
             }
 
-            val indexSet = config.getConfigurationSection("Sign").getKeys(false)
+            val indexSet = config.getConfigurationSection("Sign")?.getKeys(false).orEmpty()
 
             val metadataMap = indexSet.mapNotNull { strIndex ->
                 val path = "Sign.$strIndex"
 
                 val location = Location(
-                        Bukkit.getWorld(config.getString("$path.Location.world")),
+                        Bukkit.getWorld(config.getString("$path.Location.world").orEmpty()),
                         config.getDouble("$path.Location.x"),
                         config.getDouble("$path.Location.y"),
                         config.getDouble("$path.Location.z")
@@ -57,9 +57,11 @@ class SignConfigProvider(dataFolder: File) : BaseConfigProvider(dataFolder, "sig
                 }
 
 
-                val metadataSet = config.getConfigurationSection("$path.Metadata").getKeys(false)
+                val metadataSet = config.getConfigurationSection("$path.Metadata")?.getKeys(false).orEmpty()
                 val metadataPath = "$path.Metadata."
-                val metadataMap = metadataSet.associate { it to config.get(metadataPath + it) }.toMutableMap()
+                val metadataMap = metadataSet
+                        .associate { it to (config.get(metadataPath + it) ?: Any()) }
+                        .toMutableMap()
 
                 return@mapNotNull location to Metadata(index, metadataMap)
             }.toMap()
@@ -86,10 +88,10 @@ class SignConfigProvider(dataFolder: File) : BaseConfigProvider(dataFolder, "sig
             }
 
             // 利用可能なindexを探す
-            val index: Int = kotlin.run {
+            val index: Int = run {
                 var count = 0
                 var prev = 0
-                config.getConfigurationSection("Sign").getKeys(false)
+                config.getConfigurationSection("Sign")?.getKeys(false).orEmpty()
                         .mapNotNull { it.toInt() }
                         .sorted()
                         .forEach {
@@ -106,18 +108,18 @@ class SignConfigProvider(dataFolder: File) : BaseConfigProvider(dataFolder, "sig
             val path = "Sign.$index"
 
             val metadataMap = LinkedHashMap<String, Any>().apply {
-                put("$path.Location.world", location.world.name)
+                put("$path.Location.world", location.world?.name.orEmpty())
                 put("$path.Location.x", location.x)
                 put("$path.Location.y", location.y)
                 put("$path.Location.z", location.z)
 
                 val metadataPath = "$path.Metadata."
 
-                dataMap.forEach { key, data -> put(metadataPath + key, data) }
+                dataMap.forEach { (key, data) -> put(metadataPath + key, data) }
             }
 
             if (super.save(metadataMap)) {
-                signMetadataMap[location] = SignConfigProvider.Metadata(index, dataMap)
+                signMetadataMap[location] = Metadata(index, dataMap)
             }
         } catch (e: Exception) {
             e.printStackTrace()

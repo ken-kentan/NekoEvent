@@ -32,9 +32,9 @@ class BonusManager(
 
         val now = Date()
 
-        Bukkit.getScheduler().runTaskLater(plugin, {
+        Bukkit.getScheduler().runTaskLater(plugin, Runnable {
             if (!player.isOnline) {
-                return@runTaskLater
+                return@Runnable
             }
 
             bonusList

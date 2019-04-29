@@ -48,7 +48,7 @@ class SpawnManager(
     fun removeBedSpawnIfNeed(player: Player) {
         val spawn = player.bedSpawnLocation ?: return
 
-        if (spawn.world.name != NekoEvent.WORLD_NAME) {
+        if (spawn.world?.name != NekoEvent.WORLD_NAME) {
             return
         }
 
@@ -65,7 +65,7 @@ class SpawnManager(
      */
     override fun onSignChanged(event: SignChangeEvent) {
         val player = event.player
-        val location = event.getLine(1).split(" ").let {
+        val location = event.getLine(1).orEmpty().split(" ").let {
             if (it.size < 3) {
                 Log.error("座標パラメータが不足しています.")
                 return

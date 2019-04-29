@@ -207,7 +207,7 @@ class EventCommand(
         direction.multiply(length)
         direction.y = height
 
-        location.world.playEffect(location, Effect.SMOKE, 4)
+        location.world?.playEffect(location, Effect.SMOKE, 4)
 
         player.playSound(location, Sound.ENTITY_GHAST_SHOOT, 1f, 1f)
         player.velocity = direction
@@ -220,7 +220,7 @@ class EventCommand(
         val location = player.location
         location.add(0.0, 0.5, 0.0)
 
-        val expOrb = location.world.spawnEntity(location, EntityType.EXPERIENCE_ORB) as ExperienceOrb
+        val expOrb = player.world.spawnEntity(location, EntityType.EXPERIENCE_ORB) as ExperienceOrb
         expOrb.experience = value
     }
 

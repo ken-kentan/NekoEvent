@@ -55,13 +55,13 @@ class BukkitEventListener(
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onPlayerInteract(event: PlayerInteractEvent) {
-        val blockState = event.clickedBlock.state
+        val blockState = event.clickedBlock?.state
 
         if (blockState is Sign) {
             signInteractListenerMap[blockState.getLine(0)]?.onPlayerInteract(event, blockState)
         }
 
-        if (event.player.isInEventWorld() && (blockState.type == Material.ANVIL || blockState.type == Material.ENCHANTMENT_TABLE)) {
+        if (event.player.isInEventWorld() && (blockState?.type == Material.ANVIL || blockState?.type == Material.ENCHANTING_TABLE)) {
             event.isCancelled = true
         }
     }
@@ -94,7 +94,7 @@ class BukkitEventListener(
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onPlayerTeleport(event: PlayerTeleportEvent) {
-        if (event.from.world.isEventWorld() && !event.to.world.isEventWorld()) {
+        if (event.from.world.isEventWorld() && !event.to?.world.isEventWorld()) {
             spawn.removeBedSpawnIfNeed(event.player)
         }
     }
@@ -104,9 +104,9 @@ class BukkitEventListener(
         playerJoinListener?.onPlayerJoin(event.player)
     }
 
-    private fun Player.isInEventWorld() = (player.gameMode == GameMode.ADVENTURE) && world.isEventWorld()
+    private fun Player.isInEventWorld() = (gameMode == GameMode.ADVENTURE) && world.isEventWorld()
 
-    private fun World.isEventWorld() = name == NekoEvent.WORLD_NAME
+    private fun World?.isEventWorld() = this?.name == NekoEvent.WORLD_NAME
 
     private fun Player.removeVanishingItems() {
         val inventory = this.inventory

@@ -20,8 +20,8 @@ abstract class Ticket(
     private val shortageMessage = "${type.displayName}&eが{amount}枚&c不足&eしています.".formatColorCode()
 
     init {
-        val meta = itemStack.itemMeta.apply {
-            displayName = type.displayName
+        val meta = itemStack.itemMeta?.apply {
+            setDisplayName(type.displayName)
             setLore(lore)
             addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 1, false)
             addItemFlags(ItemFlag.HIDE_ENCHANTS)
@@ -47,9 +47,9 @@ abstract class Ticket(
             return false
         }
 
-        val meta = similarItem.itemMeta
+        val meta = similarItem.itemMeta ?: return false
 
-        return itemStack.type == similarItem.type && meta.hasLore() && meta.lore[0].contains(checkString)
+        return itemStack.type == similarItem.type && meta.hasLore() && meta.lore?.firstOrNull()?.contains(checkString) == true
     }
 
     fun getShortageMessage(amount: Int): String {

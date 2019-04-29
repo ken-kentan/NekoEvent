@@ -66,11 +66,9 @@ data class Dungeon(
     }
 
     fun stopLockTimer() {
-        asyncLockTimerTaskMap.remove(id)?.let {
+        asyncLockTimerTaskMap.remove(id)?.let { it ->
             it.cancel()
-            formatUnlockBroadcastMessage?.let {
-                Bukkit.broadcastMessage(it)
-            }
+            formatUnlockBroadcastMessage?.run(Bukkit::broadcastMessage)
         }
 
         lockTimerSeconds = 0
@@ -85,7 +83,7 @@ data class Dungeon(
     }
 
     private fun BukkitScheduler.scheduleAsyncLockTimerTask(plugin: Plugin) {
-        val asyncTask = runTaskTimerAsynchronously(plugin, {
+        val asyncTask = runTaskTimerAsynchronously(plugin, Runnable {
             if (--lockTimerSeconds < 1){
                 asyncLockTimerTaskMap.remove(id)?.cancel()
 

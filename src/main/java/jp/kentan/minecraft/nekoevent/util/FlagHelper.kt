@@ -38,7 +38,7 @@ fun List<String>.flagString(def: String?): String? {
 @Throws(InvalidFlagException::class)
 fun List<String>.flagItemStack(player: Player): ItemStack {
     val itemStack = player.inventory.itemInMainHand
-    if (itemStack == null || itemStack.type == Material.AIR) {
+    if (itemStack.type == Material.AIR) {
         throw InvalidFlagException("登録するアイテムを持って下さい.")
     }
 
@@ -49,7 +49,7 @@ fun List<String>.flagItemStack(player: Player): ItemStack {
 fun List<String>.flagMaterial(def: Material?): Material? {
     if (isEmpty()) { return def }
 
-    return Material.matchMaterial(firstOrNull() ?: "") ?: let {
+    return Material.matchMaterial(firstOrNull().orEmpty()) ?: let {
         throw InvalidFlagException("正しいマテリアル名を指定してください.(例: ${Material.REDSTONE_BLOCK.name})")
     }
 }

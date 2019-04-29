@@ -46,7 +46,7 @@ data class Key(
 
         itemStack.apply {
             if (enabledExpire) {
-                itemMeta = itemMeta.also { meta ->
+                itemMeta = itemMeta?.also { meta ->
                     val expired = DATE_FORMAT.format(ZonedDateTime.now().plusMinutes(expireMinutes.toLong()))
 
                     val lore = meta.lore ?: mutableListOf()
@@ -74,8 +74,8 @@ data class Key(
                     return KeyResult.NOT_MATCH
                 }
 
-                val strPeriod = lore.lastOrNull() ?: ""
-                lore = lore.dropLast(1) //比較用に最終行消去
+                val strPeriod = lore?.lastOrNull().orEmpty()
+                lore = lore?.dropLast(1) //比較用に最終行消去
 
                 compare.itemMeta = this
 
