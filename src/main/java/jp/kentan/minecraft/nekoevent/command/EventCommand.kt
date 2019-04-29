@@ -73,7 +73,7 @@ class EventCommand(
                 }
             }
             "jump" -> sender.doIfArguments(args, 3) {
-                eventJump(args[1], args[2], args[3])
+                eventJump(sender, args[1], args[2], args[3])
             }
             "exp" -> sender.doIfArguments(args, 2) {
                 eventExp(args[1], args[2])
@@ -196,21 +196,23 @@ class EventCommand(
         player.sendMessage(" ${if (sender != "null") "$sender${ChatColor.GREEN}: "  else ""}${ChatColor.RESET}$message".formatColorCode())
     }
 
-    private fun eventJump(strPlayer: String, strHeight: String, strLength: String) {
-        val player = strPlayer.toPlayerOrError() ?: return
+    private fun eventJump(sender: CommandSender, selector: String, strHeight: String, strLength: String) {
+        val players = selector.toPlayersOrError(sender)
         val height = strHeight.toDoubleOrError() ?: return
         val length = strLength.toDoubleOrError() ?: return
 
-        val location = player.location
-        val direction = location.direction.setY(0.0).normalize()
+        players.forEach { player ->
+            val location = player.location
+            val direction = location.direction.setY(0.0).normalize()
 
-        direction.multiply(length)
-        direction.y = height
+            direction.multiply(length)
+            direction.y = height
 
-        location.world?.playEffect(location, Effect.SMOKE, 4)
+            location.world?.playEffect(location, Effect.SMOKE, 4)
 
-        player.playSound(location, Sound.ENTITY_GHAST_SHOOT, 1f, 1f)
-        player.velocity = direction
+            player.playSound(location, Sound.ENTITY_GHAST_SHOOT, 1f, 1f)
+            player.velocity = direction
+        }
     }
 
     private fun eventExp(strPlayer: String, strValue: String) {

@@ -6,6 +6,7 @@ import org.bukkit.ChatColor
 import org.bukkit.Location
 import org.bukkit.attribute.Attribute
 import org.bukkit.command.CommandSender
+import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.PlayerInventory
 
@@ -39,6 +40,16 @@ fun String.toPlayerOrError(): Player? = Bukkit.getPlayerExact(this) ?: let {
     Log.error("プレイヤー($it)が見つかりませんでした.")
     return@let null
 }
+
+fun String.toEntitiesOrError(sender: CommandSender): List<Entity> = try {
+    Bukkit.getServer().selectEntities(sender, this)
+} catch (e: IllegalArgumentException) {
+    Log.error("Entity($this) not found.")
+    emptyList()
+}
+
+fun String.toPlayersOrError(sender: CommandSender): List<Player> =
+        toEntitiesOrError(sender).filterIsInstance(Player::class.java)
 
 fun getPlayerNames(filter: String) = Bukkit.getOnlinePlayers()
         .map { it.name }
