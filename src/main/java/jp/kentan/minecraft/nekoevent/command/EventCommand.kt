@@ -60,14 +60,14 @@ class EventCommand(
                 ticketManager.give(args[1], args[2], args[3])
             }
             "tp" -> sender.doIfArguments(args, 4) {
-                eventTp(args[1], args.drop(2))
+                eventTp(sender, args[1], args.drop(2))
             }
             "msg" -> sender.doIfArguments(args, 3) {
                 eventMessage(args[1], args[2], args.drop(3))
             }
             "setspawn" -> sender.doIfArguments(args, 4) {
                 if (it is BlockCommandSender) {
-                    spawnManager.setSpawn(args[1], listOf(it.block.world.name, args[2], args[3], args[4]))
+                    spawnManager.setSpawn(sender, args[1], listOf(it.block.world.name, args[2], args[3], args[4]))
                 } else {
                     it.sendCommandBlockCommand()
                 }
@@ -180,13 +180,13 @@ class EventCommand(
         sender.sendMessage("---------------------------------------")
     }
 
-    private fun eventTp(strPlayer: String, strLocation: List<String>) {
-        val player = strPlayer.toPlayerOrError() ?: return
-        val location = strLocation.toLocationOrError(player.location) ?: return
+    private fun eventTp(sender: CommandSender, selector: String, strLocation: List<String>) {
+        selector.toPlayersOrError(sender).forEach { player ->
+            val location = strLocation.toLocationOrError(player.location) ?: return@forEach
+            player.teleport(location)
 
-        player.teleport(location)
-
-        Log.info("${player.name}を${location.formatString()}にテレポートしました.")
+            Log.info("${player.name}を${location.formatString()}にテレポートしました.")
+        }
     }
 
     private fun eventMessage(strPlayer: String, sender: String, messages: List<String>) {
