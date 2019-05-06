@@ -45,7 +45,7 @@ class DungeonCommand(
                 manager.join(args[1], args[2])
             }
             "clear" -> sender.doIfArguments(args, 2) {
-                manager.clear(args[1], args[2])
+                manager.clear(sender, args[1], args[2])
             }
             "lock" -> sender.doIfArguments(args, 2) {
                 manager.lock(args[1], args[2])

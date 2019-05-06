@@ -93,11 +93,11 @@ class DungeonManager(
         Log.info(player.name + "がダンジョン(${dungeon.id})に参加しました.")
     }
 
-    fun clear(strPlayer: String, dungeonId: String) {
-        val player = strPlayer.toPlayerOrError() ?: return
+    fun clear(sender: CommandSender, selector: String, dungeonId: String) {
+        val players = selector.toPlayersOrError(sender)
         val dungeon = dungeonMap.getOrError(dungeonId) ?: return
 
-        clear(player, dungeon)
+        players.forEach { (clear(it, dungeon)) }
     }
 
     private fun clear(player: Player, dungeon: Dungeon) {
