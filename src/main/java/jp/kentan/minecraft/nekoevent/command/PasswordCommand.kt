@@ -41,13 +41,13 @@ class PasswordCommand(
 
         when (args[0]) {
             "input" -> sender.doIfArguments(args, 3) {
-                manager.input(args[1], args[2], args[3])
+                manager.input(it, args[1], args[2], args[3])
             }
             "set" -> sender.doIfArguments(args, 2) {
                 manager.set(args[1], args[2])
             }
             "reset" -> sender.doIfArguments(args, 2) {
-                manager.reset(args[1], args[2])
+                manager.reset(sender, args[1], args[2])
             }
             "create" -> sender.doIfArguments(args, 1) {
                 manager.create(it, args[1])

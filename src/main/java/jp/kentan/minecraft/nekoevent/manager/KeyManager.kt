@@ -28,11 +28,12 @@ class KeyManager(
 
     fun getKeyIdList() = keyMap.values.map { it.id }.sorted()
 
-    fun give(strPlayer: String, keyId: String, strAmount: String) {
-        val player = strPlayer.toPlayerOrError() ?: return
+    fun give(sender: CommandSender, selector: String, keyId: String, strAmount: String) {
         val amount = strAmount.toIntOrError() ?: return
 
-        give(player, keyId, amount)
+        selector.toPlayersOrError(sender).forEach {
+            give(it, keyId, amount)
+        }
     }
 
     fun give(player: Player, keyId: String, amount: Int) {
@@ -58,10 +59,10 @@ class KeyManager(
         location.world?.dropItemNaturally(location, key.getItemStack(amount))
     }
 
-    fun use(strPlayer: String, keyId: String) {
-        val player = strPlayer.toPlayerOrError() ?: return
-
-        use(player, keyId)
+    fun use(sender: CommandSender, selector: String, keyId: String) {
+        selector.toPlayersOrError(sender).forEach {
+            use(it, keyId)
+        }
     }
 
     fun use(player: Player, keyId: String): Boolean {

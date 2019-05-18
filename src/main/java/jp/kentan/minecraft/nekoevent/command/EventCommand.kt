@@ -63,7 +63,7 @@ class EventCommand(
                 eventTp(sender, args[1], args.drop(2))
             }
             "msg" -> sender.doIfArguments(args, 3) {
-                eventMessage(args[1], args[2], args.drop(3))
+                eventMessage(sender, args[1], args[2], args.drop(3))
             }
             "setspawn" -> sender.doIfArguments(args, 4) {
                 if (it is BlockCommandSender) {
@@ -114,7 +114,7 @@ class EventCommand(
                 }
             }
             "reset_status" -> sender.doIfArguments(args, 1) {
-                resetPlayerStatus(args[1])
+                resetPlayerStatus(sender, args[1])
             }
             "reload" -> config.reload()
             "debug" -> {
@@ -189,11 +189,12 @@ class EventCommand(
         }
     }
 
-    private fun eventMessage(strPlayer: String, sender: String, messages: List<String>) {
-        val player = strPlayer.toPlayerOrError() ?: return
+    private fun eventMessage(sender: CommandSender, selector: String, speaker: String, messages: List<String>) {
         val message = messages.joinToString(separator = " ")
 
-        player.sendMessage(" ${if (sender != "null") "$sender${ChatColor.GREEN}: "  else ""}${ChatColor.RESET}$message".formatColorCode())
+        selector.toPlayersOrError(sender).forEach {
+            it.sendMessage(" ${if (speaker != "null") "$sender${ChatColor.GREEN}: "  else ""}${ChatColor.RESET}$message".formatColorCode())
+        }
     }
 
     private fun eventJump(sender: CommandSender, selector: String, strHeight: String, strLength: String) {
@@ -274,7 +275,7 @@ class EventCommand(
         location.block.type = if (delayTaskIdMap.containsKey(delayLocation)) Material.AIR else Material.REDSTONE_BLOCK
     }
 
-    private fun resetPlayerStatus(strPlayer: String) {
-        strPlayer.toPlayerOrError()?.resetStatus()
+    private fun resetPlayerStatus(sender: CommandSender, selector: String) {
+        selector.toPlayersOrError(sender).forEach { it.resetStatus() }
     }
 }

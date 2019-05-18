@@ -41,10 +41,10 @@ class KeyCommand(
 
         when (args[0]) {
             "use" -> sender.doIfArguments(args, 2) {
-                manager.use(args[1], args[2])
+                manager.use(it, args[1], args[2])
             }
             "give" -> sender.doIfArguments(args, 2) {
-                manager.give(args[1], args[2], if (args.size >= 4) args[3] else "1")
+                manager.give(it, args[1], args[2], if (args.size >= 4) args[3] else "1")
             }
             "drop" -> sender.doIfArguments(args, 5) {
                 manager.drop(args[1], args.slice(2..5), if (args.size >= 7) args[6] else "1")

@@ -24,11 +24,12 @@ class PasswordManager(
 
     fun getKeyIdList() = passwordMap.values.map { it.id }.sorted()
 
-    fun input(strPlayer: String, passwordId: String, text: String) {
-        val player = strPlayer.toPlayerOrError() ?: return
+    fun input(sender: CommandSender, selector: String, passwordId: String, text: String) {
         val password = passwordMap.getOrError(passwordId) ?: return
 
-        input(player, password, text)
+        selector.toPlayersOrError(sender).forEach {
+            input(it, password, text)
+        }
     }
 
     private fun input(player: Player, password: Password, text: String) {
@@ -64,11 +65,12 @@ class PasswordManager(
         Log.info("パスワード($passwordId)を'$text'に設定しました.")
     }
 
-    fun reset(strPlayer: String, passwordId: String) {
-        val player = strPlayer.toPlayerOrError() ?: return
+    fun reset(sender: CommandSender, selector: String, passwordId: String) {
         val password = passwordMap.getOrError(passwordId) ?: return
 
-        reset(player, password)
+        selector.toPlayersOrError(sender).forEach {
+            reset(it, password)
+        }
     }
 
     private fun reset(player: Player, password: Password) {
