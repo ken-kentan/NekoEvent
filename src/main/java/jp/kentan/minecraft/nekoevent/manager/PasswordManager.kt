@@ -122,7 +122,7 @@ class PasswordManager(
 
         try {
             password = when (flagType) {
-                DEFAULT           -> password.copy(default = flagArgs.flagString(null) ?: "")
+                DEFAULT           -> password.copy(default = flagArgs.flagString(null).orEmpty())
                 BLOCK_MATERIAL    -> password.copy(blockMaterial = flagArgs.flagMaterial(null))
                 BLOCK_LOCATION    -> password.copy(blockLocation = flagArgs.flagLocation(player, null))
                 MATCH_MESSAGE     -> password.copy(matchMessage = flagArgs.flagString(null))

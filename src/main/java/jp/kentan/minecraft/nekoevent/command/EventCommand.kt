@@ -60,20 +60,20 @@ class EventCommand(
                 ticketManager.give(args[1], args[2], args[3])
             }
             "tp" -> sender.doIfArguments(args, 4) {
-                eventTp(args[1], args.drop(2))
+                eventTp(sender, args[1], args.drop(2))
             }
             "msg" -> sender.doIfArguments(args, 3) {
                 eventMessage(args[1], args[2], args.drop(3))
             }
             "setspawn" -> sender.doIfArguments(args, 4) {
                 if (it is BlockCommandSender) {
-                    spawnManager.setSpawn(args[1], listOf(it.block.world.name, args[2], args[3], args[4]))
+                    spawnManager.setSpawn(sender, args[1], listOf(it.block.world.name, args[2], args[3], args[4]))
                 } else {
                     it.sendCommandBlockCommand()
                 }
             }
             "jump" -> sender.doIfArguments(args, 3) {
-                eventJump(args[1], args[2], args[3])
+                eventJump(sender, args[1], args[2], args[3])
             }
             "exp" -> sender.doIfArguments(args, 2) {
                 eventExp(args[1], args[2])
@@ -180,13 +180,13 @@ class EventCommand(
         sender.sendMessage("---------------------------------------")
     }
 
-    private fun eventTp(strPlayer: String, strLocation: List<String>) {
-        val player = strPlayer.toPlayerOrError() ?: return
-        val location = strLocation.toLocationOrError(player.location) ?: return
+    private fun eventTp(sender: CommandSender, selector: String, strLocation: List<String>) {
+        selector.toPlayersOrError(sender).forEach { player ->
+            val location = strLocation.toLocationOrError(player.location) ?: return@forEach
+            player.teleport(location)
 
-        player.teleport(location)
-
-        Log.info("${player.name}を${location.formatString()}にテレポートしました.")
+            Log.info("${player.name}を${location.formatString()}にテレポートしました.")
+        }
     }
 
     private fun eventMessage(strPlayer: String, sender: String, messages: List<String>) {
@@ -196,21 +196,23 @@ class EventCommand(
         player.sendMessage(" ${if (sender != "null") "$sender${ChatColor.GREEN}: "  else ""}${ChatColor.RESET}$message".formatColorCode())
     }
 
-    private fun eventJump(strPlayer: String, strHeight: String, strLength: String) {
-        val player = strPlayer.toPlayerOrError() ?: return
+    private fun eventJump(sender: CommandSender, selector: String, strHeight: String, strLength: String) {
+        val players = selector.toPlayersOrError(sender)
         val height = strHeight.toDoubleOrError() ?: return
         val length = strLength.toDoubleOrError() ?: return
 
-        val location = player.location
-        val direction = location.direction.setY(0.0).normalize()
+        players.forEach { player ->
+            val location = player.location
+            val direction = location.direction.setY(0.0).normalize()
 
-        direction.multiply(length)
-        direction.y = height
+            direction.multiply(length)
+            direction.y = height
 
-        location.world.playEffect(location, Effect.SMOKE, 4)
+            location.world?.playEffect(location, Effect.SMOKE, 4)
 
-        player.playSound(location, Sound.ENTITY_GHAST_SHOOT, 1f, 1f)
-        player.velocity = direction
+            player.playSound(location, Sound.ENTITY_GHAST_SHOOT, 1f, 1f)
+            player.velocity = direction
+        }
     }
 
     private fun eventExp(strPlayer: String, strValue: String) {
@@ -220,7 +222,7 @@ class EventCommand(
         val location = player.location
         location.add(0.0, 0.5, 0.0)
 
-        val expOrb = location.world.spawnEntity(location, EntityType.EXPERIENCE_ORB) as ExperienceOrb
+        val expOrb = player.world.spawnEntity(location, EntityType.EXPERIENCE_ORB) as ExperienceOrb
         expOrb.experience = value
     }
 

@@ -6,6 +6,7 @@ import org.bukkit.ChatColor
 import org.bukkit.Location
 import org.bukkit.attribute.Attribute
 import org.bukkit.command.CommandSender
+import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.PlayerInventory
 
@@ -40,6 +41,16 @@ fun String.toPlayerOrError(): Player? = Bukkit.getPlayerExact(this) ?: let {
     return@let null
 }
 
+fun String.toEntitiesOrError(sender: CommandSender): List<Entity> = try {
+    Bukkit.getServer().selectEntities(sender, this)
+} catch (e: IllegalArgumentException) {
+    Log.error("Entity($this) not found.")
+    emptyList()
+}
+
+fun String.toPlayersOrError(sender: CommandSender): List<Player> =
+        toEntitiesOrError(sender).filterIsInstance(Player::class.java)
+
 fun getPlayerNames(filter: String) = Bukkit.getOnlinePlayers()
         .map { it.name }
         .filter { it.startsWith(filter) }
@@ -51,10 +62,10 @@ fun Player.broadcastMessageWithoutMe(message: String) {
 }
 
 fun Player.resetStatus() {
-    activePotionEffects.forEach { e -> player.removePotionEffect(e.type) }
+    activePotionEffects.forEach { e -> removePotionEffect(e.type) }
     fireTicks = 0
 
-    val maxHealth = getAttribute(Attribute.GENERIC_MAX_HEALTH).value
+    val maxHealth = getAttribute(Attribute.GENERIC_MAX_HEALTH)?.value ?: return
 
     if (maxHealth >= 1.0) {
         health = maxHealth
@@ -62,13 +73,13 @@ fun Player.resetStatus() {
 }
 
 fun Player.resetHealthStatus() {
-    val maxHealth = getAttribute(Attribute.GENERIC_MAX_HEALTH)
+    val maxHealth = getAttribute(Attribute.GENERIC_MAX_HEALTH) ?: return
     maxHealth.baseValue = maxHealth.defaultValue
 }
 
 fun PlayerInventory.isFull() = firstEmpty() == -1
 
-fun Location.formatString() = "(${world.name}, $blockX, $blockY, $blockZ)"
+fun Location.formatString() = "(${world?.name}, $blockX, $blockY, $blockZ)"
 
 fun List<String>.toLocationOrError(): Location? {
     if (size < 4) { return null }

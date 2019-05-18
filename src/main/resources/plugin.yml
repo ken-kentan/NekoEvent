@@ -5,6 +5,8 @@ author: ken_kentan
 website: http://ken.kentan.jp
 softdepend: [Multiverse-Core]
 
+api-version: '1.13'
+
 commands:
     event:
         description: NekoEvent

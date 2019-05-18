@@ -28,18 +28,18 @@ class DungeonConfigProvider(
                 return
             }
 
-            val dungeonIdSet = config.getConfigurationSection("Dungeon").getKeys(false)
+            val dungeonIdSet = config.getConfigurationSection("Dungeon")?.getKeys(false).orEmpty()
             val dungeonMap = dungeonIdSet.associate { id ->
                 val path = "Dungeon.$id"
 
                 val dungeon = Dungeon(
                         id,
-                        config.getString("$path.name", "ダンジョン"),
+                        config.getString("$path.name") ?: "ダンジョン",
                         config.getInt("$path.Reward.ticketAmount"),
                         config.getString("$path.Reward.gachaId"),
                         if (config.isConfigurationSection("$path.Join.Location"))
                             Location(
-                                    Bukkit.getWorld(config.getString("$path.Join.Location.world")),
+                                    Bukkit.getWorld(config.getString("$path.Join.Location.world").orEmpty()),
                                     config.getDouble("$path.Join.Location.x"),
                                     config.getDouble("$path.Join.Location.y"),
                                     config.getDouble("$path.Join.Location.z"),
@@ -52,7 +52,7 @@ class DungeonConfigProvider(
                         config.getString("$path.Join.broadcastMessage"),
                         if (config.isConfigurationSection("$path.Clear.Location"))
                             Location(
-                                    Bukkit.getWorld(config.getString("$path.Clear.Location.world")),
+                                    Bukkit.getWorld(config.getString("$path.Clear.Location.world").orEmpty()),
                                     config.getDouble("$path.Clear.Location.x"),
                                     config.getDouble("$path.Clear.Location.y"),
                                     config.getDouble("$path.Clear.Location.z"),
@@ -89,7 +89,7 @@ class DungeonConfigProvider(
 
             if (dungeon.joinLocation != null) {
                 val loc = dungeon.joinLocation
-                put("$path.Join.Location.world", loc.world.name)
+                put("$path.Join.Location.world", loc.world?.name)
                 put("$path.Join.Location.x", loc.x)
                 put("$path.Join.Location.y", loc.y)
                 put("$path.Join.Location.z", loc.z)
@@ -103,7 +103,7 @@ class DungeonConfigProvider(
 
             if (dungeon.clearLocation != null) {
                 val loc = dungeon.clearLocation
-                put("$path.Clear.Location.world", loc.world.name)
+                put("$path.Clear.Location.world", loc.world?.name)
                 put("$path.Clear.Location.x", loc.x)
                 put("$path.Clear.Location.y", loc.y)
                 put("$path.Clear.Location.z", loc.z)

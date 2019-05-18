@@ -93,11 +93,11 @@ class DungeonManager(
         Log.info(player.name + "がダンジョン(${dungeon.id})に参加しました.")
     }
 
-    fun clear(strPlayer: String, dungeonId: String) {
-        val player = strPlayer.toPlayerOrError() ?: return
+    fun clear(sender: CommandSender, selector: String, dungeonId: String) {
+        val players = selector.toPlayersOrError(sender)
         val dungeon = dungeonMap.getOrError(dungeonId) ?: return
 
-        clear(player, dungeon)
+        players.forEach { (clear(it, dungeon)) }
     }
 
     private fun clear(player: Player, dungeon: Dungeon) {
@@ -234,7 +234,7 @@ class DungeonManager(
         val sb = StringBuilder("&7--------- &4ダンジョン一覧 &7---------&r".formatColorCode())
         sb.append('\n')
 
-        dungeonMap.toSortedMap().forEach { id, password ->
+        dungeonMap.toSortedMap().forEach { (id, password) ->
             sb.append(' ')
             sb.append(id)
             sb.append(": ")
@@ -290,8 +290,8 @@ class DungeonManager(
      */
     override fun onSignChanged(event: SignChangeEvent) {
         val player = event.player
-        val dungeonId = event.getLine(1)
-        val strAction = event.getLine(2).toUpperCase()
+        val dungeonId = event.getLine(1).orEmpty()
+        val strAction = event.getLine(2).orEmpty().toUpperCase()
 
         val dungeon = dungeonMap[dungeonId] ?: let {
             player.sendMessage(NekoEvent.PREFIX + ChatColor.YELLOW + "ダンジョン($dungeonId)は存在しません.")

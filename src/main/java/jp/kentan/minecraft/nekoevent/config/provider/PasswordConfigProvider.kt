@@ -22,20 +22,20 @@ class PasswordConfigProvider(dataFolder: File) : BaseConfigProvider(dataFolder, 
                 return
             }
 
-            val passwordIdSet = config.getConfigurationSection("Password").getKeys(false)
+            val passwordIdSet = config.getConfigurationSection("Password")?.getKeys(false).orEmpty()
             val passwordMap = passwordIdSet.associate { id ->
                 val path = "Password.$id"
 
                 val password = Password(
                         id,
-                        config.getString("$path.default", ""),
+                        config.getString("$path.default").orEmpty(),
                         if (config.isString("$path.Block.material"))
-                            Material.matchMaterial(config.getString("$path.Block.material"))
+                            Material.matchMaterial(config.getString("$path.Block.material").orEmpty())
                         else
                             null,
                         if (config.isConfigurationSection("$path.Block.Location"))
                             Location(
-                                    Bukkit.getWorld(config.getString("$path.Block.Location.world")),
+                                    Bukkit.getWorld(config.getString("$path.Block.Location.world").orEmpty()),
                                     config.getDouble("$path.Block.Location.x"),
                                     config.getDouble("$path.Block.Location.y"),
                                     config.getDouble("$path.Block.Location.z")
@@ -66,7 +66,7 @@ class PasswordConfigProvider(dataFolder: File) : BaseConfigProvider(dataFolder, 
 
             if (password.blockLocation != null) {
                 val loc = password.blockLocation
-                put("$path.Block.Location.world", loc.world.name)
+                put("$path.Block.Location.world", loc.world?.name)
                 put("$path.Block.Location.x", loc.blockX)
                 put("$path.Block.Location.y", loc.blockY)
                 put("$path.Block.Location.z", loc.blockZ)

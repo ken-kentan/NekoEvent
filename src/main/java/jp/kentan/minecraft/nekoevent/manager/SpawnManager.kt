@@ -8,6 +8,7 @@ import org.bukkit.ChatColor
 import org.bukkit.Location
 import org.bukkit.Sound
 import org.bukkit.block.Sign
+import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.SignChangeEvent
@@ -27,11 +28,11 @@ class SpawnManager(
         private const val LOCATION_Z_METADATA_KEY = "setspawnZ"
     }
 
-    fun setSpawn(strPlayer: String, strLocation: List<String>) {
-        val player = strPlayer.toPlayerOrError() ?: return
+    fun setSpawn(sender: CommandSender, selector: String, strLocation: List<String>) {
+        val players = selector.toPlayersOrError(sender)
         val location = strLocation.toLocationOrError() ?: return
 
-        setSpawn(player, location)
+        players.forEach { setSpawn(it, location) }
     }
 
     fun setSpawn(player: Player, location: Location, isSendMessage: Boolean = true) {
@@ -48,7 +49,7 @@ class SpawnManager(
     fun removeBedSpawnIfNeed(player: Player) {
         val spawn = player.bedSpawnLocation ?: return
 
-        if (spawn.world.name != NekoEvent.WORLD_NAME) {
+        if (spawn.world?.name != NekoEvent.WORLD_NAME) {
             return
         }
 
@@ -65,7 +66,7 @@ class SpawnManager(
      */
     override fun onSignChanged(event: SignChangeEvent) {
         val player = event.player
-        val location = event.getLine(1).split(" ").let {
+        val location = event.getLine(1).orEmpty().split(" ").let {
             if (it.size < 3) {
                 Log.error("座標パラメータが不足しています.")
                 return

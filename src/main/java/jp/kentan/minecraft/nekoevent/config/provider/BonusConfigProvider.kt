@@ -27,7 +27,7 @@ class BonusConfigProvider(
                 return
             }
 
-            val bonusIdSet = config.getConfigurationSection("Bonus").getKeys(false)
+            val bonusIdSet = config.getConfigurationSection("Bonus")?.getKeys(false).orEmpty()
             val bonusMap = bonusIdSet.associate { id ->
                 val path = "Bonus.$id"
 
@@ -38,7 +38,7 @@ class BonusConfigProvider(
                         id,
                         startDate,
                         endDate,
-                        config.getString("$path.command", ""),
+                        config.getString("$path.command").orEmpty(),
                         config.getString("$path.message")?.formatColorCode()
                 )
 

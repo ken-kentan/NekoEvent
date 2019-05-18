@@ -54,9 +54,9 @@ class TicketFactory {
                 setAmount(amount)
             }
 
-            val meta = itemStack.itemMeta.apply {
+            val meta = itemStack.itemMeta?.apply {
                 val lore = ArrayList<String>()
-                lore.addAll(getLore())
+                lore.addAll(getLore().orEmpty())
                 lore[0] = LORE_CONTENT + player.name
                 setLore(lore)
             }

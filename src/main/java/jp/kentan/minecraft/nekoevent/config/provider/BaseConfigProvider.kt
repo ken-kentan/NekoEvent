@@ -6,18 +6,21 @@ import java.io.File
 
 abstract class BaseConfigProvider(dataFolder: File, fileName: String? = null) {
 
-    protected val configFile: File? = if (fileName != null) {
+    private val _configFile: File? = if (fileName != null) {
         File("$dataFolder${File.separator}$fileName")
     } else {
         null
     }
+
+    protected val configFile: File
+        get() = _configFile ?: throw NullPointerException("_configFile is null")
 
     init {
         createIfNeed()
     }
 
     private fun createIfNeed() {
-        configFile?.let { file ->
+        configFile.let { file ->
             if (file.exists()) { return }
 
             try {

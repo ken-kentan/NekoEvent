@@ -4,7 +4,10 @@ import jp.kentan.minecraft.nekoevent.NekoEvent
 import jp.kentan.minecraft.nekoevent.config.provider.SignConfigProvider
 import jp.kentan.minecraft.nekoevent.listener.SignListener
 import jp.kentan.minecraft.nekoevent.util.*
-import org.bukkit.*
+import org.bukkit.ChatColor
+import org.bukkit.Location
+import org.bukkit.Particle
+import org.bukkit.Sound
 import org.bukkit.block.Sign
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
@@ -38,7 +41,7 @@ class ReviveManager(
         player.teleport(location)
         player.playSound(location, Sound.ENTITY_PLAYER_LEVELUP, 2.0f, 1.0f)
 
-        location.world.spawnParticle(Particle.VILLAGER_HAPPY, location, 100, 0.6, 0.6, 0.6)
+        player.world.spawnParticle(Particle.VILLAGER_HAPPY, location, 100, 0.6, 0.6, 0.6)
     }
 
     /**
@@ -51,7 +54,7 @@ class ReviveManager(
     override fun onSignChanged(event: SignChangeEvent) {
         val player = event.player
 
-        val location = event.getLine(1).split(" ").let {
+        val location = event.getLine(1).orEmpty().split(" ").let {
             if (it.size < 3) {
                 Log.error("座標パラメータが不足しています.")
                 return
@@ -65,7 +68,7 @@ class ReviveManager(
             )
         }
 
-        val exp = event.getLine(2).toIntOrNull() ?: let {
+        val exp = event.getLine(2).orEmpty().toIntOrNull() ?: let {
             Log.error("経験値コストが不足しています..")
             return
         }
