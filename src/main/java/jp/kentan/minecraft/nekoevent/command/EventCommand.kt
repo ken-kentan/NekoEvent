@@ -190,10 +190,11 @@ class EventCommand(
     }
 
     private fun eventMessage(sender: CommandSender, selector: String, speaker: String, messages: List<String>) {
-        val message = messages.joinToString(separator = " ")
+        val message = " ${if (speaker != "null") "$speaker§a: "  else ""}§r${messages.joinToString(separator = " ")}"
+                .formatColorCode()
 
         selector.toPlayersOrError(sender).forEach {
-            it.sendMessage(" ${if (speaker != "null") "$sender${ChatColor.GREEN}: "  else ""}${ChatColor.RESET}$message".formatColorCode())
+            it.sendMessage(message)
         }
     }
 
