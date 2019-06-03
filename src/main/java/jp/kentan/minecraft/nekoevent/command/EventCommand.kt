@@ -17,6 +17,8 @@ import org.bukkit.entity.Player
 import org.bukkit.entity.SmallFireball
 import org.bukkit.plugin.Plugin
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.math.max
+import kotlin.math.min
 
 class EventCommand(
         private val plugin: Plugin,
@@ -209,6 +211,12 @@ class EventCommand(
 
             direction.multiply(length)
             direction.y = height
+
+            // limit for (0054-Add-velocity-warnings.patch)
+            direction.x = max(-3.9, min(3.9, direction.x))
+            direction.y = max(-3.9, min(3.9, direction.y))
+            direction.z = max(-3.9, min(3.9, direction.z))
+
 
             location.world?.playEffect(location, Effect.SMOKE, 4)
 
