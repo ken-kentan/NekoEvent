@@ -53,7 +53,7 @@ class BukkitEventListener(
         signChangedListenerMap[event.getLine(0)]?.onSignChanged(event)
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
     fun onPlayerInteract(event: PlayerInteractEvent) {
         val blockState = event.clickedBlock?.state
 
@@ -61,7 +61,7 @@ class BukkitEventListener(
             signInteractListenerMap[blockState.getLine(0)]?.onPlayerInteract(event, blockState)
         }
 
-        if (event.player.isInEventWorld() && (blockState?.type == Material.ANVIL || blockState?.type == Material.ENCHANTING_TABLE)) {
+        if (event.player.isInEventWorld() && (blockState?.type == Material.ANVIL || blockState?.type == Material.ENCHANTING_TABLE || event.player.isCustomRiptiding())) {
             event.isCancelled = true
         }
     }
@@ -118,5 +118,9 @@ class BukkitEventListener(
                 inventory.setItem(i, null)
             }
         }
+    }
+
+    private fun Player.isCustomRiptiding() = with(inventory.itemInMainHand) {
+        type == Material.TRIDENT && enchantments.containsKey(Enchantment.RIPTIDE)
     }
 }
