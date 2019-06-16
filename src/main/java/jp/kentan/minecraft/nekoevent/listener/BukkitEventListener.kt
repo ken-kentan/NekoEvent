@@ -19,6 +19,7 @@ import org.bukkit.event.player.PlayerChangedWorldEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerTeleportEvent
+import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.Plugin
 
 class BukkitEventListener(
@@ -120,7 +121,11 @@ class BukkitEventListener(
         }
     }
 
-    private fun Player.isCustomRiptiding() = with(inventory.itemInMainHand) {
-        type == Material.TRIDENT && enchantments.containsKey(Enchantment.RIPTIDE)
+    private fun Player.isCustomRiptiding() = with (inventory) {
+        itemInMainHand.isRiptide || itemInOffHand.isRiptide
     }
+
+    private val ItemStack.isRiptide: Boolean
+        get() = type == Material.TRIDENT && enchantments.containsKey(Enchantment.RIPTIDE)
+
 }
