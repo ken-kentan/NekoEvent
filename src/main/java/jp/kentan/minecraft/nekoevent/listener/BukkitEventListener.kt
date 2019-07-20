@@ -13,6 +13,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
+import org.bukkit.event.block.Action
 import org.bukkit.event.block.SignChangeEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerChangedWorldEvent
@@ -62,7 +63,7 @@ class BukkitEventListener(
             signInteractListenerMap[blockState.getLine(0)]?.onPlayerInteract(event, blockState)
         }
 
-        if (event.player.isInEventWorld() && (blockState?.type == Material.ANVIL || blockState?.type == Material.ENCHANTING_TABLE || event.player.isCustomRiptiding())) {
+        if (event.player.isInEventWorld() && (blockState?.type == Material.ANVIL || blockState?.type == Material.ENCHANTING_TABLE || (event.action != Action.PHYSICAL && event.player.isCustomRiptiding()))) {
             event.isCancelled = true
         }
     }
@@ -107,7 +108,7 @@ class BukkitEventListener(
 
     private fun Player.isInEventWorld() = (gameMode == GameMode.ADVENTURE) && world.isEventWorld()
 
-    private fun World?.isEventWorld() = this?.name == NekoEvent.WORLD_NAME
+    private fun World?.isEventWorld() = this?.name == NekoEvent.WORLD_NAME || this?.name == "sandbox_world"
 
     private fun Player.removeVanishingItems() {
         val inventory = this.inventory
