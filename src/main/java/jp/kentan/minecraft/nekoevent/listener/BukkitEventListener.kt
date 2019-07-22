@@ -21,7 +21,9 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.PotionMeta
 import org.bukkit.plugin.Plugin
+import org.bukkit.potion.PotionType
 
 class BukkitEventListener(
         private val plugin: Plugin,
@@ -63,7 +65,15 @@ class BukkitEventListener(
             signInteractListenerMap[blockState.getLine(0)]?.onPlayerInteract(event, blockState)
         }
 
-        if (event.player.isInEventWorld() && (blockState?.type == Material.ANVIL || blockState?.type == Material.ENCHANTING_TABLE || (event.action != Action.PHYSICAL && event.player.isCustomRiptiding()))) {
+        if (!event.player.isInEventWorld()) {
+            return
+        }
+
+        if (blockState?.type == Material.ANVIL
+                || blockState?.type == Material.ENCHANTING_TABLE
+                || event.item.isSlowFallingPotion
+                || (event.action != Action.PHYSICAL && event.player.isCustomRiptiding())) {
+
             event.isCancelled = true
         }
     }
@@ -128,5 +138,11 @@ class BukkitEventListener(
 
     private val ItemStack.isRiptide: Boolean
         get() = type == Material.TRIDENT && enchantments.containsKey(Enchantment.RIPTIDE)
+
+    private val ItemStack?.isSlowFallingPotion: Boolean
+        get() {
+            val meta = this?.itemMeta as? PotionMeta ?: return false
+            return meta.basePotionData.type == PotionType.SLOW_FALLING
+        }
 
 }
