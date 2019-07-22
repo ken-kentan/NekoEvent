@@ -3,6 +3,7 @@ package jp.kentan.minecraft.nekoevent.listener
 import jp.kentan.minecraft.nekoevent.NekoEvent
 import jp.kentan.minecraft.nekoevent.manager.SpawnManager
 import jp.kentan.minecraft.nekoevent.util.resetHealthStatus
+import jp.kentan.minecraft.nekoevent.util.resetStatus
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Material
@@ -99,8 +100,12 @@ class BukkitEventListener(
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onPlayerChangeWorld(event: PlayerChangedWorldEvent) {
-        if (event.from.isEventWorld()) {
-            event.player.resetHealthStatus()
+        with(event.player) {
+            if (event.from.isEventWorld()) {
+                resetHealthStatus()
+            } else if (isInEventWorld()) {
+                resetStatus()
+            }
         }
     }
 
