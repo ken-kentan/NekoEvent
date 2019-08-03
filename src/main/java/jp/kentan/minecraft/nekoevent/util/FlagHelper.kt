@@ -42,7 +42,7 @@ fun List<String>.flagItemStack(player: Player): ItemStack {
         throw InvalidFlagException("登録するアイテムを持って下さい.")
     }
 
-    return itemStack
+    return ItemStack.deserialize(itemStack.serialize())
 }
 
 @Throws(InvalidFlagException::class)

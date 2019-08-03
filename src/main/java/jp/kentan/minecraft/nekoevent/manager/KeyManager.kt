@@ -13,6 +13,7 @@ import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 
 class KeyManager(
         private val keyConfig: KeyConfigProvider
@@ -109,7 +110,7 @@ class KeyManager(
             return
         }
 
-        val key = Key(keyId, itemStack)
+        val key = Key(keyId, ItemStack.deserialize(itemStack.serialize()))
         if (keyConfig.update(key)) {
             keyMap[keyId] = key
             player.sendMessage(NekoEvent.PREFIX + key.name + ChatColor.GREEN + "を登録しました.")
