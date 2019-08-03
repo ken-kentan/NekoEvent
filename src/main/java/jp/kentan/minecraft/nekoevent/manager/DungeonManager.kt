@@ -54,11 +54,12 @@ class DungeonManager(
 
     fun getDungeonIdList() = dungeonMap.values.map { it.id }.sorted()
 
-    fun join(strPlayer: String, dungeonId: String) {
-        val player = strPlayer.toPlayerOrError() ?: return
+    fun join(sender: CommandSender, selector: String, dungeonId: String) {
         val dungeon = dungeonMap.getOrError(dungeonId) ?: return
 
-        join(player, dungeon)
+        selector.toPlayersOrError(sender).forEach { player ->
+            join(player, dungeon)
+        }
     }
 
     private fun join(player: Player, dungeon: Dungeon) {

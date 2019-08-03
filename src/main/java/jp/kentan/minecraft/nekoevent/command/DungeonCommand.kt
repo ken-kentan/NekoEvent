@@ -42,7 +42,7 @@ class DungeonCommand(
 
         when (args[0]) {
             "join" -> sender.doIfArguments(args, 2) {
-                manager.join(args[1], args[2])
+                manager.join(sender, args[1], args[2])
             }
             "clear" -> sender.doIfArguments(args, 2) {
                 manager.clear(sender, args[1], args[2])
