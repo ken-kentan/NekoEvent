@@ -13,8 +13,6 @@ import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.ExperienceOrb
-import org.bukkit.entity.Player
-import org.bukkit.entity.SmallFireball
 import org.bukkit.plugin.Plugin
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.max
@@ -89,7 +87,7 @@ class EventCommand(
             }
             "randomtp" -> sender.doIfArguments(args, 6) {
                 if (it is BlockCommandSender) {
-                    eventRandomTp(args[1], it, args.drop(2))
+                    eventRandomTp(it, args[1], args.drop(2))
                 } else {
                     it.sendCommandBlockCommand()
                 }
@@ -121,14 +119,14 @@ class EventCommand(
             "reload" -> config.reload()
             "debug" -> {
                 if (sender.isOp) {
-                    val p = sender as Player
-                    val loc = Location(p.world, 0.0, 0.0, 0.0)
+                    val target = args.getOrNull(1) ?: return false
 
-                    val list = loc.chunk.entities.filter { it is SmallFireball }
-                    Log.info("Find: ${list.size}")
-                    Log.info("Removing...")
-                    list.forEach { it.remove() }
-                    Log.info("Done.")
+                    val banList = Bukkit.getBanList(BanList.Type.NAME)
+                    sender.sendMessage("$target: ${banList.isBanned(target)}")
+
+                    Bukkit.getBanList(BanList.Type.NAME).pardon(target)
+
+                    sender.sendMessage("$target: ${banList.isBanned(target)}")
                 }
             }
             else -> sender.sendUnknownCommand()
@@ -245,15 +243,17 @@ class EventCommand(
         scheduler.scheduleSyncDelayedTask(plugin, { location.block.type = Material.AIR }, 10L)
     }
 
-    private fun eventRandomTp(strPlayer: String, sender: BlockCommandSender, strLocationList: List<String>) {
+    private fun eventRandomTp(sender: BlockCommandSender, selector: String, strLocationList: List<String>) {
+        val players = selector.toPlayersOrError(sender)
         val pivot = RANDOM.nextInt(strLocationList.size / 3) * 3
         val location = strLocationList.slice(pivot..pivot+2).toLocationOrError(sender.block.location) ?: return
 
-        val player = strPlayer.toPlayerOrError() ?: return
-        location.yaw = player.location.yaw
-        location.pitch = player.location.pitch
+        players.forEach { player ->
+            location.yaw = player.location.yaw
+            location.pitch = player.location.pitch
 
-        player.teleport(location)
+            player.teleport(location)
+        }
     }
 
     private fun eventDelay(sender: BlockCommandSender, strSeconds: String, strLocationList: List<String>) {
