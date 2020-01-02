@@ -1,6 +1,7 @@
 package jp.kentan.minecraft.nekoevent.component.model
 
 import jp.kentan.minecraft.nekoevent.component.KeyResult
+import jp.kentan.minecraft.nekoevent.util.Log
 import jp.kentan.minecraft.nekoevent.util.formatColorCode
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -109,11 +110,13 @@ data class Key(
 
     private fun isExpired(strPeriod: String): Boolean {
         try {
-            val period = ZonedDateTime.parse(strPeriod, DATE_FORMAT)
+            val period = ZonedDateTime.parse(strPeriod.substring(10), DATE_FORMAT)
             return period < ZonedDateTime.now()
-        } catch (e: Exception) {}
+        } catch (e: Exception) {
+            Log.error(e)
+        }
 
-        return false
+        return true
     }
 
     private fun String?.format() = this?.replace("{name}", name)?.formatColorCode()
